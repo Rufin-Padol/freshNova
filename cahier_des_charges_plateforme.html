@@ -1,0 +1,1701 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cahier des Charges — Plateforme de Revente Seconde Main</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;600;700&display=swap');
+
+  :root {
+    --blue-50: #EFF6FF;
+    --blue-100: #DBEAFE;
+    --blue-200: #BFDBFE;
+    --blue-400: #60A5FA;
+    --blue-600: #2563EB;
+    --blue-700: #1D4ED8;
+    --blue-800: #1E40AF;
+    --blue-900: #1E3A8A;
+
+    --teal-50: #F0FDFA;
+    --teal-100: #CCFBF1;
+    --teal-500: #14B8A6;
+    --teal-600: #0D9488;
+    --teal-700: #0F766E;
+
+    --amber-50: #FFFBEB;
+    --amber-100: #FEF3C7;
+    --amber-500: #F59E0B;
+    --amber-600: #D97706;
+    --amber-700: #B45309;
+
+    --red-50: #FFF1F2;
+    --red-100: #FFE4E6;
+    --red-500: #EF4444;
+    --red-600: #DC2626;
+
+    --green-50: #F0FDF4;
+    --green-100: #DCFCE7;
+    --green-500: #22C55E;
+    --green-600: #16A34A;
+
+    --gray-50: #F8FAFC;
+    --gray-100: #F1F5F9;
+    --gray-200: #E2E8F0;
+    --gray-300: #CBD5E1;
+    --gray-400: #94A3B8;
+    --gray-500: #64748B;
+    --gray-600: #475569;
+    --gray-700: #334155;
+    --gray-800: #1E293B;
+    --gray-900: #0F172A;
+
+    --accent: #2563EB;
+    --accent-light: #EFF6FF;
+    --bg: #FFFFFF;
+    --bg-page: #F8FAFC;
+    --text: #0F172A;
+    --text-muted: #64748B;
+    --border: #E2E8F0;
+    --radius: 12px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.04);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-page);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* ── COVER PAGE ── */
+  .cover {
+    background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 50%, #1D4ED8 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    background: rgba(37,99,235,0.18);
+  }
+
+  .cover::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: -60px;
+    width: 350px; height: 350px;
+    border-radius: 50%;
+    background: rgba(20,184,166,0.12);
+  }
+
+  .cover-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 50px;
+    padding: 6px 18px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.8);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cover-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: #14B8A6;
+    border-radius: 50%;
+  }
+
+  .cover h1 {
+    font-family: 'Sora', sans-serif;
+    font-size: clamp(36px, 5vw, 64px);
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.15;
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cover h1 span {
+    background: linear-gradient(90deg, #60A5FA, #14B8A6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .cover-sub {
+    font-size: 18px;
+    color: rgba(255,255,255,0.65);
+    max-width: 560px;
+    margin: 0 auto 48px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cover-stats {
+    display: flex;
+    gap: 48px;
+    justify-content: center;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 60px;
+  }
+
+  .cover-stat { text-align: center; }
+  .cover-stat .num { font-family: 'Sora', sans-serif; font-size: 32px; font-weight: 700; color: #fff; }
+  .cover-stat .lbl { font-size: 12px; color: rgba(255,255,255,0.5); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; }
+
+  .cover-meta {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    padding-top: 32px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    width: 100%;
+    max-width: 600px;
+  }
+
+  .cover-meta span { font-size: 13px; color: rgba(255,255,255,0.5); }
+  .cover-meta strong { color: rgba(255,255,255,0.9); }
+
+  /* ── LAYOUT ── */
+  .doc {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  /* ── TABLE OF CONTENTS ── */
+  .toc {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 36px 40px;
+    margin: 48px 0;
+  }
+
+  .toc h2 { font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 600; margin-bottom: 24px; color: var(--gray-800); }
+
+  .toc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 40px;
+  }
+
+  .toc-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--gray-100);
+    text-decoration: none;
+    color: var(--gray-700);
+    font-size: 14px;
+    transition: color 0.15s;
+  }
+
+  .toc-item:hover { color: var(--accent); }
+  .toc-item .toc-num { font-weight: 600; color: var(--accent); min-width: 28px; font-size: 12px; }
+
+  /* ── SECTION ── */
+  .section {
+    margin-top: 64px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--blue-100);
+  }
+
+  .section-num {
+    background: var(--accent);
+    color: #fff;
+    font-family: 'Sora', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .section-header h2 {
+    font-family: 'Sora', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--gray-900);
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+
+  .card h3 {
+    font-family: 'Sora', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--gray-800);
+  }
+
+  .card p { color: var(--gray-600); font-size: 14px; line-height: 1.7; }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+  }
+
+  .card-accent-blue { border-left: 4px solid var(--blue-600); }
+  .card-accent-teal { border-left: 4px solid var(--teal-600); }
+  .card-accent-amber { border-left: 4px solid var(--amber-600); }
+  .card-accent-red { border-left: 4px solid var(--red-600); }
+  .card-accent-green { border-left: 4px solid var(--green-600); }
+
+  /* ── PROCESS FLOW ── */
+  .process-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+    margin: 24px 0;
+  }
+
+  .process-step {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    position: relative;
+  }
+
+  .process-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 19px;
+    top: 48px;
+    width: 2px;
+    height: calc(100% - 24px);
+    background: var(--blue-200);
+  }
+
+  .step-icon {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--blue-600);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .step-body {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    flex: 1;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+
+  .step-body h4 { font-weight: 600; font-size: 15px; color: var(--gray-800); margin-bottom: 6px; }
+  .step-body p { font-size: 13px; color: var(--gray-500); line-height: 1.6; }
+
+  .step-icon.teal { background: var(--teal-600); }
+  .step-icon.amber { background: var(--amber-600); }
+  .step-icon.green { background: var(--green-600); }
+  .step-icon.red { background: var(--red-600); }
+
+  /* ── ROLES TABLE ── */
+  .role-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+  }
+
+  .role-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    text-align: center;
+    box-shadow: var(--shadow);
+  }
+
+  .role-icon {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    margin: 0 auto 12px;
+  }
+
+  .role-icon.blue { background: var(--blue-50); }
+  .role-icon.teal { background: var(--teal-50); }
+  .role-icon.amber { background: var(--amber-50); }
+  .role-icon.red { background: var(--red-50); }
+  .role-icon.green { background: var(--green-50); }
+
+  .role-card h4 { font-weight: 600; font-size: 14px; color: var(--gray-800); margin-bottom: 8px; }
+  .role-card ul { list-style: none; text-align: left; }
+  .role-card ul li {
+    font-size: 12px;
+    color: var(--gray-500);
+    padding: 3px 0;
+    border-bottom: 1px solid var(--gray-100);
+    display: flex; align-items: flex-start; gap: 6px;
+  }
+  .role-card ul li::before { content: '→'; color: var(--accent); flex-shrink: 0; }
+
+  /* ── FEATURES LIST ── */
+  .feature-section { margin-bottom: 32px; }
+  .feature-section h3 {
+    font-family: 'Sora', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .feature-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .feature-badge.acheteur { background: var(--blue-50); color: var(--blue-700); }
+  .feature-badge.vendeur { background: var(--teal-50); color: var(--teal-700); }
+  .feature-badge.agent { background: var(--amber-50); color: var(--amber-700); }
+  .feature-badge.admin { background: var(--red-50); color: var(--red-600); }
+  .feature-badge.super { background: var(--gray-100); color: var(--gray-700); }
+
+  .feature-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 8px;
+  }
+
+  .feature-item {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 13px;
+    color: var(--gray-700);
+  }
+
+  .feature-item .fi-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+
+  .fi-dot.blue { background: var(--blue-600); }
+  .fi-dot.teal { background: var(--teal-600); }
+  .fi-dot.amber { background: var(--amber-600); }
+  .fi-dot.red { background: var(--red-600); }
+  .fi-dot.gray { background: var(--gray-400); }
+
+  /* ── FAILLE CARDS ── */
+  .faille-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+
+  .faille-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    background: var(--red-50);
+    border-bottom: 1px solid var(--red-100);
+  }
+
+  .faille-header h4 { font-weight: 600; font-size: 14px; color: var(--red-600); }
+
+  .faille-body { padding: 16px 20px; }
+  .faille-risk { font-size: 13px; color: var(--gray-600); margin-bottom: 12px; }
+
+  .solution-block {
+    background: var(--green-50);
+    border: 1px solid var(--green-100);
+    border-radius: 8px;
+    padding: 12px 16px;
+  }
+
+  .solution-block p { font-size: 13px; color: var(--green-600); }
+  .solution-block strong { color: var(--green-700); }
+
+  /* ── STATES TABLE ── */
+  .states-flow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    align-items: center;
+    margin: 20px 0;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    overflow-x: auto;
+  }
+
+  .state-pill {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 4px;
+  }
+
+  .state-pill .pill {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .state-pill .pill-sub { font-size: 10px; color: var(--gray-400); }
+
+  .state-arrow { font-size: 16px; color: var(--gray-300); padding: 0 6px; align-self: center; margin-bottom: 16px; }
+
+  .pill-orange { background: var(--amber-100); color: var(--amber-700); }
+  .pill-blue { background: var(--blue-100); color: var(--blue-700); }
+  .pill-teal { background: var(--teal-100); color: var(--teal-700); }
+  .pill-purple { background: #EDE9FE; color: #5B21B6; }
+  .pill-green { background: var(--green-100); color: var(--green-700); }
+  .pill-red { background: var(--red-100); color: var(--red-600); }
+  .pill-gray { background: var(--gray-100); color: var(--gray-600); }
+
+  /* ── MARCHE ── */
+  .marche-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 20px 0;
+  }
+
+  .concur-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+  }
+
+  .concur-card h4 { font-size: 14px; font-weight: 600; color: var(--gray-800); margin-bottom: 12px; }
+
+  .avantage-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--gray-100);
+    font-size: 12px;
+  }
+
+  .avantage-row:last-child { border-bottom: none; }
+
+  .badge-oui { background: var(--green-100); color: var(--green-700); border-radius: 4px; padding: 2px 8px; font-size: 11px; }
+  .badge-non { background: var(--red-100); color: var(--red-600); border-radius: 4px; padding: 2px 8px; font-size: 11px; }
+  .badge-partiel { background: var(--amber-100); color: var(--amber-700); border-radius: 4px; padding: 2px 8px; font-size: 11px; }
+
+  /* ── COMMISSION TABLE ── */
+  .comm-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg);
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    font-size: 13px;
+  }
+
+  .comm-table th {
+    background: var(--gray-800);
+    color: #fff;
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 500;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .comm-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--gray-100);
+    color: var(--gray-700);
+  }
+
+  .comm-table tr:last-child td { border-bottom: none; }
+  .comm-table tr:hover td { background: var(--gray-50); }
+  .comm-pct { font-weight: 600; color: var(--blue-700); }
+
+  /* ── STRATEGIE ── */
+  .strat-timeline {
+    position: relative;
+    padding-left: 32px;
+    margin: 24px 0;
+  }
+
+  .strat-timeline::before {
+    content: '';
+    position: absolute;
+    left: 10px; top: 0; bottom: 0;
+    width: 2px;
+    background: var(--blue-200);
+  }
+
+  .strat-item {
+    position: relative;
+    margin-bottom: 24px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    box-shadow: var(--shadow);
+  }
+
+  .strat-item::before {
+    content: '';
+    position: absolute;
+    left: -26px; top: 20px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px var(--blue-200);
+  }
+
+  .strat-item .phase-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    background: var(--blue-50);
+    color: var(--blue-700);
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .strat-item h4 { font-weight: 600; font-size: 15px; color: var(--gray-800); margin-bottom: 8px; }
+  .strat-item ul { list-style: none; padding: 0; }
+  .strat-item ul li { font-size: 13px; color: var(--gray-600); padding: 3px 0; display: flex; gap: 8px; align-items: flex-start; }
+  .strat-item ul li::before { content: '✓'; color: var(--green-600); font-size: 12px; margin-top: 2px; }
+
+  /* ── ARCHITECTURE ── */
+  .arch-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin: 20px 0;
+  }
+
+  .arch-block {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    text-align: center;
+    box-shadow: var(--shadow);
+  }
+
+  .arch-block .arch-icon {
+    font-size: 28px;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .arch-block h4 { font-size: 13px; font-weight: 600; color: var(--gray-800); margin-bottom: 6px; }
+  .arch-block p { font-size: 11px; color: var(--gray-500); line-height: 1.5; }
+
+  /* ── CHART WRAPPER ── */
+  .chart-wrap {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+    margin: 20px 0;
+  }
+
+  .chart-wrap h4 { font-size: 14px; font-weight: 600; color: var(--gray-700); margin-bottom: 20px; }
+
+  /* ── CALLOUT ── */
+  .callout {
+    display: flex;
+    gap: 14px;
+    padding: 16px 20px;
+    border-radius: var(--radius);
+    margin: 20px 0;
+    align-items: flex-start;
+  }
+
+  .callout.info { background: var(--blue-50); border: 1px solid var(--blue-200); }
+  .callout.warning { background: var(--amber-50); border: 1px solid var(--amber-100); }
+  .callout.success { background: var(--green-50); border: 1px solid var(--green-100); }
+  .callout.danger { background: var(--red-50); border: 1px solid var(--red-100); }
+
+  .callout-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .callout p { font-size: 14px; line-height: 1.6; }
+  .callout.info p { color: var(--blue-800); }
+  .callout.warning p { color: var(--amber-700); }
+  .callout.success p { color: var(--green-700); }
+  .callout.danger p { color: var(--red-600); }
+
+  /* ── FOOTER ── */
+  .doc-footer {
+    text-align: center;
+    margin-top: 80px;
+    padding: 40px 0;
+    border-top: 1px solid var(--border);
+    color: var(--gray-400);
+    font-size: 13px;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 680px) {
+    .cover h1 { font-size: 28px; }
+    .cover-stats { gap: 24px; }
+    .toc-grid { grid-template-columns: 1fr; }
+    .marche-grid { grid-template-columns: 1fr; }
+    .doc { padding: 0 16px 60px; }
+  }
+
+  /* ── PRINT ── */
+  @media print {
+    .cover { min-height: auto; page-break-after: always; }
+    .section { page-break-inside: avoid; }
+  }
+
+  p { margin-bottom: 12px; }
+  p:last-child { margin-bottom: 0; }
+
+  .intro-text {
+    font-size: 15px;
+    color: var(--gray-600);
+    background: var(--gray-50);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    border-left: 4px solid var(--accent);
+    margin-bottom: 24px;
+    line-height: 1.8;
+  }
+
+  strong { font-weight: 600; color: var(--gray-800); }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     PAGE DE COUVERTURE
+═══════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-badge">Document confidentiel · Version 1.0</div>
+  <h1>Plateforme de Revente<br><span>Seconde Main</span></h1>
+  <p class="cover-sub">Cahier des Charges Stratégique & Fonctionnel Complet — Marché Camerounais</p>
+
+  <div class="cover-stats">
+    <div class="cover-stat">
+      <div class="num">5</div>
+      <div class="lbl">Rôles distincts</div>
+    </div>
+    <div class="cover-stat">
+      <div class="num">40+</div>
+      <div class="lbl">Fonctionnalités</div>
+    </div>
+    <div class="cover-stat">
+      <div class="num">7</div>
+      <div class="lbl">États produit</div>
+    </div>
+    <div class="cover-stat">
+      <div class="num">3</div>
+      <div class="lbl">Phases de lancement</div>
+    </div>
+  </div>
+
+  <div class="cover-meta">
+    <span><strong>Technologies</strong> Spring Boot · Flutter</span>
+    <span><strong>Marché cible</strong> Cameroun, expansion régionale</span>
+    <span><strong>Modèle</strong> Marketplace B2C intermédiaire</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     DOCUMENT PRINCIPAL
+═══════════════════════════════════════════════ -->
+<div class="doc">
+
+  <!-- TABLE DES MATIÈRES -->
+  <div class="toc">
+    <h2>Table des matières</h2>
+    <div class="toc-grid">
+      <a href="#vision" class="toc-item"><span class="toc-num">01</span> Vision & Problème résolu</a>
+      <a href="#modele" class="toc-item"><span class="toc-num">02</span> Modèle économique</a>
+      <a href="#roles" class="toc-item"><span class="toc-num">03</span> Acteurs & Rôles</a>
+      <a href="#processus" class="toc-item"><span class="toc-num">04</span> Processus métier complet</a>
+      <a href="#etats" class="toc-item"><span class="toc-num">05</span> États du produit</a>
+      <a href="#fonctionnalites" class="toc-item"><span class="toc-num">06</span> Fonctionnalités détaillées</a>
+      <a href="#architecture" class="toc-item"><span class="toc-num">07</span> Architecture technique</a>
+      <a href="#marche" class="toc-item"><span class="toc-num">08</span> Étude de marché</a>
+      <a href="#failles" class="toc-item"><span class="toc-num">09</span> Failles & Solutions</a>
+      <a href="#strategie" class="toc-item"><span class="toc-num">10</span> Stratégie de lancement</a>
+      <a href="#analytique" class="toc-item"><span class="toc-num">11</span> Analytique & Données</a>
+      <a href="#impact" class="toc-item"><span class="toc-num">12</span> Impact & Valeur créée</a>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────
+       01 — VISION
+  ───────────────────────────────────────── -->
+  <div class="section" id="vision">
+    <div class="section-header">
+      <div class="section-num">01</div>
+      <h2>Vision & Problème résolu</h2>
+    </div>
+
+    <div class="intro-text">
+      Au Cameroun, des milliers de ménages possèdent des appareils électroménagers, téléphones, meubles, et équipements en bon état qu'ils ne savent pas comment vendre. Les plateformes existantes exigent que le vendeur soit lui-même compétent en ligne, qu'il gère les arnaques, et qu'il négocie directement avec des inconnus. Cette plateforme résout ce problème de bout en bout.
+    </div>
+
+    <div class="card-grid">
+      <div class="card card-accent-red">
+        <h3>🔴 Le problème réel</h3>
+        <p>Un vendeur au Cameroun qui veut revendre un produit d'occasion fait face à : risque d'arnaque, difficulté à fixer un prix juste, manque de visibilité, transactions non sécurisées, et aucun intermédiaire de confiance.</p>
+      </div>
+      <div class="card card-accent-blue">
+        <h3>🔵 Notre réponse</h3>
+        <p>Une boutique en ligne où <strong>nous sommes l'intermédiaire total</strong>. Nous allons physiquement chez le vendeur, vérifions le produit, le photographions, le publions et gérons toute la transaction. Vendeur et acheteur ne se connaissent jamais.</p>
+      </div>
+      <div class="card card-accent-green">
+        <h3>🟢 La valeur créée</h3>
+        <p>Confiance absolue pour l'acheteur (produit vérifié, défauts déclarés). Simplicité totale pour le vendeur (juste soumettre une demande). Revenus durables pour l'entreprise via commission sur chaque vente.</p>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <span class="callout-icon">💡</span>
+      <p><strong>Principe central d'anonymat :</strong> La plateforme est l'unique interface entre vendeur et acheteur. Ils ne communiquent jamais directement. Toute transaction, livraison et paiement passe par nous. Ceci protège notre modèle commercial et crée une couche de confiance irremplaçable.</p>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────
+       02 — MODÈLE ÉCONOMIQUE
+  ───────────────────────────────────────── -->
+  <div class="section" id="modele">
+    <div class="section-header">
+      <div class="section-num">02</div>
+      <h2>Modèle économique</h2>
+    </div>
+
+    <p style="color:var(--gray-600); margin-bottom:20px;">Le modèle repose sur deux sources de revenus principales : les <strong>commissions sur ventes</strong> et les <strong>frais de livraison</strong>. Le vendeur fixe lui-même son prix. Nous prélevons notre commission et reversons le reste.</p>
+
+    <table class="comm-table">
+      <thead>
+        <tr>
+          <th>Catégorie de produit</th>
+          <th>Exemples</th>
+          <th>Commission proposée</th>
+          <th>Remarque</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Électronique & Téléphonie</strong></td>
+          <td>Smartphones, laptops, tablettes</td>
+          <td><span class="comm-pct">8 – 12 %</span></td>
+          <td>Forte valeur, rotation rapide</td>
+        </tr>
+        <tr>
+          <td><strong>Électroménager</strong></td>
+          <td>Réfrigérateurs, climatiseurs, TV</td>
+          <td><span class="comm-pct">10 – 15 %</span></td>
+          <td>Logistique lourde incluse</td>
+        </tr>
+        <tr>
+          <td><strong>Meubles & Décoration</strong></td>
+          <td>Canapés, lits, armoires</td>
+          <td><span class="comm-pct">12 – 18 %</span></td>
+          <td>Livraison complexe</td>
+        </tr>
+        <tr>
+          <td><strong>Vêtements & Accessoires</strong></td>
+          <td>Habits, chaussures, sacs</td>
+          <td><span class="comm-pct">15 – 25 %</span></td>
+          <td>Faible valeur unitaire, volume fort</td>
+        </tr>
+        <tr>
+          <td><strong>Véhicules & Engins</strong></td>
+          <td>Motos, vélos, pièces auto</td>
+          <td><span class="comm-pct">5 – 8 %</span></td>
+          <td>Montants élevés, marge fixe</td>
+        </tr>
+        <tr>
+          <td><strong>Autres produits</strong></td>
+          <td>Jouets, sport, divers</td>
+          <td><span class="comm-pct">10 – 20 %</span></td>
+          <td>À définir par catégorie</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="card-grid" style="margin-top:20px;">
+      <div class="card card-accent-blue">
+        <h3>💰 Frais de livraison</h3>
+        <p>Chaque produit peut être vendu avec ou sans livraison. Le prix de livraison est défini selon la zone géographique et le poids/volume du produit. Ce montant est affiché séparément sur la fiche produit.</p>
+      </div>
+      <div class="card card-accent-amber">
+        <h3>📋 Transparence tarifaire</h3>
+        <p>Le vendeur sait dès la soumission qu'une commission sera prélevée selon la catégorie. Aucune surprise. Le montant qu'il recevra lui est communiqué avant la mise en ligne du produit.</p>
+      </div>
+      <div class="card card-accent-green">
+        <h3>🔄 Remboursement</h3>
+        <p>Si un produit vendu n'est plus disponible au moment de la transaction (vendu ailleurs, endommagé, propriétaire injoignable), l'acheteur est intégralement remboursé. Politique non négociable.</p>
+      </div>
+    </div>
+
+    <div class="chart-wrap">
+      <h4>Répartition estimée des revenus par catégorie (projection Douala, phase 1)</h4>
+      <div style="position:relative;height:280px;">
+        <canvas id="revChart" role="img" aria-label="Graphique en barres de la répartition des revenus estimés par catégorie de produit">Électronique: fort, Électroménager: moyen-fort, Vêtements: moyen, Meubles: moyen, Autres: faible.</canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────
+       03 — ACTEURS & RÔLES
+  ───────────────────────────────────────── -->
+  <div class="section" id="roles">
+    <div class="section-header">
+      <div class="section-num">03</div>
+      <h2>Acteurs & Rôles</h2>
+    </div>
+
+    <p style="color:var(--gray-600); margin-bottom:24px;">La plateforme implique <strong>5 types d'acteurs</strong> avec des droits et responsabilités clairement distincts. Aucune confusion n'est permise entre les rôles.</p>
+
+    <div class="role-grid">
+      <div class="role-card">
+        <div class="role-icon blue">📦</div>
+        <h4>Vendeur</h4>
+        <ul>
+          <li>Soumet une demande de vente</li>
+          <li>Décrit son produit et fixe son prix</li>
+          <li>Attend la visite de l'agent</li>
+          <li>Reçoit son paiement après vente</li>
+          <li>Ne connaît jamais l'acheteur</li>
+          <li>Ne publie jamais rien lui-même</li>
+        </ul>
+      </div>
+      <div class="role-card">
+        <div class="role-icon teal">🛒</div>
+        <h4>Acheteur</h4>
+        <ul>
+          <li>Parcourt la boutique</li>
+          <li>Consulte les fiches produits</li>
+          <li>Réserve et paie en ligne</li>
+          <li>Suit l'état de sa commande</li>
+          <li>Choisit livraison ou retrait</li>
+          <li>Ne connaît jamais le vendeur</li>
+        </ul>
+      </div>
+      <div class="role-card">
+        <div class="role-icon amber">🏍️</div>
+        <h4>Agent Terrain</h4>
+        <ul>
+          <li>Reçoit ses missions via l'app</li>
+          <li>Se rend chez le vendeur</li>
+          <li>Vérifie la propriété du produit</li>
+          <li>Prend les photos officielles</li>
+          <li>Collecte le produit</li>
+          <li>Effectue les livraisons</li>
+        </ul>
+      </div>
+      <div class="role-card">
+        <div class="role-icon red">⚙️</div>
+        <h4>Admin</h4>
+        <ul>
+          <li>Publie les produits vérifiés</li>
+          <li>Rédige les fiches produits</li>
+          <li>Gère les commandes et litiges</li>
+          <li>Gère les utilisateurs</li>
+          <li>Suit tous les états produits</li>
+          <li>Assigne les missions agents</li>
+        </ul>
+      </div>
+      <div class="role-card">
+        <div class="role-icon green">👑</div>
+        <h4>Super Admin</h4>
+        <ul>
+          <li>Gère les admins</li>
+          <li>Configure les taux de commission</li>
+          <li>Accède aux rapports financiers</li>
+          <li>Vue globale sur toute la plateforme</li>
+          <li>Seul à pouvoir supprimer un admin</li>
+          <li>Prise de décisions stratégiques</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────
+       04 — PROCESSUS MÉTIER
+  ───────────────────────────────────────── -->
+  <div class="section" id="processus">
+    <div class="section-header">
+      <div class="section-num">04</div>
+      <h2>Processus métier complet</h2>
+    </div>
+
+    <p style="color:var(--gray-600); margin-bottom:24px;">Du moment où un vendeur soumet sa demande jusqu'au moment où l'acheteur reçoit son produit, voici chaque étape sans exception.</p>
+
+    <div class="process-flow">
+      <div class="process-step">
+        <div class="step-icon">1</div>
+        <div class="step-body">
+          <h4>Soumission de la demande (Vendeur)</h4>
+          <p>Le vendeur remplit un formulaire simple sur l'application ou le site web. Il renseigne : type de produit, quantité disponible, description sommaire, prix souhaité, photos éventuelles de sa part (non obligatoires), et ses coordonnées pour la visite. L'admin reçoit une notification immédiate.</p>
+        </div>
+      </div>
+      <div class="process-step">
+        <div class="step-icon teal">2</div>
+        <div class="step-body">
+          <h4>Traitement de la demande (Admin)</h4>
+          <p>L'admin examine la demande, valide sa pertinence, et assigne une mission à un agent terrain disponible dans la zone géographique du vendeur. Un délai de visite est communiqué au vendeur.</p>
+        </div>
+      </div>
+      <div class="process-step">
+        <div class="step-icon amber">3</div>
+        <div class="step-body">
+          <h4>Visite & Vérification physique (Agent Terrain)</h4>
+          <p>L'agent se rend chez le vendeur. Il vérifie que le produit appartient bien à cette personne (carte d'identité + preuve d'achat ou autre justificatif). Il inspecte l'état réel du produit, note tous les défauts visibles, prend des photos officielles sous différents angles. Si la propriété n'est pas prouvée → refus de la collecte, demande annulée.</p>
+        </div>
+      </div>
+      <div class="process-step">
+        <div class="step-icon">4</div>
+        <div class="step-body">
+          <h4>Collecte du produit (Agent Terrain)</h4>
+          <p>Le produit est physiquement récupéré par l'agent et ramené à notre point de collecte ou entrepôt. Un accusé de réception est généré (preuve pour le vendeur). Le produit change de statut : <strong>En traitement</strong>.</p>
+        </div>
+      </div>
+      <div class="process-step">
+        <div class="step-icon teal">5</div>
+        <div class="step-body">
+          <h4>Publication sur la boutique (Admin)</h4>
+          <p>L'admin rédige la fiche produit complète : titre, description détaillée, photos officielles, état du produit, liste des défauts connus (et mention explicite "défauts inconnus non garantis" si applicable), prix vendeur + commission = prix affiché, options de livraison et leurs prix. Le produit passe en statut <strong>En vente</strong>.</p>
+        </div>
+      </div>
+      <div class="process-step">
+        <div class="step-icon amber">6</div>
+        <div class="step-body">
+          <h4>Achat & Paiement (Acheteur)</h4>
+          <p>L'acheteur consulte la fiche, choisit avec ou sans livraison, et paie en ligne (Mobile Money : Orange Money, MTN MoMo). Le produit passe en statut <strong>Réservé / Vendu</strong>. L'acheteur reçoit une confirmation et peut suivre l'état en temps réel.</p>
+        </div>
+      </div>
+      <div class="process-step">
+        <div class="step-icon green">7</div>
+        <div class="step-body">
+          <h4>Livraison ou retrait (Agent Terrain)</h4>
+          <p>Si livraison : un agent livre le produit à l'adresse de l'acheteur dans le délai promis. Si retrait : l'acheteur vient au point de retrait avec son numéro de commande. La remise est confirmée dans l'app. Statut → <strong>Livré</strong>.</p>
+        </div>
+      </div>
+      <div class="process-step">
+        <div class="step-icon">8</div>
+        <div class="step-body">
+          <h4>Clôture de la transaction (Admin)</h4>
+          <p>La commission est prélevée sur le montant de la vente. Le solde est reversé au vendeur (via Mobile Money). La transaction est archivée. Les deux parties reçoivent une notification de finalisation. Aucune n'a l'information de l'autre.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout warning">
+      <span class="callout-icon">⚠️</span>
+      <p><strong>Cas d'annulation :</strong> Si entre la collecte et la vente, le propriétaire du produit change d'avis ou le produit disparaît de notre entrepôt, nous remboursons intégralement l'acheteur et documenton l'incident. Ce cas doit être rare mais doit être géré de façon automatisée dans la plateforme.</p>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────
+       05 — ÉTATS DU PRODUIT
+  ───────────────────────────────────────── -->
+  <div class="section" id="etats">
+    <div class="section-header">
+      <div class="section-num">05</div>
+      <h2>États du produit — Cycle de vie complet</h2>
+    </div>
+
+    <p style="color:var(--gray-600); margin-bottom:20px;">Chaque produit sur la plateforme a un état précis à tout moment. Ces états permettent à toutes les parties concernées de savoir exactement où en est un produit. Zéro ambiguïté.</p>
+
+    <div class="states-flow">
+      <div class="state-pill">
+        <div class="pill pill-orange">Soumis</div>
+        <div class="pill-sub">Demande reçue</div>
+      </div>
+      <div class="state-arrow">→</div>
+      <div class="state-pill">
+        <div class="pill pill-blue">Mission assignée</div>
+        <div class="pill-sub">Agent désigné</div>
+      </div>
+      <div class="state-arrow">→</div>
+      <div class="state-pill">
+        <div class="pill pill-teal">En vérification</div>
+        <div class="pill-sub">Agent chez vendeur</div>
+      </div>
+      <div class="state-arrow">→</div>
+      <div class="state-pill">
+        <div class="pill pill-purple">Collecté</div>
+        <div class="pill-sub">Produit récupéré</div>
+      </div>
+      <div class="state-arrow">→</div>
+      <div class="state-pill">
+        <div class="pill pill-blue">En traitement</div>
+        <div class="pill-sub">Photos + fiche</div>
+      </div>
+      <div class="state-arrow">→</div>
+      <div class="state-pill">
+        <div class="pill pill-green">En vente</div>
+        <div class="pill-sub">Publié sur boutique</div>
+      </div>
+      <div class="state-arrow">→</div>
+      <div class="state-pill">
+        <div class="pill pill-orange">Réservé</div>
+        <div class="pill-sub">Paiement reçu</div>
+      </div>
+      <div class="state-arrow">→</div>
+      <div class="state-pill">
+        <div class="pill pill-teal">En livraison</div>
+        <div class="pill-sub">En cours de remise</div>
+      </div>
+      <div class="state-arrow">→</div>
+      <div class="state-pill">
+        <div class="pill pill-green">Livré</div>
+        <div class="pill-sub">Transaction clôturée</div>
+      </div>
+    </div>
+
+    <div class="card-grid">
+      <div class="card card-accent-red">
+        <h3>🔴 États d'exception</h3>
+        <p><strong>Refusé :</strong> Propriété non prouvée lors de la visite.<br>
+        <strong>Annulé :</strong> Vendeur change d'avis avant collecte.<br>
+        <strong>Indisponible :</strong> Produit endommagé ou perdu après collecte → remboursement acheteur.<br>
+        <strong>Expiré :</strong> Produit en vente depuis trop longtemps sans acheteur → retour au vendeur.</p>
+      </div>
+      <div class="card card-accent-amber">
+        <h3>🟡 Règle de réservation</h3>
+        <p>Un produit réservé sans paiement confirmé dans les <strong>2 heures</strong> est automatiquement remis en vente. Un acheteur qui commence le paiement mais ne finalise pas dans ce délai perd sa réservation. Cela évite les blocages inutiles.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────
+       06 — FONCTIONNALITÉS
+  ───────────────────────────────────────── -->
+  <div class="section" id="fonctionnalites">
+    <div class="section-header">
+      <div class="section-num">06</div>
+      <h2>Fonctionnalités détaillées</h2>
+    </div>
+
+    <!-- ACHETEUR -->
+    <div class="feature-section">
+      <h3><span class="feature-badge acheteur">Acheteur</span> Interface Boutique</h3>
+      <div class="feature-list">
+        <div class="feature-item"><div class="fi-dot blue"></div>Parcourir les produits par catégorie</div>
+        <div class="feature-item"><div class="fi-dot blue"></div>Recherche par mot-clé, filtre par prix, état, zone</div>
+        <div class="feature-item"><div class="fi-dot blue"></div>Fiche produit complète avec galerie photos</div>
+        <div class="feature-item"><div class="fi-dot blue"></div>Affichage transparent des défauts connus</div>
+        <div class="feature-item"><div class="fi-dot blue"></div>Mention "défaut inconnu" si non évalué</div>
+        <div class="feature-item"><div class="fi-dot blue"></div>Choix livraison ou retrait avec prix séparés</div>
+        <div class="feature-item"><div class="fi-dot blue"></div>Paiement via Orange Money / MTN MoMo</div>
+        <div class="feature-item"><div class="fi-dot blue"></div>Confirmation de commande par notification</div>
+        <div class="feature-item"><div class="fi-dot blue"></div>Suivi de commande en temps réel (7 états)</div>
+        <div class="feature-item"><div class="fi-dot blue"></div>Historique des achats</div>
+        <div class="feature-item"><div class="fi-dot blue"></div>Gestion du compte personnel</div>
+        <div class="feature-item"><div class="fi-dot blue"></div>Notifications push à chaque changement d'état</div>
+      </div>
+    </div>
+
+    <!-- VENDEUR -->
+    <div class="feature-section">
+      <h3><span class="feature-badge vendeur">Vendeur</span> Interface Soumission</h3>
+      <div class="feature-list">
+        <div class="feature-item"><div class="fi-dot teal"></div>Formulaire de soumission de produit</div>
+        <div class="feature-item"><div class="fi-dot teal"></div>Saisie : type produit, quantité, description, prix</div>
+        <div class="feature-item"><div class="fi-dot teal"></div>Upload facultatif de photos (aide préalable)</div>
+        <div class="feature-item"><div class="fi-dot teal"></div>Suivi de l'état de sa demande</div>
+        <div class="feature-item"><div class="fi-dot teal"></div>Notification de l'heure de visite de l'agent</div>
+        <div class="feature-item"><div class="fi-dot teal"></div>Confirmation de collecte reçue</div>
+        <div class="feature-item"><div class="fi-dot teal"></div>Notification quand le produit est mis en vente</div>
+        <div class="feature-item"><div class="fi-dot teal"></div>Notification de vente réalisée</div>
+        <div class="feature-item"><div class="fi-dot teal"></div>Confirmation de réception de son paiement</div>
+        <div class="feature-item"><div class="fi-dot teal"></div>Historique de ses ventes</div>
+        <div class="feature-item"><div class="fi-dot teal"></div>Gestion de plusieurs produits simultanément</div>
+        <div class="feature-item"><div class="fi-dot teal"></div>Compte vendeur avec profil et historique</div>
+      </div>
+    </div>
+
+    <!-- AGENT -->
+    <div class="feature-section">
+      <h3><span class="feature-badge agent">Agent Terrain</span> Application Mobile</h3>
+      <div class="feature-list">
+        <div class="feature-item"><div class="fi-dot amber"></div>Réception des missions assignées</div>
+        <div class="feature-item"><div class="fi-dot amber"></div>Détails du vendeur + adresse + produit</div>
+        <div class="feature-item"><div class="fi-dot amber"></div>Navigation GPS vers le vendeur</div>
+        <div class="feature-item"><div class="fi-dot amber"></div>Checklist de vérification de propriété</div>
+        <div class="feature-item"><div class="fi-dot amber"></div>Prise de photos officielles in-app</div>
+        <div class="feature-item"><div class="fi-dot amber"></div>Formulaire d'état du produit (défauts notés)</div>
+        <div class="feature-item"><div class="fi-dot amber"></div>Validation / Refus de la collecte</div>
+        <div class="feature-item"><div class="fi-dot amber"></div>Mise à jour de l'état de la mission</div>
+        <div class="feature-item"><div class="fi-dot amber"></div>Missions de livraison assignées</div>
+        <div class="feature-item"><div class="fi-dot amber"></div>Confirmation de livraison à l'acheteur</div>
+        <div class="feature-item"><div class="fi-dot amber"></div>Historique de ses missions complétées</div>
+        <div class="feature-item"><div class="fi-dot amber"></div>Profil et statistiques de performance</div>
+      </div>
+    </div>
+
+    <!-- ADMIN -->
+    <div class="feature-section">
+      <h3><span class="feature-badge admin">Admin</span> Panneau de Gestion</h3>
+      <div class="feature-list">
+        <div class="feature-item"><div class="fi-dot red"></div>Tableau de bord général (produits, commandes, revenus)</div>
+        <div class="feature-item"><div class="fi-dot red"></div>Gestion complète des demandes vendeurs</div>
+        <div class="feature-item"><div class="fi-dot red"></div>Assignation de missions aux agents</div>
+        <div class="feature-item"><div class="fi-dot red"></div>Publication et édition des fiches produits</div>
+        <div class="feature-item"><div class="fi-dot red"></div>Gestion du catalogue complet</div>
+        <div class="feature-item"><div class="fi-dot red"></div>Gestion des catégories et sous-catégories</div>
+        <div class="feature-item"><div class="fi-dot red"></div>Suivi de toutes les commandes</div>
+        <div class="feature-item"><div class="fi-dot red"></div>Gestion des litiges et remboursements</div>
+        <div class="feature-item"><div class="fi-dot red"></div>Gestion des utilisateurs (acheteurs, vendeurs)</div>
+        <div class="feature-item"><div class="fi-dot red"></div>Gestion des agents terrain (zones, missions)</div>
+        <div class="feature-item"><div class="fi-dot red"></div>Suivi des paiements et reversements</div>
+        <div class="feature-item"><div class="fi-dot red"></div>Notifications push vers tous les acteurs</div>
+        <div class="feature-item"><div class="fi-dot red"></div>Gestion des prix de livraison par zone</div>
+        <div class="feature-item"><div class="fi-dot red"></div>Rapport d'activité hebdomadaire auto-généré</div>
+      </div>
+    </div>
+
+    <!-- SUPER ADMIN -->
+    <div class="feature-section">
+      <h3><span class="feature-badge super">Super Admin</span> Gestion Globale</h3>
+      <div class="feature-list">
+        <div class="feature-item"><div class="fi-dot gray"></div>Gestion des comptes admin (créer, désactiver)</div>
+        <div class="feature-item"><div class="fi-dot gray"></div>Configuration des taux de commission par catégorie</div>
+        <div class="feature-item"><div class="fi-dot gray"></div>Accès aux rapports financiers complets</div>
+        <div class="feature-item"><div class="fi-dot gray"></div>Vue globale sur toute la plateforme</div>
+        <div class="feature-item"><div class="fi-dot gray"></div>Paramètres globaux de la plateforme</div>
+        <div class="feature-item"><div class="fi-dot gray"></div>Logs et audit de toutes les actions admin</div>
+        <div class="feature-item"><div class="fi-dot gray"></div>Gestion des zones géographiques couvertes</div>
+        <div class="feature-item"><div class="fi-dot gray"></div>Tableaux analytiques stratégiques</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────
+       07 — ARCHITECTURE TECHNIQUE
+  ───────────────────────────────────────── -->
+  <div class="section" id="architecture">
+    <div class="section-header">
+      <div class="section-num">07</div>
+      <h2>Architecture technique</h2>
+    </div>
+
+    <div class="callout info">
+      <span class="callout-icon">⚙️</span>
+      <p><strong>Stack technologique :</strong> Le backend est développé en <strong>Spring Boot</strong> (Java), exposant des APIs REST sécurisées. Le frontend mobile est développé en <strong>Flutter</strong> (Dart), permettant de couvrir iOS et Android avec une seule base de code. Le panneau admin est une application web responsive.</p>
+    </div>
+
+    <div class="arch-row">
+      <div class="arch-block">
+        <span class="arch-icon">📱</span>
+        <h4>App Acheteur / Vendeur</h4>
+        <p>Flutter — iOS & Android. Interface boutique, suivi de commande, soumission de produit.</p>
+      </div>
+      <div class="arch-block">
+        <span class="arch-icon">🏍️</span>
+        <h4>App Agent Terrain</h4>
+        <p>Flutter — Mobile. Missions, GPS, photos, checklists, confirmations.</p>
+      </div>
+      <div class="arch-block">
+        <span class="arch-icon">🖥️</span>
+        <h4>Panel Admin Web</h4>
+        <p>Web responsive. Gestion catalogue, commandes, utilisateurs, analytics.</p>
+      </div>
+      <div class="arch-block">
+        <span class="arch-icon">⚡</span>
+        <h4>Backend API</h4>
+        <p>Spring Boot — REST API sécurisée (JWT). Toute la logique métier centralisée.</p>
+      </div>
+      <div class="arch-block">
+        <span class="arch-icon">🗄️</span>
+        <h4>Base de données</h4>
+        <p>PostgreSQL pour les données structurées. Stockage cloud pour les photos produits.</p>
+      </div>
+      <div class="arch-block">
+        <span class="arch-icon">🔔</span>
+        <h4>Notifications</h4>
+        <p>Firebase Cloud Messaging. Push en temps réel pour tous les acteurs.</p>
+      </div>
+    </div>
+
+    <div class="card card-accent-blue">
+      <h3>🔐 Sécurité & Authentification</h3>
+      <p>Authentification JWT pour tous les utilisateurs. Chaque rôle a des permissions strictement définies côté serveur. Un acheteur ne peut jamais accéder aux informations d'un vendeur et vice-versa. Les transactions financières sont chiffrées. Les photos produits sont stockées sur un serveur privé non accessible sans token valide.</p>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────
+       08 — ÉTUDE DE MARCHÉ
+  ───────────────────────────────────────── -->
+  <div class="section" id="marche">
+    <div class="section-header">
+      <div class="section-num">08</div>
+      <h2>Étude de marché</h2>
+    </div>
+
+    <div class="intro-text">
+      Le marché de la seconde main au Cameroun est <strong>massif mais non structuré</strong>. Les échanges se font principalement via les réseaux sociaux (Facebook Marketplace, groupes WhatsApp), les marchés physiques, et le bouche-à-oreille. Aucun acteur ne propose un service avec collecte physique, vérification de propriété et anonymat total.
+    </div>
+
+    <div class="chart-wrap">
+      <h4>Nombre d'utilisateurs internet mobiles au Cameroun (millions)</h4>
+      <div style="position:relative;height:220px;">
+        <canvas id="internetChart" role="img" aria-label="Graphique de croissance des utilisateurs internet mobiles au Cameroun de 2019 à 2024">Croissance constante de 6M en 2019 à 11M en 2024.</canvas>
+      </div>
+    </div>
+
+    <h3 style="font-size:17px; font-weight:600; color:var(--gray-800); margin:28px 0 16px;">Analyse comparative des concurrents</h3>
+
+    <div class="marche-grid">
+      <div class="concur-card">
+        <h4>🌍 Jumia (présent au Cameroun)</h4>
+        <div class="avantage-row"><span>Vente de produits neufs</span><span class="badge-oui">Oui</span></div>
+        <div class="avantage-row"><span>Revente de seconde main</span><span class="badge-non">Non</span></div>
+        <div class="avantage-row"><span>Collecte physique vendeur</span><span class="badge-non">Non</span></div>
+        <div class="avantage-row"><span>Vérification propriété</span><span class="badge-non">Non</span></div>
+        <div class="avantage-row"><span>Anonymat vendeur/acheteur</span><span class="badge-non">Non</span></div>
+        <div class="avantage-row"><span>Paiement Mobile Money</span><span class="badge-oui">Oui</span></div>
+      </div>
+      <div class="concur-card">
+        <h4>📱 Facebook Marketplace</h4>
+        <div class="avantage-row"><span>Revente seconde main</span><span class="badge-oui">Oui</span></div>
+        <div class="avantage-row"><span>Collecte physique vendeur</span><span class="badge-non">Non</span></div>
+        <div class="avantage-row"><span>Vérification propriété</span><span class="badge-non">Non</span></div>
+        <div class="avantage-row"><span>Anonymat vendeur/acheteur</span><span class="badge-non">Non</span></div>
+        <div class="avantage-row"><span>Protection contre arnaques</span><span class="badge-non">Non</span></div>
+        <div class="avantage-row"><span>Paiement sécurisé intégré</span><span class="badge-non">Non</span></div>
+      </div>
+      <div class="concur-card">
+        <h4>🌐 OLX / Tontons</h4>
+        <div class="avantage-row"><span>Annonces seconde main</span><span class="badge-oui">Oui</span></div>
+        <div class="avantage-row"><span>Collecte physique</span><span class="badge-non">Non</span></div>
+        <div class="avantage-row"><span>Vérification produit</span><span class="badge-non">Non</span></div>
+        <div class="avantage-row"><span>Anonymat garanti</span><span class="badge-non">Non</span></div>
+        <div class="avantage-row"><span>Présence locale forte</span><span class="badge-partiel">Partiel</span></div>
+        <div class="avantage-row"><span>Confiance utilisateur</span><span class="badge-partiel">Faible</span></div>
+      </div>
+      <div class="concur-card">
+        <h4>✅ Notre Plateforme</h4>
+        <div class="avantage-row"><span>Revente seconde main</span><span class="badge-oui">Oui</span></div>
+        <div class="avantage-row"><span>Collecte physique vendeur</span><span class="badge-oui">Oui</span></div>
+        <div class="avantage-row"><span>Vérification propriété</span><span class="badge-oui">Oui</span></div>
+        <div class="avantage-row"><span>Anonymat total garanti</span><span class="badge-oui">Oui</span></div>
+        <div class="avantage-row"><span>Défauts déclarés (transparence)</span><span class="badge-oui">Oui</span></div>
+        <div class="avantage-row"><span>Paiement Mobile Money</span><span class="badge-oui">Oui</span></div>
+      </div>
+    </div>
+
+    <div class="callout success">
+      <span class="callout-icon">✅</span>
+      <p><strong>Conclusion marché :</strong> Aucun concurrent ne combine collecte physique + vérification de propriété + anonymat + transparence des défauts sur le marché camerounais. C'est notre avantage concurrentiel unique et très difficile à répliquer rapidement.</p>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────
+       09 — FAILLES & SOLUTIONS
+  ───────────────────────────────────────── -->
+  <div class="section" id="failles">
+    <div class="section-header">
+      <div class="section-num">09</div>
+      <h2>Failles identifiées & Solutions</h2>
+    </div>
+
+    <p style="color:var(--gray-600); margin-bottom:24px;">Tout projet a des risques. Les ignorer est dangereux. Les identifier et les corriger dès le départ est la marque d'une entreprise sérieuse.</p>
+
+    <div class="faille-card">
+      <div class="faille-header">
+        <span>⚠️</span>
+        <h4>Faille 1 — Fraude à la propriété du produit</h4>
+      </div>
+      <div class="faille-body">
+        <p class="faille-risk">Risque : Un vendeur tente de vendre un produit qui ne lui appartient pas (volé, emprunté). L'agent se laisse convaincre ou est trompé par un faux document.</p>
+        <div class="solution-block">
+          <p><strong>Solution :</strong> Processus strict de vérification (pièce d'identité + justificatif). Tout document photographié et archivé. Si un doute existe, refus systématique. En cas de litige post-vente signalé par un tiers, procédure légale enclenchée avec les preuves. Formation régulière des agents à détecter les faux documents.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="faille-card">
+      <div class="faille-header">
+        <span>⚠️</span>
+        <h4>Faille 2 — Agent terrain malhonnête</h4>
+      </div>
+      <div class="faille-body">
+        <p class="faille-risk">Risque : Un agent collecte un produit mais ne le rapporte pas, ou endommage un produit pendant le transport. Un agent partage les coordonnées du vendeur avec l'acheteur.</p>
+        <div class="solution-block">
+          <p><strong>Solution :</strong> Chaque collecte est tracée (photos in-app, horodatage, géolocalisation). Un produit sans enregistrement de collecte valide ne peut pas être publié. Les agents ont des zones définies et des performances suivies. Des audits aléatoires sont planifiés. Contrat avec clause de responsabilité claire. Les informations vendeur/acheteur ne sont jamais affichées dans l'app agent, seulement l'adresse de mission.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="faille-card">
+      <div class="faille-header">
+        <span>⚠️</span>
+        <h4>Faille 3 — Vendeur qui contourne la plateforme</h4>
+      </div>
+      <div class="faille-body">
+        <p class="faille-risk">Risque : Un vendeur, après avoir soumis sa demande et vu qu'il peut obtenir plus en vendant directement, contourne notre plateforme et vend à un acheteur qu'il a trouvé lui-même. Ou il vend le produit ailleurs après que nous l'ayons collecté.</p>
+        <div class="solution-block">
+          <p><strong>Solution :</strong> Après collecte physique du produit, celui-ci est en notre possession. Le vendeur ne peut plus le vendre lui-même. Avant collecte, un accord formel est signé (ou validé électroniquement) engageant le vendeur. En cas de rupture d'accord avant collecte, la demande est simplement annulée sans pénalité.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="faille-card">
+      <div class="faille-header">
+        <span>⚠️</span>
+        <h4>Faille 4 — Désaccord sur l'état du produit à la réception</h4>
+      </div>
+      <div class="faille-body">
+        <p class="faille-risk">Risque : L'acheteur reçoit un produit et affirme qu'il est en moins bon état que décrit sur la fiche. Dispute potentielle et mauvaise réputation.</p>
+        <div class="solution-block">
+          <p><strong>Solution :</strong> Toutes les photos officielles sont prises par l'agent et horodatées. La fiche produit liste explicitement tous les défauts visibles. Un délai de réclamation de 24h post-livraison est accordé à l'acheteur. Si la réclamation est justifiée (preuve photo), remboursement partiel ou total selon la gravité. Un processus de retour produit doit être défini.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="faille-card">
+      <div class="faille-header">
+        <span>⚠️</span>
+        <h4>Faille 5 — Scalabilité des agents terrain</h4>
+      </div>
+      <div class="faille-body">
+        <p class="faille-risk">Risque : Si les demandes augmentent rapidement, le nombre d'agents est insuffisant. Les délais de collecte et livraison s'allongent, nuisant à l'expérience.</p>
+        <div class="solution-block">
+          <p><strong>Solution :</strong> Système de priorité des missions (valeur produit, délai d'attente). Possibilité d'intégrer des agents freelance avec un système de certification. Limitation géographique progressive : démarrer Douala uniquement, puis expanser. Indicateurs de performance (KPIs) des agents pour identifier les surcharges à temps.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────
+       10 — STRATÉGIE DE LANCEMENT
+  ───────────────────────────────────────── -->
+  <div class="section" id="strategie">
+    <div class="section-header">
+      <div class="section-num">10</div>
+      <h2>Stratégie de lancement</h2>
+    </div>
+
+    <div class="strat-timeline">
+      <div class="strat-item">
+        <div class="phase-badge">Phase 1 — Mois 1 à 3 · Douala pilote</div>
+        <h4>Validation du modèle — Test terrain réel</h4>
+        <ul>
+          <li>Recruter et former 3 à 5 agents terrain sur Douala</li>
+          <li>Lancer la plateforme en version beta (accès limité)</li>
+          <li>Traiter les 50 premières demandes manuellement pour affiner le processus</li>
+          <li>Cibler d'abord l'électronique (smartphone, laptop) — forte demande, facile à gérer</li>
+          <li>Construire les premiers avis et la réputation</li>
+          <li>Tester les intégrations Mobile Money (Orange + MTN)</li>
+          <li>Documenter chaque friction et corriger en temps réel</li>
+        </ul>
+      </div>
+      <div class="strat-item">
+        <div class="phase-badge">Phase 2 — Mois 4 à 8 · Croissance Douala</div>
+        <h4>Montée en puissance — Toutes catégories</h4>
+        <ul>
+          <li>Ouvrir toutes les catégories de produits</li>
+          <li>Lancer la campagne marketing digitale (Facebook, Instagram, YouTube)</li>
+          <li>Partenariats avec des communautés locales, associations, quartiers</li>
+          <li>Recruter 10 à 20 agents terrain selon la demande</li>
+          <li>Développer l'analytique et les rapports de performance</li>
+          <li>Programme de fidélité vendeurs récurrents</li>
+        </ul>
+      </div>
+      <div class="strat-item">
+        <div class="phase-badge">Phase 3 — Mois 9+ · Expansion régionale</div>
+        <h4>Expansion — Yaoundé et autres villes</h4>
+        <ul>
+          <li>Répliquer le modèle validé à Yaoundé</li>
+          <li>Explorer Bafoussam, Garoua, autres grandes villes</li>
+          <li>Système de franchise locale d'agents certifiés</li>
+          <li>Négocier des partenariats avec des points de dépôt / retrait physiques</li>
+          <li>Étude de l'expansion Afrique Centrale (Congo, Gabon)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout warning">
+      <span class="callout-icon">🎯</span>
+      <p><strong>Stratégie d'acquisition :</strong> Le premier vecteur de croissance est le <strong>bouche-à-oreille</strong>. Chaque vendeur bien traité parle à 5 personnes. Chaque acheteur satisfait revient. La qualité du service est le meilleur marketing au Cameroun. Les 6 premiers mois : zéro pub payante, 100% relations terrain.</p>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────
+       11 — ANALYTIQUE
+  ───────────────────────────────────────── -->
+  <div class="section" id="analytique">
+    <div class="section-header">
+      <div class="section-num">11</div>
+      <h2>Analytique & Données stratégiques</h2>
+    </div>
+
+    <p style="color:var(--gray-600); margin-bottom:20px;">Les données collectées par la plateforme permettent des <strong>décisions stratégiques précises</strong>. Voici les métriques clés suivies en temps réel.</p>
+
+    <div class="card-grid">
+      <div class="card card-accent-blue">
+        <h3>📊 Métriques Ventes</h3>
+        <p>Revenus journaliers / hebdomadaires / mensuels. Commissions générées par catégorie. Produits les plus vendus. Taux de conversion (vu → acheté). Délai moyen entre mise en vente et vente.</p>
+      </div>
+      <div class="card card-accent-teal">
+        <h3>🏍️ Métriques Agents</h3>
+        <p>Nombre de missions complétées par agent. Taux de refus de collecte (propriété non prouvée). Délai moyen de collecte et livraison. Performance par zone géographique. Incidents signalés.</p>
+      </div>
+      <div class="card card-accent-amber">
+        <h3>👥 Métriques Utilisateurs</h3>
+        <p>Nombre de vendeurs actifs vs inactifs. Récurrence des acheteurs (1ère commande vs 2ème+). Catégories les plus consultées. Taux d'abandon du panier. Zones géographiques les plus actives.</p>
+      </div>
+      <div class="card card-accent-green">
+        <h3>📦 Métriques Catalogue</h3>
+        <p>Temps moyen de mise en vente après collecte. Durée moyenne de vie d'un produit avant vente. Taux de produits expirés (pas vendus). Stock actuel par catégorie. Produits avec des défauts non déclarés détectés.</p>
+      </div>
+    </div>
+
+    <div class="chart-wrap">
+      <h4>Projection des revenus mensuels sur 12 mois (estimation phase 1)</h4>
+      <div style="position:relative;height:260px;">
+        <canvas id="projChart" role="img" aria-label="Graphique de projection des revenus mensuels sur 12 mois en millions de FCFA">Projection de croissance des revenus de 200 000 FCFA à 3 millions FCFA sur 12 mois.</canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────
+       12 — IMPACT
+  ───────────────────────────────────────── -->
+  <div class="section" id="impact">
+    <div class="section-header">
+      <div class="section-num">12</div>
+      <h2>Impact & Valeur créée</h2>
+    </div>
+
+    <div class="intro-text">
+      Ce projet ne vend pas de la technologie. Il résout un <strong>problème humain réel</strong> : comment un Camerounais peut vendre ses biens d'occasion en toute sécurité, et comment un autre peut acheter un produit d'occasion sans se faire arnaquer. C'est une infrastructure de confiance, pas une app de plus.
+    </div>
+
+    <div class="card-grid">
+      <div class="card card-accent-green">
+        <h3>🌱 Pour le vendeur</h3>
+        <p>Il peut monétiser ses biens inutilisés sans compétence digitale. Il n'a pas besoin d'internet, de WhatsApp, de négociation. Il appelle ou soumet, on vient, il reçoit son argent. Simple. Accessible. Digne.</p>
+      </div>
+      <div class="card card-accent-blue">
+        <h3>🛡️ Pour l'acheteur</h3>
+        <p>Il achète avec confiance. Le produit est vérifié. Les défauts sont déclarés. Il peut payer en ligne. Il sait exactement ce qu'il reçoit. Fini les arnaques du "ça marche très bien" qui tombe en panne au premier usage.</p>
+      </div>
+      <div class="card card-accent-teal">
+        <h3>💼 Pour les agents terrain</h3>
+        <p>Création d'emplois locaux directs. Chaque agent terrain a un revenu structuré, une formation, des équipements, et une progression possible vers agent senior ou responsable de zone.</p>
+      </div>
+      <div class="card card-accent-amber">
+        <h3>♻️ Pour l'environnement</h3>
+        <p>Chaque produit recirculé est un produit neuf qui n'a pas été produit. Prolonger la durée de vie des appareils électroniques, électroménagers et meubles réduit les déchets et la consommation de ressources.</p>
+      </div>
+    </div>
+
+    <div class="callout success">
+      <span class="callout-icon">🚀</span>
+      <p><strong>Vision à 3 ans :</strong> Devenir la référence de la revente de seconde main en Afrique Centrale. Couvrir les 10 principales villes du Cameroun, explorer le Congo et le Gabon. Traiter 500+ transactions par mois. Former une communauté d'agents terrain certifiés qui représentent la marque sur le terrain.</p>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="doc-footer">
+    <p>Document confidentiel · Cahier des Charges v1.0 · Plateforme de Revente Seconde Main · Cameroun</p>
+    <p style="margin-top:6px;">Développé avec Spring Boot & Flutter · 2024</p>
+  </div>
+
+</div>
+
+<script>
+// ── GRAPHIQUE REVENUS PAR CATÉGORIE ──
+const revCtx = document.getElementById('revChart').getContext('2d');
+new Chart(revCtx, {
+  type: 'bar',
+  data: {
+    labels: ['Électronique', 'Électroménager', 'Vêtements', 'Meubles', 'Véhicules', 'Autres'],
+    datasets: [{
+      label: 'Revenus estimés (FCFA x1000)',
+      data: [850, 620, 430, 380, 290, 180],
+      backgroundColor: ['#3B82F6','#14B8A6','#F59E0B','#8B5CF6','#10B981','#6B7280'],
+      borderRadius: 6,
+      borderSkipped: false
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (c) => ' ' + c.parsed.y.toLocaleString() + ' FCFA'
+        }
+      }
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { size: 12 } } },
+      y: {
+        beginAtZero: true,
+        ticks: {
+          callback: (v) => v.toLocaleString(),
+          font: { size: 11 }
+        },
+        grid: { color: '#F1F5F9' }
+      }
+    }
+  }
+});
+
+// ── GRAPHIQUE INTERNET CAMEROUN ──
+const intCtx = document.getElementById('internetChart').getContext('2d');
+new Chart(intCtx, {
+  type: 'line',
+  data: {
+    labels: ['2019', '2020', '2021', '2022', '2023', '2024'],
+    datasets: [{
+      label: 'Utilisateurs internet mobiles (millions)',
+      data: [6.2, 7.1, 8.0, 9.1, 10.2, 11.4],
+      borderColor: '#2563EB',
+      backgroundColor: 'rgba(37,99,235,0.08)',
+      fill: true,
+      tension: 0.4,
+      pointBackgroundColor: '#2563EB',
+      pointRadius: 5
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { size: 12 } } },
+      y: {
+        beginAtZero: false,
+        min: 5,
+        ticks: {
+          callback: (v) => v + 'M',
+          font: { size: 11 }
+        },
+        grid: { color: '#F1F5F9' }
+      }
+    }
+  }
+});
+
+// ── GRAPHIQUE PROJECTION REVENUS ──
+const projCtx = document.getElementById('projChart').getContext('2d');
+const mois = ['M1','M2','M3','M4','M5','M6','M7','M8','M9','M10','M11','M12'];
+const donnees = [200, 280, 390, 520, 680, 850, 1050, 1280, 1550, 1850, 2200, 2600];
+new Chart(projCtx, {
+  type: 'line',
+  data: {
+    labels: mois,
+    datasets: [{
+      label: 'Revenus (FCFA x1000)',
+      data: donnees,
+      borderColor: '#0D9488',
+      backgroundColor: 'rgba(13,148,136,0.08)',
+      fill: true,
+      tension: 0.4,
+      pointBackgroundColor: '#0D9488',
+      pointRadius: 4
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { size: 12 } } },
+      y: {
+        beginAtZero: true,
+        ticks: {
+          callback: (v) => v.toLocaleString() + 'K',
+          font: { size: 11 }
+        },
+        grid: { color: '#F1F5F9' }
+      }
+    }
+  }
+});
+</script>
+
+</body>
+</html>

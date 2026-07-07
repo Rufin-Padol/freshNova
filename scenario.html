@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scénarios 06–09 — Vendeur · Agent · Admin · Super Admin</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;600;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#F8FAFC;color:#0F172A;font-size:15px;line-height:1.7}
+
+.cover{background:linear-gradient(135deg,#0F172A 0%,#1E3A8A 55%,#1D4ED8 100%);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 40px;position:relative;overflow:hidden}
+.cover::before{content:'';position:absolute;top:-100px;right:-100px;width:600px;height:600px;border-radius:50%;background:rgba(37,99,235,.15)}
+.cover::after{content:'';position:absolute;bottom:-80px;left:-80px;width:400px;height:400px;border-radius:50%;background:rgba(20,184,166,.1)}
+.cover-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:50px;padding:6px 20px;font-size:12px;color:rgba(255,255,255,.8);letter-spacing:.08em;text-transform:uppercase;margin-bottom:32px;position:relative;z-index:1}
+.cover-badge::before{content:'';width:6px;height:6px;background:#14B8A6;border-radius:50%}
+.cover h1{font-family:'Sora',sans-serif;font-size:clamp(32px,5vw,60px);font-weight:800;color:#fff;line-height:1.15;margin-bottom:16px;position:relative;z-index:1}
+.cover h1 span{background:linear-gradient(90deg,#60A5FA,#14B8A6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.cover-sub{font-size:17px;color:rgba(255,255,255,.6);max-width:540px;margin:0 auto 48px;position:relative;z-index:1}
+.cover-pills{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;position:relative;z-index:1}
+.cover-pill{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:8px 18px;font-size:13px;color:rgba(255,255,255,.75)}
+
+.doc{max-width:1000px;margin:0 auto;padding:0 24px 100px}
+
+.scenario{margin-top:72px}
+.scenario-head{display:flex;align-items:center;gap:16px;margin-bottom:12px;padding-bottom:18px;border-bottom:2px solid #DBEAFE}
+.scenario-num{color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;padding:4px 12px;border-radius:6px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.sn-blue{background:#2563EB}
+.sn-teal{background:#0D9488}
+.sn-red{background:#DC2626}
+.sn-gray{background:#475569}
+.scenario-head h2{font-family:'Sora',sans-serif;font-size:24px;font-weight:700;color:#0F172A}
+.scenario-desc{font-size:14px;color:#64748B;background:#F1F5F9;border-left:4px solid #2563EB;border-radius:0 8px 8px 0;padding:14px 18px;margin-bottom:32px;line-height:1.7}
+
+.screen-block{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:40px;align-items:start}
+.screen-block.single{grid-template-columns:1fr}
+.screen-block.reverse{direction:rtl}
+.screen-block.reverse>*{direction:ltr}
+
+.screen-info h3{font-family:'Sora',sans-serif;font-size:17px;font-weight:600;color:#1E293B;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.screen-num-badge{background:#EFF6FF;color:#2563EB;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.04em;white-space:nowrap}
+.sn-badge-teal{background:#F0FDFA;color:#0D9488}
+.sn-badge-red{background:#FFF1F2;color:#DC2626}
+.sn-badge-gray{background:#F1F5F9;color:#475569}
+.screen-info p{font-size:13px;color:#475569;line-height:1.75;margin-bottom:12px}
+
+.logic-block{margin-top:14px}
+.logic-item{display:flex;gap:10px;align-items:flex-start;background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:10px 14px;margin-bottom:8px;font-size:12px;color:#475569;line-height:1.6}
+.logic-dot{width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;margin-top:1px}
+.logic-dot.blue{background:#DBEAFE;color:#1D4ED8}
+.logic-dot.green{background:#DCFCE7;color:#15803D}
+.logic-dot.red{background:#FEE2E2;color:#DC2626}
+.logic-dot.amber{background:#FEF3C7;color:#B45309}
+.logic-dot.gray{background:#F1F5F9;color:#475569}
+.logic-dot.teal{background:#CCFBF1;color:#0D9488}
+
+.mockup-wrap{background:#fff;border:1px solid #E2E8F0;border-radius:16px;padding:20px;box-shadow:0 4px 24px rgba(0,0,0,.06)}
+.mockup-wrap svg{width:100%;height:auto;display:block}
+
+.flow-section{background:#fff;border:1px solid #E2E8F0;border-radius:16px;padding:28px;margin-bottom:32px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.flow-section h3{font-family:'Sora',sans-serif;font-size:16px;font-weight:600;color:#1E293B;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+
+.callout{display:flex;gap:12px;padding:14px 18px;border-radius:10px;margin:16px 0;align-items:flex-start;font-size:13px;line-height:1.65}
+.callout.info{background:#EFF6FF;border:1px solid #BFDBFE;color:#1E40AF}
+.callout.warning{background:#FFFBEB;border:1px solid #FDE68A;color:#92400E}
+.callout.success{background:#F0FDF4;border:1px solid #BBF7D0;color:#14532D}
+.callout.danger{background:#FFF1F2;border:1px solid #FECDD3;color:#9F1239}
+.callout-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+
+.section-divider{height:1px;background:linear-gradient(90deg,transparent,#E2E8F0 20%,#E2E8F0 80%,transparent);margin:60px 0}
+
+.info-table{width:100%;border-collapse:collapse;font-size:13px;margin:12px 0}
+.info-table th{background:#F8FAFC;color:#475569;padding:8px 12px;text-align:left;font-weight:500;border-bottom:1px solid #E2E8F0;font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+.info-table td{padding:9px 12px;border-bottom:1px solid #F1F5F9;color:#334155;vertical-align:top}
+.info-table tr:last-child td{border-bottom:none}
+.info-table tr:hover td{background:#F8FAFC}
+
+.feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:16px 0}
+.feature-card{background:#fff;border:1px solid #E2E8F0;border-radius:10px;padding:16px}
+.feature-card h4{font-size:13px;font-weight:600;color:#1E293B;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.feature-card ul{list-style:none;padding:0}
+.feature-card ul li{font-size:12px;color:#475569;padding:4px 0;border-bottom:1px solid #F8FAFC;display:flex;gap:6px;align-items:flex-start}
+.feature-card ul li::before{content:'→';color:#2563EB;flex-shrink:0;font-size:10px;margin-top:2px}
+
+.admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:20px 0}
+.admin-stat{background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:18px;text-align:center}
+.admin-stat .num{font-family:'Sora',sans-serif;font-size:28px;font-weight:700;color:#2563EB}
+.admin-stat .lbl{font-size:11px;color:#94A3B8;margin-top:4px}
+
+@media(max-width:700px){.screen-block{grid-template-columns:1fr}.cover h1{font-size:28px}.doc{padding:0 16px 60px}}
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="cover-badge">Scénarios UX · Suite · Version 1.0</div>
+  <h1>Vendeur · Agent<br><span>Admin · Super Admin</span></h1>
+  <p class="cover-sub">Scénarios 06 à 09 — Chaque rôle, chaque écran, chaque logique détaillée</p>
+  <div class="cover-pills">
+    <div class="cover-pill">06 — Soumission Vendeur</div>
+    <div class="cover-pill">07 — Agent Terrain</div>
+    <div class="cover-pill">08 — Panel Admin</div>
+    <div class="cover-pill">09 — Super Admin</div>
+  </div>
+</div>
+
+<div class="doc">
+
+<!-- ═══════════════════════════════════════
+     SCÉNARIO 06 — VENDEUR
+═══════════════════════════════════════ -->
+<div class="scenario">
+  <div class="scenario-head">
+    <div class="scenario-num sn-blue">Scénario 06</div>
+    <h2>Soumission Vendeur</h2>
+  </div>
+  <div class="scenario-desc">
+    Le vendeur n'est pas forcément à l'aise avec le numérique. Il peut être un commerçant, une ménagère, un étudiant. Le formulaire doit être le plus simple possible — 3 étapes, des mots simples, pas de jargon. Il ne publie rien lui-même. Il soumet une demande et attend qu'on vienne chez lui. C'est tout.
+  </div>
+
+  <!-- ACCUEIL VENDEUR -->
+  <div class="screen-block">
+    <div class="screen-info">
+      <h3><span class="screen-num-badge">Écran 1</span> Accueil Vendeur</h3>
+      <p>Explication visuelle du processus en 3 étapes simples avant même de commencer. Le vendeur sait exactement ce qui va se passer avant de toucher quoi que ce soit.</p>
+      <div class="logic-block">
+        <div class="logic-item"><div class="logic-dot blue">→</div>3 étapes illustrées : Vous décrivez → On vient chez vous → Vous recevez votre argent. Clair, rassurant, humain.</div>
+        <div class="logic-item"><div class="logic-dot green">✓</div>Si le vendeur a déjà des demandes en cours, elles apparaissent en bas avec leur état actuel.</div>
+        <div class="logic-item"><div class="logic-dot amber">!</div>Si non connecté → tap sur "Soumettre" → modal connexion. Après connexion → retour direct ici, rien perdu.</div>
+        <div class="logic-item"><div class="logic-dot gray">→</div>Lien discret "Comment ça marche ?" pour ceux qui veulent plus d'explications avant de commencer.</div>
+      </div>
+    </div>
+    <div class="mockup-wrap">
+      <svg viewBox="0 0 280 540" xmlns="http://www.w3.org/2000/svg">
+        <rect width="280" height="540" rx="24" fill="#0F172A"/>
+        <rect x="10" y="10" width="260" height="520" rx="20" fill="#F8FAFC"/>
+        <rect x="10" y="10" width="260" height="64" rx="20" fill="#fff"/>
+        <rect x="10" y="54" width="260" height="20" fill="#fff"/>
+        <text x="140" y="44" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="16" fill="#0F172A">Vendre un produit</text>
+        <!-- hero block -->
+        <rect x="16" y="78" width="248" height="120" rx="14" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="1"/>
+        <text x="140" y="108" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="14" fill="#1E40AF">Comment ça marche ?</text>
+        <!-- steps -->
+        <circle cx="52" cy="148" r="18" fill="#2563EB"/>
+        <text x="52" y="153" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="12" fill="#fff">1</text>
+        <text x="52" y="174" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#475569">Vous décrivez</text>
+        <text x="52" y="185" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#475569">votre produit</text>
+        <line x1="76" y1="148" x2="108" y2="148" stroke="#BFDBFE" stroke-width="2" stroke-dasharray="4 2"/>
+        <circle cx="140" cy="148" r="18" fill="#0D9488"/>
+        <text x="140" y="153" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="12" fill="#fff">2</text>
+        <text x="140" y="174" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#475569">On vient</text>
+        <text x="140" y="185" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#475569">chez vous</text>
+        <line x1="164" y1="148" x2="204" y2="148" stroke="#BFDBFE" stroke-width="2" stroke-dasharray="4 2"/>
+        <circle cx="228" cy="148" r="18" fill="#16A34A"/>
+        <text x="228" y="153" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="12" fill="#fff">3</text>
+        <text x="228" y="174" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#475569">Vous recevez</text>
+        <text x="228" y="185" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#475569">votre argent</text>
+        <!-- CTA -->
+        <rect x="24" y="214" width="232" height="50" rx="14" fill="#2563EB"/>
+        <text x="140" y="243" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="15" fill="#fff">📦 Soumettre un produit</text>
+        <!-- active demands -->
+        <text x="20" y="284" font-family="sans-serif" font-weight="600" font-size="12" fill="#1E293B">Mes demandes en cours</text>
+        <rect x="16" y="292" width="248" height="72" rx="12" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+        <rect x="26" y="304" width="44" height="44" rx="8" fill="#DBEAFE"/>
+        <text x="48" y="330" text-anchor="middle" font-family="sans-serif" font-size="20">📱</text>
+        <text x="82" y="316" font-family="sans-serif" font-weight="600" font-size="12" fill="#0F172A">iPhone 11 Noir</text>
+        <text x="82" y="332" font-family="sans-serif" font-size="10" fill="#94A3B8">Soumis le 13 Jan</text>
+        <rect x="82" y="340" width="88" height="18" rx="6" fill="#FEF3C7"/>
+        <text x="126" y="353" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#B45309">🟡 Visite planifiée</text>
+        <text x="252" y="330" text-anchor="end" font-family="sans-serif" font-size="10" fill="#2563EB">Suivre →</text>
+        <!-- empty state hint -->
+        <rect x="16" y="374" width="248" height="54" rx="12" fill="#F0FDF4" stroke="#BBF7D0" stroke-width="1"/>
+        <text x="140" y="398" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#15803D">💡 Vous pouvez soumettre plusieurs</text>
+        <text x="140" y="414" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#15803D">produits en même temps</text>
+        <!-- bottom nav -->
+        <rect x="10" y="496" width="260" height="34" rx="0 0 20 20" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="50" y="516" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#94A3B8">🏠</text>
+        <text x="100" y="516" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#94A3B8">🔍</text>
+        <text x="150" y="516" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#94A3B8">❤️</text>
+        <text x="200" y="516" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#94A3B8">📦</text>
+        <text x="240" y="516" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#2563EB">👤</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 1 -->
+  <div class="screen-block reverse">
+    <div class="screen-info">
+      <h3><span class="screen-num-badge">Écran 2</span> Formulaire — Étape 1/3 : Le produit</h3>
+      <p>Catégorie, nom, état, quantité, description optionnelle. Les boutons d'état sont visuels — pas une liste déroulante. L'utilisateur comprend d'un coup d'œil.</p>
+      <div class="logic-block">
+        <div class="logic-item"><div class="logic-dot green">✓</div>Bouton "Suivant" inactif tant que catégorie, nom et état ne sont pas remplis. Il s'active progressivement.</div>
+        <div class="logic-item"><div class="logic-dot blue">→</div>Sélection de catégorie → change l'icône du produit dans le formulaire pour confirmer visuellement le choix.</div>
+        <div class="logic-item"><div class="logic-dot amber">!</div>Quantité max = 10 par soumission. Au-delà, message : "Pour une grande quantité, contactez-nous directement."</div>
+        <div class="logic-item"><div class="logic-dot gray">→</div>Description libre optionnelle. Le placeholder donne des exemples concrets adaptés au contexte camerounais.</div>
+      </div>
+    </div>
+    <div class="mockup-wrap">
+      <svg viewBox="0 0 280 560" xmlns="http://www.w3.org/2000/svg">
+        <rect width="280" height="560" rx="24" fill="#0F172A"/>
+        <rect x="10" y="10" width="260" height="540" rx="20" fill="#F8FAFC"/>
+        <rect x="10" y="10" width="260" height="60" rx="20" fill="#fff"/>
+        <rect x="10" y="50" width="260" height="20" fill="#fff"/>
+        <text x="30" y="40" font-family="sans-serif" font-size="16" fill="#64748B">←</text>
+        <text x="140" y="40" text-anchor="middle" font-family="sans-serif" font-weight="600" font-size="14" fill="#0F172A">Votre produit</text>
+        <!-- progress -->
+        <rect x="24" y="56" width="232" height="5" rx="3" fill="#E2E8F0"/>
+        <rect x="24" y="56" width="77" height="5" rx="3" fill="#2563EB"/>
+        <text x="24" y="74" font-family="sans-serif" font-size="9" fill="#94A3B8">Étape 1 sur 3</text>
+        <!-- catégorie -->
+        <text x="20" y="96" font-family="sans-serif" font-size="11" font-weight="600" fill="#475569">Catégorie *</text>
+        <rect x="16" y="104" width="248" height="40" rx="10" fill="#fff" stroke="#2563EB" stroke-width="1.5"/>
+        <text x="28" y="128" font-family="sans-serif" font-size="12" fill="#0F172A">📱 Téléphonie</text>
+        <text x="252" y="128" text-anchor="end" font-family="sans-serif" font-size="12" fill="#94A3B8">▼</text>
+        <!-- nom -->
+        <text x="20" y="162" font-family="sans-serif" font-size="11" font-weight="600" fill="#475569">Nom du produit *</text>
+        <rect x="16" y="170" width="248" height="40" rx="10" fill="#fff" stroke="#2563EB" stroke-width="1.5"/>
+        <text x="28" y="194" font-family="sans-serif" font-size="12" fill="#0F172A">iPhone 11 noir 64Go</text>
+        <!-- état -->
+        <text x="20" y="228" font-family="sans-serif" font-size="11" font-weight="600" fill="#475569">État général *</text>
+        <rect x="16" y="236" width="74" height="52" rx="10" fill="#DCFCE7" stroke="#16A34A" stroke-width="2"/>
+        <text x="53" y="258" text-anchor="middle" font-family="sans-serif" font-size="16">🟢</text>
+        <text x="53" y="272" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="600" fill="#15803D">Bon état</text>
+        <text x="53" y="282" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#16A34A">Sélectionné</text>
+        <rect x="98" y="236" width="74" height="52" rx="10" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="135" y="258" text-anchor="middle" font-family="sans-serif" font-size="16">🟡</text>
+        <text x="135" y="272" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#64748B">État correct</text>
+        <text x="135" y="282" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#94A3B8">Traces d'usure</text>
+        <rect x="180" y="236" width="84" height="52" rx="10" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="222" y="258" text-anchor="middle" font-family="sans-serif" font-size="16">🔴</text>
+        <text x="222" y="272" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#64748B">À réparer</text>
+        <text x="222" y="282" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#94A3B8">Défaut fonctionnel</text>
+        <!-- quantité -->
+        <text x="20" y="310" font-family="sans-serif" font-size="11" font-weight="600" fill="#475569">Quantité disponible</text>
+        <rect x="16" y="318" width="248" height="44" rx="10" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+        <rect x="26" y="328" width="32" height="24" rx="6" fill="#F1F5F9"/>
+        <text x="42" y="344" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#64748B">−</text>
+        <text x="140" y="344" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="16" fill="#0F172A">1</text>
+        <rect x="222" y="328" width="32" height="24" rx="6" fill="#EFF6FF"/>
+        <text x="238" y="344" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#2563EB">+</text>
+        <!-- description -->
+        <text x="20" y="382" font-family="sans-serif" font-size="11" font-weight="600" fill="#475569">Description <tspan fill="#94A3B8">(optionnel)</tspan></text>
+        <rect x="16" y="390" width="248" height="70" rx="10" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="28" y="412" font-family="sans-serif" font-size="10" fill="#CBD5E1">Ex: Chargeur inclus, écran sans rayure,</text>
+        <text x="28" y="426" font-family="sans-serif" font-size="10" fill="#CBD5E1">acheté en 2022, toujours fonctionnel...</text>
+        <!-- next btn -->
+        <rect x="16" y="476" width="248" height="48" rx="14" fill="#2563EB"/>
+        <text x="140" y="505" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="14" fill="#fff">Suivant →</text>
+        <rect x="110" y="530" width="60" height="4" rx="2" fill="#E2E8F0"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 2 -->
+  <div class="screen-block">
+    <div class="screen-info">
+      <h3><span class="screen-num-badge">Écran 3</span> Formulaire — Étape 2/3 : Le prix</h3>
+      <p>Le vendeur saisit son prix. La commission et le montant qu'il recevra se calculent en temps réel. Transparence totale. Aucune surprise.</p>
+      <div class="logic-block">
+        <div class="logic-item"><div class="logic-dot green">✓</div>Calcul en temps réel : Prix vendeur → Commission → Montant reçu. Se met à jour à chaque chiffre tapé.</div>
+        <div class="logic-item"><div class="logic-dot blue">→</div>Photos optionnelles (5 max). Message clair : "Les photos officielles seront prises par notre agent. Les vôtres servent d'aperçu."</div>
+        <div class="logic-item"><div class="logic-dot amber">!</div>Prix trop bas pour la catégorie → alerte douce : "Ce prix semble bas pour ce type de produit. Êtes-vous sûr ?"</div>
+        <div class="logic-item"><div class="logic-dot red">✗</div>Prix à 0 ou vide → bouton Suivant reste inactif. Jamais de soumission sans prix.</div>
+      </div>
+    </div>
+    <div class="mockup-wrap">
+      <svg viewBox="0 0 280 540" xmlns="http://www.w3.org/2000/svg">
+        <rect width="280" height="540" rx="24" fill="#0F172A"/>
+        <rect x="10" y="10" width="260" height="520" rx="20" fill="#F8FAFC"/>
+        <rect x="10" y="10" width="260" height="60" rx="20" fill="#fff"/>
+        <rect x="10" y="50" width="260" height="20" fill="#fff"/>
+        <text x="30" y="40" font-family="sans-serif" font-size="16" fill="#64748B">←</text>
+        <text x="140" y="40" text-anchor="middle" font-family="sans-serif" font-weight="600" font-size="14" fill="#0F172A">Prix et photos</text>
+        <rect x="24" y="56" width="232" height="5" rx="3" fill="#E2E8F0"/>
+        <rect x="24" y="56" width="154" height="5" rx="3" fill="#2563EB"/>
+        <text x="24" y="74" font-family="sans-serif" font-size="9" fill="#94A3B8">Étape 2 sur 3</text>
+        <!-- prix -->
+        <text x="20" y="96" font-family="sans-serif" font-size="11" font-weight="600" fill="#475569">Votre prix de vente *</text>
+        <rect x="16" y="104" width="248" height="56" rx="12" fill="#fff" stroke="#2563EB" stroke-width="2"/>
+        <text x="28" y="128" font-family="sans-serif" font-size="11" fill="#94A3B8">FCFA</text>
+        <text x="80" y="140" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="28" fill="#0F172A">85 000</text>
+        <!-- commission bloc -->
+        <rect x="16" y="172" width="248" height="84" rx="12" fill="#FFFBEB" stroke="#FDE68A" stroke-width="1"/>
+        <text x="28" y="192" font-family="sans-serif" font-size="11" font-weight="600" fill="#92400E">Votre estimation en temps réel</text>
+        <line x1="28" y1="200" x2="252" y2="200" stroke="#FDE68A" stroke-width="1"/>
+        <text x="28" y="218" font-family="sans-serif" font-size="11" fill="#78350F">Prix affiché sur la boutique</text>
+        <text x="252" y="218" text-anchor="end" font-family="sans-serif" font-size="11" font-weight="600" fill="#0F172A">85 000 FCFA</text>
+        <text x="28" y="236" font-family="sans-serif" font-size="11" fill="#78350F">Commission plateforme (10%)</text>
+        <text x="252" y="236" text-anchor="end" font-family="sans-serif" font-size="11" fill="#DC2626">− 8 500 FCFA</text>
+        <text x="28" y="248" font-family="sans-serif" font-size="12" font-weight="700" fill="#15803D">Vous recevrez</text>
+        <text x="252" y="248" text-anchor="end" font-family="sans-serif" font-size="14" font-weight="700" fill="#15803D">76 500 FCFA</text>
+        <!-- photos -->
+        <text x="20" y="276" font-family="sans-serif" font-size="11" font-weight="600" fill="#475569">Photos <tspan fill="#94A3B8">(optionnel, max 5)</tspan></text>
+        <rect x="16" y="284" width="56" height="56" rx="10" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="1.5"/>
+        <text x="44" y="316" text-anchor="middle" font-family="sans-serif" font-size="24" fill="#2563EB">+</text>
+        <rect x="80" y="284" width="56" height="56" rx="10" fill="#DBEAFE"/>
+        <text x="108" y="316" text-anchor="middle" font-family="sans-serif" font-size="22">📷</text>
+        <rect x="144" y="284" width="56" height="56" rx="10" fill="#DBEAFE"/>
+        <text x="172" y="316" text-anchor="middle" font-family="sans-serif" font-size="22">📷</text>
+        <rect x="16" y="350" width="248" height="34" rx="8" fill="#EFF6FF"/>
+        <text x="28" y="365" font-family="sans-serif" font-size="9" fill="#1E40AF">💡 Les photos officielles sont prises par notre agent lors de sa visite.</text>
+        <text x="28" y="378" font-family="sans-serif" font-size="9" fill="#1E40AF">Les vôtres nous donnent juste un aperçu préalable.</text>
+        <!-- next btn -->
+        <rect x="16" y="400" width="248" height="48" rx="14" fill="#2563EB"/>
+        <text x="140" y="429" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="14" fill="#fff">Suivant →</text>
+        <rect x="110" y="506" width="60" height="4" rx="2" fill="#E2E8F0"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 3 -->
+  <div class="screen-block reverse">
+    <div class="screen-info">
+      <h3><span class="screen-num-badge">Écran 4</span> Formulaire — Étape 3/3 : Adresse & Disponibilité</h3>
+      <p>Zone de couverture, adresse descriptive (pas de code postal — contexte camerounais), créneaux de disponibilité, numéro de contact pré-rempli.</p>
+      <div class="logic-block">
+        <div class="logic-item"><div class="logic-dot red">✗</div>Zone non couverte → message immédiat : "On n'est pas encore dans votre zone. Laissez votre numéro, on vous prévient dès qu'on arrive." Jamais bloquer sans alternative.</div>
+        <div class="logic-item"><div class="logic-dot green">✓</div>Adresse libre en texte — placeholder contextuel : "Ex: Rue des palmiers, en face de l'école, maison bleue". Réalité camerounaise respectée.</div>
+        <div class="logic-item"><div class="logic-dot blue">→</div>Numéro de contact pré-rempli avec le numéro du compte. Modifiable si besoin (ex: numéro d'un proche à contacter).</div>
+        <div class="logic-item"><div class="logic-dot amber">!</div>Au moins un créneau de disponibilité obligatoire. Sinon le bouton reste inactif.</div>
+      </div>
+    </div>
+    <div class="mockup-wrap">
+      <svg viewBox="0 0 280 540" xmlns="http://www.w3.org/2000/svg">
+        <rect width="280" height="540" rx="24" fill="#0F172A"/>
+        <rect x="10" y="10" width="260" height="520" rx="20" fill="#F8FAFC"/>
+        <rect x="10" y="10" width="260" height="60" rx="20" fill="#fff"/>
+        <rect x="10" y="50" width="260" height="20" fill="#fff"/>
+        <text x="30" y="40" font-family="sans-serif" font-size="16" fill="#64748B">←</text>
+        <text x="140" y="40" text-anchor="middle" font-family="sans-serif" font-weight="600" font-size="14" fill="#0F172A">Votre adresse</text>
+        <rect x="24" y="56" width="232" height="5" rx="3" fill="#E2E8F0"/>
+        <rect x="24" y="56" width="232" height="5" rx="3" fill="#2563EB"/>
+        <text x="24" y="74" font-family="sans-serif" font-size="9" fill="#94A3B8">Étape 3 sur 3 — Dernière étape !</text>
+        <!-- zone -->
+        <text x="20" y="96" font-family="sans-serif" font-size="11" font-weight="600" fill="#475569">Votre zone / Quartier *</text>
+        <rect x="16" y="104" width="248" height="40" rx="10" fill="#fff" stroke="#2563EB" stroke-width="1.5"/>
+        <text x="28" y="128" font-family="sans-serif" font-size="12" fill="#0F172A">Akwa, Douala</text>
+        <text x="252" y="128" text-anchor="end" font-family="sans-serif" font-size="12" fill="#94A3B8">▼</text>
+        <!-- adresse -->
+        <text x="20" y="162" font-family="sans-serif" font-size="11" font-weight="600" fill="#475569">Adresse précise *</text>
+        <rect x="16" y="170" width="248" height="64" rx="10" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="28" y="192" font-family="sans-serif" font-size="10" fill="#0F172A">Rue Njo-Njo, immeuble blanc 3 étages,</text>
+        <text x="28" y="208" font-family="sans-serif" font-size="10" fill="#0F172A">appt 2B, en face de la pharmacie</text>
+        <text x="28" y="226" font-family="sans-serif" font-size="9" fill="#94A3B8">Soyez précis pour faciliter la visite de l'agent</text>
+        <!-- disponibilité -->
+        <text x="20" y="256" font-family="sans-serif" font-size="11" font-weight="600" fill="#475569">Disponible pour la visite * <tspan fill="#94A3B8">(plusieurs choix)</tspan></text>
+        <rect x="16" y="264" width="74" height="44" rx="10" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+        <text x="53" y="284" text-anchor="middle" font-family="sans-serif" font-size="16">☀️</text>
+        <text x="53" y="298" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="600" fill="#1E40AF">Matin</text>
+        <text x="53" y="308" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#2563EB">8h–12h ✓</text>
+        <rect x="98" y="264" width="80" height="44" rx="10" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+        <text x="138" y="284" text-anchor="middle" font-family="sans-serif" font-size="16">🌤</text>
+        <text x="138" y="298" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="600" fill="#1E40AF">Après-midi</text>
+        <text x="138" y="308" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#2563EB">12h–17h ✓</text>
+        <rect x="186" y="264" width="78" height="44" rx="10" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="225" y="284" text-anchor="middle" font-family="sans-serif" font-size="16">🌙</text>
+        <text x="225" y="298" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#94A3B8">Soir</text>
+        <text x="225" y="308" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#CBD5E1">17h–20h</text>
+        <!-- contact -->
+        <text x="20" y="332" font-family="sans-serif" font-size="11" font-weight="600" fill="#475569">Numéro à contacter *</text>
+        <rect x="16" y="340" width="248" height="40" rx="10" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="28" y="364" font-family="sans-serif" font-size="12" fill="#0F172A">+237 699 XXX X42</text>
+        <text x="252" y="364" text-anchor="end" font-family="sans-serif" font-size="10" fill="#2563EB">Modifier</text>
+        <!-- send btn -->
+        <rect x="16" y="396" width="248" height="52" rx="14" fill="#16A34A"/>
+        <text x="140" y="427" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="15" fill="#fff">✅ Envoyer ma demande</text>
+        <rect x="110" y="506" width="60" height="4" rx="2" fill="#E2E8F0"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- CONFIRMATION + SUIVI -->
+  <div class="screen-block">
+    <div class="screen-info">
+      <h3><span class="screen-num-badge">Écrans 5 & 6</span> Confirmation & Suivi Vendeur</h3>
+      <p>Confirmation rassurante avec récapitulatif financier clair. Timeline vendeur avec 6 états. Lien vers l'annonce en lecture seule quand le produit est mis en vente.</p>
+      <div class="logic-block">
+        <div class="logic-item"><div class="logic-dot green">✓</div>Récapitulatif confirme : prix demandé, commission, montant estimé reçu. Aucune surprise ultérieure.</div>
+        <div class="logic-item"><div class="logic-dot blue">→</div>Notification push à chaque étape. Ex: "Votre agent arrive demain matin entre 8h et 12h. Soyez disponible."</div>
+        <div class="logic-item"><div class="logic-dot amber">!</div>Produit en vente → lien "Voir mon annonce" affiché. Vendeur voit sa fiche en lecture seule. Ne peut rien modifier.</div>
+        <div class="logic-item"><div class="logic-dot red">✗</div>Annulation possible uniquement avant collecte. Après que l'agent a récupéré le produit → annulation impossible via app. Contact support requis.</div>
+      </div>
+    </div>
+    <div class="mockup-wrap">
+      <svg viewBox="0 0 280 540" xmlns="http://www.w3.org/2000/svg">
+        <rect width="280" height="540" rx="24" fill="#0F172A"/>
+        <rect x="10" y="10" width="260" height="520" rx="20" fill="#F8FAFC"/>
+        <rect x="10" y="10" width="260" height="60" rx="20" fill="#fff"/>
+        <rect x="10" y="50" width="260" height="20" fill="#fff"/>
+        <text x="140" y="40" text-anchor="middle" font-family="sans-serif" font-weight="600" font-size="14" fill="#0F172A">Ma demande</text>
+        <!-- success -->
+        <circle cx="140" cy="110" r="40" fill="#F0FDF4"/>
+        <circle cx="140" cy="110" r="28" fill="#DCFCE7"/>
+        <circle cx="140" cy="110" r="18" fill="#16A34A"/>
+        <text x="140" y="116" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#fff">✓</text>
+        <text x="140" y="168" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="15" fill="#0F172A">Demande envoyée !</text>
+        <text x="140" y="184" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#64748B">Un agent vous contacte sous 24 à 48h</text>
+        <!-- recap financier -->
+        <rect x="16" y="196" width="248" height="72" rx="12" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="28" y="216" font-family="sans-serif" font-size="11" fill="#64748B">Produit</text>
+        <text x="252" y="216" text-anchor="end" font-family="sans-serif" font-size="11" font-weight="600" fill="#0F172A">iPhone 11 Noir</text>
+        <text x="28" y="234" font-family="sans-serif" font-size="11" fill="#64748B">Prix demandé</text>
+        <text x="252" y="234" text-anchor="end" font-family="sans-serif" font-size="11" fill="#0F172A">85 000 FCFA</text>
+        <line x1="28" y1="242" x2="252" y2="242" stroke="#F1F5F9" stroke-width="1"/>
+        <text x="28" y="258" font-family="sans-serif" font-size="12" font-weight="700" fill="#15803D">Vous recevrez environ</text>
+        <text x="252" y="258" text-anchor="end" font-family="sans-serif" font-size="13" font-weight="700" fill="#15803D">76 500 FCFA</text>
+        <!-- timeline suivi -->
+        <text x="20" y="286" font-family="sans-serif" font-weight="600" font-size="12" fill="#1E293B">Suivi de votre demande</text>
+        <line x1="38" y1="306" x2="38" y2="476" stroke="#E2E8F0" stroke-width="2"/>
+        <circle cx="38" cy="306" r="8" fill="#16A34A"/>
+        <text x="38" y="310" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#fff">✓</text>
+        <text x="54" y="303" font-family="sans-serif" font-weight="600" font-size="11" fill="#0F172A">Demande soumise</text>
+        <text x="54" y="316" font-family="sans-serif" font-size="9" fill="#94A3B8">13 Jan · 10h14</text>
+        <circle cx="38" cy="348" r="8" fill="#16A34A"/>
+        <text x="38" y="352" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#fff">✓</text>
+        <text x="54" y="345" font-family="sans-serif" font-weight="600" font-size="11" fill="#0F172A">Examinée par l'équipe</text>
+        <text x="54" y="358" font-family="sans-serif" font-size="9" fill="#94A3B8">13 Jan · 15h30</text>
+        <circle cx="38" cy="390" r="10" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2"/>
+        <circle cx="38" cy="390" r="5" fill="#F59E0B"/>
+        <text x="54" y="387" font-family="sans-serif" font-weight="700" font-size="11" fill="#B45309">Visite planifiée</text>
+        <text x="54" y="400" font-family="sans-serif" font-size="9" fill="#F59E0B">Mar 14 Jan — matin (8h–12h)</text>
+        <circle cx="38" cy="430" r="8" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1.5"/>
+        <text x="54" y="434" font-family="sans-serif" font-size="11" fill="#CBD5E1">Collecté</text>
+        <circle cx="38" cy="460" r="8" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1.5"/>
+        <text x="54" y="464" font-family="sans-serif" font-size="11" fill="#CBD5E1">Mis en vente</text>
+        <circle cx="38" cy="490" r="8" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1.5"/>
+        <text x="54" y="494" font-family="sans-serif" font-size="11" fill="#CBD5E1">Vendu — paiement reçu</text>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- ═══════════════════════════════════════
+     SCÉNARIO 07 — AGENT TERRAIN
+═══════════════════════════════════════ -->
+<div class="scenario">
+  <div class="scenario-head">
+    <div class="scenario-num sn-teal">Scénario 07</div>
+    <h2>Application Agent Terrain</h2>
+  </div>
+  <div class="scenario-desc">
+    L'agent terrain est le cœur opérationnel de la plateforme. Sans lui, rien ne fonctionne. Son application doit être ultra-simple, rapide, utilisable d'une main sur son téléphone, même en déplacement. Chaque mission est documentée, tracée, horodatée. Zéro ambiguïté sur ce qu'il doit faire à chaque étape.
+  </div>
+
+  <!-- TABLEAU DE BORD AGENT -->
+  <div class="screen-block reverse">
+    <div class="screen-info">
+      <h3><span class="sn-badge-teal screen-num-badge">Écran 1</span> Tableau de bord Agent</h3>
+      <p>Vue d'ensemble immédiate : missions du jour, missions urgentes en premier, statistiques de performance. L'agent sait en un coup d'œil ce qu'il doit faire.</p>
+      <div class="logic-block">
+        <div class="logic-item"><div class="logic-dot teal">→</div>Missions triées par urgence : livraisons du jour en haut, collectes planifiées ensuite.</div>
+        <div class="logic-item"><div class="logic-dot green">✓</div>Badge rouge sur l'icône missions si nouvelle mission assignée pendant que l'agent est connecté.</div>
+        <div class="logic-item"><div class="logic-dot amber">!</div>Mission expirée (délai dépassé) → alerte rouge. Admin notifié automatiquement.</div>
+        <div class="logic-item"><div class="logic-dot blue">→</div>Statistiques du mois : missions complétées, taux de réussite, zones couvertes.</div>
+      </div>
+    </div>
+    <div class="mockup-wrap">
+      <svg viewBox="0 0 280 540" xmlns="http://www.w3.org/2000/svg">
+        <rect width="280" height="540" rx="24" fill="#0F172A"/>
+        <rect x="10" y="10" width="260" height="520" rx="20" fill="#F8FAFC"/>
+        <rect x="10" y="10" width="260" height="70" rx="20" fill="#0D9488"/>
+        <rect x="10" y="55" width="260" height="25" fill="#0D9488"/>
+        <text x="30" y="40" font-family="sans-serif" font-weight="700" font-size="16" fill="#fff">Bonjour, Jean-Pierre 👋</text>
+        <text x="30" y="58" font-family="sans-serif" font-size="11" fill="rgba(255,255,255,.7)">Agent terrain · Zone Akwa-Bonanjo</text>
+        <text x="252" y="44" text-anchor="end" font-family="sans-serif" font-size="22" fill="#fff">🔔</text>
+        <!-- stats cards -->
+        <rect x="16" y="88" width="74" height="60" rx="12" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="53" y="110" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="20" fill="#0D9488">3</text>
+        <text x="53" y="126" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#64748B">Missions</text>
+        <text x="53" y="137" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#64748B">aujourd'hui</text>
+        <rect x="98" y="88" width="74" height="60" rx="12" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="135" y="110" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="20" fill="#2563EB">24</text>
+        <text x="135" y="126" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#64748B">Ce mois-ci</text>
+        <text x="135" y="137" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#64748B">complétées</text>
+        <rect x="180" y="88" width="84" height="60" rx="12" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="222" y="110" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="20" fill="#16A34A">96%</text>
+        <text x="222" y="126" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#64748B">Taux de</text>
+        <text x="222" y="137" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#64748B">réussite</text>
+        <!-- missions list -->
+        <text x="20" y="168" font-family="sans-serif" font-weight="600" font-size="12" fill="#1E293B">Missions du jour</text>
+        <!-- Mission 1 - urgent -->
+        <rect x="16" y="176" width="248" height="76" rx="12" fill="#fff" stroke="#FED7AA" stroke-width="1.5"/>
+        <rect x="16" y="176" width="6" height="76" rx="3" fill="#F97316"/>
+        <text x="30" y="194" font-family="sans-serif" font-size="9" fill="#EA580C">🔴 URGENT · Livraison</text>
+        <text x="30" y="210" font-family="sans-serif" font-weight="600" font-size="12" fill="#0F172A">TV Samsung 43" → Akwa</text>
+        <text x="30" y="226" font-family="sans-serif" font-size="10" fill="#94A3B8">Commande #CM-2024-0041 · Avant 14h</text>
+        <text x="30" y="240" font-family="sans-serif" font-size="10" fill="#64748B">📍 Rue Njo-Njo, face pharmacie</text>
+        <rect x="196" y="220" width="58" height="24" rx="8" fill="#0D9488"/>
+        <text x="225" y="236" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#fff">Démarrer</text>
+        <!-- Mission 2 -->
+        <rect x="16" y="262" width="248" height="76" rx="12" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+        <rect x="16" y="262" width="6" height="76" rx="3" fill="#2563EB"/>
+        <text x="30" y="280" font-family="sans-serif" font-size="9" fill="#2563EB">🔵 Collecte</text>
+        <text x="30" y="296" font-family="sans-serif" font-weight="600" font-size="12" fill="#0F172A">iPhone 11 · Bonapriso</text>
+        <text x="30" y="312" font-family="sans-serif" font-size="10" fill="#94A3B8">Demande #DEM-0047 · Après 14h</text>
+        <text x="30" y="326" font-family="sans-serif" font-size="10" fill="#64748B">📍 Résidence Les Palmiers, bâtiment A</text>
+        <rect x="196" y="306" width="58" height="24" rx="8" fill="#2563EB"/>
+        <text x="225" y="322" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#fff">Démarrer</text>
+        <!-- Mission 3 -->
+        <rect x="16" y="348" width="248" height="76" rx="12" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+        <rect x="16" y="348" width="6" height="76" rx="3" fill="#2563EB"/>
+        <text x="30" y="366" font-family="sans-serif" font-size="9" fill="#2563EB">🔵 Collecte</text>
+        <text x="30" y="382" font-family="sans-serif" font-weight="600" font-size="12" fill="#0F172A">Canapé 3 places · Makepe</text>
+        <text x="30" y="398" font-family="sans-serif" font-size="10" fill="#94A3B8">Demande #DEM-0048 · Soir</text>
+        <text x="30" y="412" font-family="sans-serif" font-size="10" fill="#64748B">📍 Quartier Makepe, villa rouge</text>
+        <rect x="196" y="392" width="58" height="24" rx="8" fill="#F1F5F9"/>
+        <text x="225" y="408" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#94A3B8">En attente</text>
+        <!-- bottom nav -->
+        <rect x="10" y="488" width="260" height="42" rx="0 0 20 20" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="60" y="512" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#0D9488">🗺️</text>
+        <text x="60" y="522" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#0D9488">Missions</text>
+        <text x="140" y="512" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#94A3B8">📋</text>
+        <text x="140" y="522" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#94A3B8">Historique</text>
+        <text x="220" y="512" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#94A3B8">👤</text>
+        <text x="220" y="522" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#94A3B8">Mon profil</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- MISSION COLLECTE -->
+  <div class="screen-block">
+    <div class="screen-info">
+      <h3><span class="sn-badge-teal screen-num-badge">Écrans 2 & 3</span> Mission Collecte — Vérification</h3>
+      <p>L'agent suit une checklist obligatoire. Chaque point doit être validé. Photos prises in-app uniquement — pas depuis la galerie. Tout est tracé, horodaté, géolocalisé.</p>
+      <div class="logic-block">
+        <div class="logic-item"><div class="logic-dot teal">→</div>Bouton GPS intégré → ouvre Maps avec l'adresse du vendeur pré-remplie. Un seul tap.</div>
+        <div class="logic-item"><div class="logic-dot green">✓</div>Checklist de vérification : CNI vendeur ✓, Preuve achat ✓, Correspondance produit ✓. Toutes obligatoires.</div>
+        <div class="logic-item"><div class="logic-dot red">✗</div>Photos depuis galerie interdites. Uniquement prises in-app avec horodatage et géolocalisation automatique. Impossibilité de tricher.</div>
+        <div class="logic-item"><div class="logic-dot amber">!</div>Si propriété non prouvée → bouton "Refuser la collecte". Raison obligatoire. Admin notifié immédiatement. Vendeur notifié avec explication.</div>
+        <div class="logic-item"><div class="logic-dot blue">→</div>Minimum 4 photos obligatoires : face, dos, côtés, défauts visibles. L'app refuse de continuer sans.</div>
+      </div>
+    </div>
+    <div class="mockup-wrap">
+      <svg viewBox="0 0 280 560" xmlns="http://www.w3.org/2000/svg">
+        <rect width="280" height="560" rx="24" fill="#0F172A"/>
+        <rect x="10" y="10" width="260" height="540" rx="20" fill="#F8FAFC"/>
+        <rect x="10" y="10" width="260" height="60" rx="20" fill="#0D9488"/>
+        <rect x="10" y="50" width="260" height="20" fill="#0D9488"/>
+        <text x="30" y="40" font-family="sans-serif" font-size="16" fill="#fff">←</text>
+        <text x="140" y="40" text-anchor="middle" font-family="sans-serif" font-weight="600" font-size="14" fill="#fff">Mission Collecte</text>
+        <text x="252" y="40" text-anchor="end" font-family="sans-serif" font-size="11" fill="rgba(255,255,255,.8)">#DEM-0047</text>
+        <!-- vendor info -->
+        <rect x="16" y="74" width="248" height="64" rx="12" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="28" y="93" font-family="sans-serif" font-weight="600" font-size="12" fill="#0F172A">iPhone 11 Noir · 85 000 FCFA</text>
+        <text x="28" y="109" font-family="sans-serif" font-size="10" fill="#64748B">📍 Res. Palmiers, bâtiment A, Bonapriso</text>
+        <text x="28" y="125" font-family="sans-serif" font-size="10" fill="#64748B">📞 Contact : 6XX XXX X42</text>
+        <rect x="192" y="96" width="60" height="28" rx="8" fill="#0D9488"/>
+        <text x="222" y="114" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#fff">🗺 GPS</text>
+        <!-- checklist -->
+        <text x="20" y="158" font-family="sans-serif" font-weight="600" font-size="12" fill="#1E293B">Checklist de vérification obligatoire</text>
+        <rect x="16" y="166" width="248" height="44" rx="10" fill="#F0FDF4" stroke="#BBF7D0" stroke-width="1"/>
+        <rect x="28" y="178" width="20" height="20" rx="5" fill="#16A34A"/>
+        <text x="38" y="192" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#fff">✓</text>
+        <text x="58" y="188" font-family="sans-serif" font-size="11" fill="#0F172A">Carte d'identité vérifiée</text>
+        <text x="252" y="188" text-anchor="end" font-family="sans-serif" font-size="9" fill="#94A3B8">Photo prise ✓</text>
+        <rect x="16" y="216" width="248" height="44" rx="10" fill="#F0FDF4" stroke="#BBF7D0" stroke-width="1"/>
+        <rect x="28" y="228" width="20" height="20" rx="5" fill="#16A34A"/>
+        <text x="38" y="242" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#fff">✓</text>
+        <text x="58" y="238" font-family="sans-serif" font-size="11" fill="#0F172A">Preuve de propriété vérifiée</text>
+        <text x="252" y="238" text-anchor="end" font-family="sans-serif" font-size="9" fill="#94A3B8">Photo prise ✓</text>
+        <rect x="16" y="266" width="248" height="44" rx="10" fill="#FEF3C7" stroke="#FDE68A" stroke-width="1.5"/>
+        <rect x="28" y="278" width="20" height="20" rx="5" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="58" y="288" font-family="sans-serif" font-size="11" fill="#0F172A">Produit correspond à la description</text>
+        <text x="252" y="288" text-anchor="end" font-family="sans-serif" font-size="9" fill="#F59E0B">En attente</text>
+        <rect x="16" y="316" width="248" height="44" rx="10" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+        <rect x="28" y="328" width="20" height="20" rx="5" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="58" y="338" font-family="sans-serif" font-size="11" fill="#CBD5E1">Photos officielles prises (min 4)</text>
+        <text x="252" y="338" text-anchor="end" font-family="sans-serif" font-size="9" fill="#CBD5E1">0/4</text>
+        <!-- photos section -->
+        <text x="20" y="378" font-family="sans-serif" font-weight="600" font-size="12" fill="#1E293B">Photos officielles <tspan fill="#DC2626">*</tspan> <tspan fill="#94A3B8" font-weight="400" font-size="10">(app uniquement)</tspan></text>
+        <rect x="16" y="386" width="58" height="58" rx="10" fill="#CCFBF1" stroke="#0D9488" stroke-width="1.5" stroke-dasharray="4 2"/>
+        <text x="45" y="420" text-anchor="middle" font-family="sans-serif" font-size="22" fill="#0D9488">📷</text>
+        <rect x="82" y="386" width="58" height="58" rx="10" fill="#CCFBF1" stroke="#0D9488" stroke-width="1.5" stroke-dasharray="4 2"/>
+        <text x="111" y="420" text-anchor="middle" font-family="sans-serif" font-size="22" fill="#0D9488">📷</text>
+        <rect x="148" y="386" width="58" height="58" rx="10" fill="#CCFBF1" stroke="#0D9488" stroke-width="1.5" stroke-dasharray="4 2"/>
+        <text x="177" y="420" text-anchor="middle" font-family="sans-serif" font-size="22" fill="#0D9488">📷</text>
+        <rect x="214" y="386" width="50" height="58" rx="10" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1" stroke-dasharray="4 2"/>
+        <text x="239" y="420" text-anchor="middle" font-family="sans-serif" font-size="22" fill="#CBD5E1">+</text>
+        <!-- buttons -->
+        <rect x="16" y="460" width="152" height="44" rx="12" fill="#0D9488"/>
+        <text x="92" y="487" text-anchor="middle" font-family="sans-serif" font-weight="600" font-size="12" fill="#fff">✓ Valider collecte</text>
+        <rect x="176" y="460" width="88" height="44" rx="12" fill="#FFF1F2" stroke="#FECDD3" stroke-width="1"/>
+        <text x="220" y="487" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#DC2626">✗ Refuser</text>
+        <rect x="110" y="530" width="60" height="4" rx="2" fill="#E2E8F0"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- MISSION LIVRAISON -->
+  <div class="screen-block reverse">
+    <div class="screen-info">
+      <h3><span class="sn-badge-teal screen-num-badge">Écran 4</span> Mission Livraison</h3>
+      <p>L'agent livre le produit à l'acheteur. Confirmation de livraison avec code unique que l'acheteur doit présenter. Signature ou code — la remise est prouvée.</p>
+      <div class="logic-block">
+        <div class="logic-item"><div class="logic-dot teal">→</div>L'acheteur reçoit un code de confirmation à 6 chiffres. L'agent saisit ce code pour confirmer la remise. Les deux doivent correspondre.</div>
+        <div class="logic-item"><div class="logic-dot green">✓</div>Code validé → livraison confirmée. Statut mis à jour instantanément. Acheteur et admin notifiés.</div>
+        <div class="logic-item"><div class="logic-dot red">✗</div>Acheteur absent après 2 tentatives → agent signale "Acheteur injoignable". Admin prend le relais pour replanifier.</div>
+        <div class="logic-item"><div class="logic-dot amber">!</div>Produit endommagé constaté lors de la livraison → agent signale avant remise. Photo obligatoire. Remise suspendue jusqu'à décision admin.</div>
+      </div>
+    </div>
+    <div class="mockup-wrap">
+      <svg viewBox="0 0 280 500" xmlns="http://www.w3.org/2000/svg">
+        <rect width="280" height="500" rx="24" fill="#0F172A"/>
+        <rect x="10" y="10" width="260" height="480" rx="20" fill="#F8FAFC"/>
+        <rect x="10" y="10" width="260" height="60" rx="20" fill="#0D9488"/>
+        <rect x="10" y="50" width="260" height="20" fill="#0D9488"/>
+        <text x="30" y="40" font-family="sans-serif" font-size="16" fill="#fff">←</text>
+        <text x="140" y="40" text-anchor="middle" font-family="sans-serif" font-weight="600" font-size="14" fill="#fff">Mission Livraison</text>
+        <!-- order info -->
+        <rect x="16" y="74" width="248" height="60" rx="12" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+        <rect x="26" y="84" width="42" height="42" rx="8" fill="#DBEAFE"/>
+        <text x="47" y="110" text-anchor="middle" font-family="sans-serif" font-size="20">📱</text>
+        <text x="78" y="96" font-family="sans-serif" font-weight="600" font-size="12" fill="#0F172A">iPhone 11 → #CM-2024-0047</text>
+        <text x="78" y="112" font-family="sans-serif" font-size="10" fill="#64748B">📍 Rue Njo-Njo, Akwa · Avant 14h</text>
+        <rect x="192" y="88" width="60" height="28" rx="8" fill="#0D9488"/>
+        <text x="222" y="106" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#fff">🗺 GPS</text>
+        <!-- acheteur info -->
+        <rect x="16" y="144" width="248" height="54" rx="12" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="1"/>
+        <text x="28" y="162" font-family="sans-serif" font-size="11" fill="#1E40AF">Acheteur · À ne pas communiquer</text>
+        <text x="28" y="180" font-family="sans-serif" font-size="10" fill="#94A3B8">📞 6XX XXX X47 · Sonnez 2 fois</text>
+        <text x="252" y="180" text-anchor="end" font-family="sans-serif" font-size="10" fill="#2563EB">Appeler</text>
+        <!-- code section -->
+        <text x="140" y="222" text-anchor="middle" font-family="sans-serif" font-weight="600" font-size="13" fill="#1E293B">Code de confirmation remise</text>
+        <text x="140" y="240" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#64748B">Demandez ce code à l'acheteur</text>
+        <rect x="36" y="252" width="40" height="48" rx="10" fill="#fff" stroke="#0D9488" stroke-width="2"/>
+        <text x="56" y="283" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="22" fill="#0F172A">4</text>
+        <rect x="82" y="252" width="40" height="48" rx="10" fill="#fff" stroke="#0D9488" stroke-width="2"/>
+        <text x="102" y="283" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="22" fill="#0F172A">7</text>
+        <rect x="128" y="252" width="40" height="48" rx="10" fill="#fff" stroke="#0D9488" stroke-width="2"/>
+        <text x="148" y="283" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="22" fill="#0F172A">2</text>
+        <rect x="174" y="252" width="40" height="48" rx="10" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="194" y="283" text-anchor="middle" font-family="sans-serif" font-size="22" fill="#CBD5E1">_</text>
+        <rect x="220" y="252" width="40" height="48" rx="10" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="240" y="283" text-anchor="middle" font-family="sans-serif" font-size="22" fill="#CBD5E1">_</text>
+        <!-- confirm btn -->
+        <rect x="16" y="320" width="248" height="50" rx="14" fill="#0D9488"/>
+        <text x="140" y="350" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="14" fill="#fff">✓ Confirmer la remise</text>
+        <!-- problem btn -->
+        <rect x="16" y="380" width="248" height="44" rx="12" fill="#FFF1F2" stroke="#FECDD3" stroke-width="1"/>
+        <text x="140" y="407" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#DC2626">⚠ Signaler un problème</text>
+        <text x="140" y="422" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#94A3B8">Acheteur absent · Produit endommagé · Autre</text>
+        <rect x="110" y="462" width="60" height="4" rx="2" fill="#E2E8F0"/>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- ═══════════════════════════════════════
+     SCÉNARIO 08 — PANEL ADMIN
+═══════════════════════════════════════ -->
+<div class="scenario">
+  <div class="scenario-head">
+    <div class="scenario-num sn-red">Scénario 08</div>
+    <h2>Panel Admin</h2>
+  </div>
+  <div class="scenario-desc">
+    L'admin est le chef d'orchestre quotidien. Il valide, publie, assigne, gère les litiges, suit les commandes. Son interface est un tableau de bord web dense mais organisé. Chaque information est accessible en maximum 2 clics. Aucune action destructive sans confirmation explicite.
+  </div>
+
+  <!-- DASHBOARD ADMIN -->
+  <div class="screen-block single">
+    <div class="screen-info">
+      <h3><span class="sn-badge-red screen-num-badge">Écran 1</span> Tableau de bord Admin — Vue générale</h3>
+      <p>KPIs du jour en haut. Alertes prioritaires en rouge. Demandes en attente, commandes en cours, missions agents — tout visible sans naviguer.</p>
+      <div class="logic-block">
+        <div class="logic-item"><div class="logic-dot red">✗</div>Alerte rouge si demande vendeur en attente depuis plus de 4h. L'admin doit traiter en priorité.</div>
+        <div class="logic-item"><div class="logic-dot amber">!</div>Alerte orange si livraison en retard de plus de 2h. Action requise immédiatement.</div>
+        <div class="logic-item"><div class="logic-dot green">✓</div>Toutes les métriques clés visibles d'un coup d'œil : revenus du jour, commandes actives, produits en vente, agents en mission.</div>
+        <div class="logic-item"><div class="logic-dot blue">→</div>Chaque chiffre cliquable → vue détaillée. Ex: tap sur "3 réclamations" → liste des réclamations ouvertes.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup-wrap" style="margin-bottom:32px">
+    <svg viewBox="0 0 900 520" xmlns="http://www.w3.org/2000/svg">
+      <rect width="900" height="520" rx="16" fill="#F8FAFC"/>
+      <!-- Sidebar -->
+      <rect x="0" y="0" width="200" height="520" rx="16" fill="#0F172A"/>
+      <rect x="150" y="0" width="50" height="520" fill="#0F172A"/>
+      <circle cx="100" cy="44" r="20" fill="#1E3A8A"/>
+      <text x="100" y="49" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="12" fill="#fff">ADMIN</text>
+      <text x="100" y="70" text-anchor="middle" font-family="sans-serif" font-size="10" fill="rgba(255,255,255,.5)">Panel de gestion</text>
+      <!-- Nav items -->
+      <rect x="14" y="96" width="172" height="36" rx="8" fill="#1E3A8A"/>
+      <text x="32" y="118" font-family="sans-serif" font-size="13" fill="#fff">📊 Tableau de bord</text>
+      <text x="32" y="154" font-family="sans-serif" font-size="13" fill="rgba(255,255,255,.5)">📦 Demandes vendeurs</text>
+      <rect x="186" y="144" width="18" height="18" rx="5" fill="#DC2626"/>
+      <text x="195" y="157" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#fff">5</text>
+      <text x="32" y="190" font-family="sans-serif" font-size="13" fill="rgba(255,255,255,.5)">🏪 Catalogue produits</text>
+      <text x="32" y="226" font-family="sans-serif" font-size="13" fill="rgba(255,255,255,.5)">🛒 Commandes</text>
+      <text x="32" y="262" font-family="sans-serif" font-size="13" fill="rgba(255,255,255,.5)">🏍️ Agents terrain</text>
+      <text x="32" y="298" font-family="sans-serif" font-size="13" fill="rgba(255,255,255,.5)">👥 Utilisateurs</text>
+      <text x="32" y="334" font-family="sans-serif" font-size="13" fill="rgba(255,255,255,.5)">⚠ Réclamations</text>
+      <rect x="186" y="324" width="18" height="18" rx="5" fill="#F59E0B"/>
+      <text x="195" y="337" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#fff">3</text>
+      <text x="32" y="370" font-family="sans-serif" font-size="13" fill="rgba(255,255,255,.5)">💰 Paiements</text>
+      <text x="32" y="406" font-family="sans-serif" font-size="13" fill="rgba(255,255,255,.5)">📈 Analytique</text>
+      <!-- Main content -->
+      <!-- Top bar -->
+      <rect x="200" y="0" width="700" height="56" fill="#fff" rx="0"/>
+      <text x="220" y="32" font-family="sans-serif" font-weight="600" font-size="16" fill="#0F172A">Tableau de bord</text>
+      <text x="220" y="48" font-family="sans-serif" font-size="11" fill="#94A3B8">Lundi 13 Janvier 2025</text>
+      <rect x="770" y="14" width="110" height="30" rx="8" fill="#EFF6FF"/>
+      <text x="825" y="33" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#2563EB">+ Publier produit</text>
+      <!-- Alerts -->
+      <rect x="210" y="64" width="680" height="36" rx="8" fill="#FFF1F2" stroke="#FECDD3" stroke-width="1"/>
+      <text x="222" y="87" font-family="sans-serif" font-size="12" fill="#DC2626">🔴 5 demandes vendeurs en attente depuis plus de 4h — Action requise</text>
+      <text x="876" y="87" text-anchor="end" font-family="sans-serif" font-size="11" fill="#2563EB">Traiter →</text>
+      <!-- KPI cards -->
+      <rect x="210" y="110" width="152" height="80" rx="12" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+      <text x="226" y="136" font-family="sans-serif" font-size="12" fill="#64748B">Revenus du jour</text>
+      <text x="226" y="162" font-family="sans-serif" font-weight="700" font-size="22" fill="#2563EB">247 500</text>
+      <text x="226" y="178" font-family="sans-serif" font-size="10" fill="#94A3B8">FCFA · +12% vs hier</text>
+      <rect x="374" y="110" width="152" height="80" rx="12" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+      <text x="390" y="136" font-family="sans-serif" font-size="12" fill="#64748B">Commandes actives</text>
+      <text x="390" y="162" font-family="sans-serif" font-weight="700" font-size="22" fill="#0D9488">18</text>
+      <text x="390" y="178" font-family="sans-serif" font-size="10" fill="#94A3B8">dont 4 en livraison</text>
+      <rect x="538" y="110" width="152" height="80" rx="12" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+      <text x="554" y="136" font-family="sans-serif" font-size="12" fill="#64748B">Produits en vente</text>
+      <text x="554" y="162" font-family="sans-serif" font-weight="700" font-size="22" fill="#7C3AED">143</text>
+      <text x="554" y="178" font-family="sans-serif" font-size="10" fill="#94A3B8">12 ajoutés aujourd'hui</text>
+      <rect x="702" y="110" width="188" height="80" rx="12" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+      <text x="718" y="136" font-family="sans-serif" font-size="12" fill="#64748B">Agents en mission</text>
+      <text x="718" y="162" font-family="sans-serif" font-weight="700" font-size="22" fill="#F59E0B">5/8</text>
+      <text x="718" y="178" font-family="sans-serif" font-size="10" fill="#94A3B8">3 disponibles</text>
+      <!-- Demandes table -->
+      <rect x="210" y="204" width="460" height="300" rx="12" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+      <text x="226" y="228" font-family="sans-serif" font-weight="600" font-size="14" fill="#0F172A">Demandes vendeurs récentes</text>
+      <text x="656" y="228" text-anchor="end" font-family="sans-serif" font-size="11" fill="#2563EB">Voir toutes →</text>
+      <rect x="210" y="238" width="460" height="28" fill="#F8FAFC"/>
+      <text x="226" y="257" font-family="sans-serif" font-size="10" fill="#64748B">PRODUIT</text>
+      <text x="380" y="257" font-family="sans-serif" font-size="10" fill="#64748B">VENDEUR</text>
+      <text x="480" y="257" font-family="sans-serif" font-size="10" fill="#64748B">PRIX</text>
+      <text x="570" y="257" font-family="sans-serif" font-size="10" fill="#64748B">ÉTAT</text>
+      <text x="630" y="257" font-family="sans-serif" font-size="10" fill="#64748B">ACTION</text>
+      <!-- Row 1 -->
+      <rect x="210" y="266" width="460" height="36" fill="#FFF7ED"/>
+      <text x="226" y="288" font-family="sans-serif" font-size="12" fill="#0F172A">📱 iPhone 11 Noir 64Go</text>
+      <text x="380" y="288" font-family="sans-serif" font-size="12" fill="#64748B">M. Kamga</text>
+      <text x="480" y="288" font-family="sans-serif" font-size="12" fill="#0F172A">85 000</text>
+      <rect x="560" y="274" width="56" height="20" rx="5" fill="#FEF3C7"/>
+      <text x="588" y="288" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#B45309">En attente</text>
+      <rect x="628" y="274" width="34" height="20" rx="5" fill="#EFF6FF"/>
+      <text x="645" y="288" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#2563EB">Gérer</text>
+      <!-- Row 2 -->
+      <rect x="210" y="302" width="460" height="36" fill="#fff"/>
+      <text x="226" y="324" font-family="sans-serif" font-size="12" fill="#0F172A">🏠 Réfrigérateur Samsung 200L</text>
+      <text x="380" y="324" font-family="sans-serif" font-size="12" fill="#64748B">Mme Biya</text>
+      <text x="480" y="324" font-family="sans-serif" font-size="12" fill="#0F172A">145 000</text>
+      <rect x="560" y="310" width="64" height="20" rx="5" fill="#DCFCE7"/>
+      <text x="592" y="324" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#15803D">Assignée</text>
+      <rect x="628" y="310" width="34" height="20" rx="5" fill="#EFF6FF"/>
+      <text x="645" y="324" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#2563EB">Gérer</text>
+      <!-- Row 3 -->
+      <rect x="210" y="338" width="460" height="36" fill="#FFF7ED"/>
+      <text x="226" y="360" font-family="sans-serif" font-size="12" fill="#0F172A">👗 Lot vêtements (x5)</text>
+      <text x="380" y="360" font-family="sans-serif" font-size="12" fill="#64748B">M. Tchamba</text>
+      <text x="480" y="360" font-family="sans-serif" font-size="12" fill="#0F172A">25 000</text>
+      <rect x="560" y="346" width="56" height="20" rx="5" fill="#FEF3C7"/>
+      <text x="588" y="360" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#B45309">En attente</text>
+      <rect x="628" y="346" width="34" height="20" rx="5" fill="#EFF6FF"/>
+      <text x="645" y="360" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#2563EB">Gérer</text>
+      <!-- Row 4 -->
+      <rect x="210" y="374" width="460" height="36" fill="#fff"/>
+      <text x="226" y="396" font-family="sans-serif" font-size="12" fill="#0F172A">💻 MacBook Pro 2020</text>
+      <text x="380" y="396" font-family="sans-serif" font-size="12" fill="#64748B">Mme Fouda</text>
+      <text x="480" y="396" font-family="sans-serif" font-size="12" fill="#0F172A">320 000</text>
+      <rect x="560" y="382" width="72" height="20" rx="5" fill="#DBEAFE"/>
+      <text x="596" y="396" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#1D4ED8">Collectée</text>
+      <rect x="628" y="382" width="34" height="20" rx="5" fill="#EFF6FF"/>
+      <text x="645" y="396" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#2563EB">Publier</text>
+      <!-- Row 5 -->
+      <rect x="210" y="410" width="460" height="36" fill="#FFF7ED"/>
+      <text x="226" y="432" font-family="sans-serif" font-size="12" fill="#0F172A">🛋 Canapé d'angle gris</text>
+      <text x="380" y="432" font-family="sans-serif" font-size="12" fill="#64748B">M. Ngono</text>
+      <text x="480" y="432" font-family="sans-serif" font-size="12" fill="#0F172A">180 000</text>
+      <rect x="560" y="418" width="56" height="20" rx="5" fill="#FEE2E2"/>
+      <text x="588" y="432" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#DC2626">Refusée</text>
+      <rect x="628" y="418" width="34" height="20" rx="5" fill="#F1F5F9"/>
+      <text x="645" y="432" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#94A3B8">Voir</text>
+      <!-- Orders widget -->
+      <rect x="682" y="204" width="208" height="300" rx="12" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+      <text x="698" y="228" font-family="sans-serif" font-weight="600" font-size="14" fill="#0F172A">Commandes actives</text>
+      <!-- mini order list -->
+      <rect x="694" y="238" width="182" height="48" rx="8" fill="#FFF7ED"/>
+      <text x="706" y="256" font-family="sans-serif" font-size="11" fill="#0F172A">🟠 #CM-0047 · En livraison</text>
+      <text x="706" y="272" font-family="sans-serif" font-size="10" fill="#64748B">iPhone 11 · 86 500 FCFA</text>
+      <rect x="694" y="292" width="182" height="48" rx="8" fill="#F0FDF4"/>
+      <text x="706" y="310" font-family="sans-serif" font-size="11" fill="#0F172A">🟢 #CM-0046 · Livré ✓</text>
+      <text x="706" y="326" font-family="sans-serif" font-size="10" fill="#64748B">TV Samsung · 121 500 FCFA</text>
+      <rect x="694" y="346" width="182" height="48" rx="8" fill="#EFF6FF"/>
+      <text x="706" y="364" font-family="sans-serif" font-size="11" fill="#0F172A">🔵 #CM-0045 · En prépa</text>
+      <text x="706" y="380" font-family="sans-serif" font-size="10" fill="#64748B">MacBook · 321 500 FCFA</text>
+      <rect x="694" y="400" width="182" height="48" rx="8" fill="#FFF1F2"/>
+      <text x="706" y="418" font-family="sans-serif" font-size="11" fill="#DC2626">⚠ #CM-0044 · Réclamation</text>
+      <text x="706" y="434" font-family="sans-serif" font-size="10" fill="#64748B">Canapé · À traiter</text>
+      <text x="785" y="492" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#2563EB">Voir toutes les commandes →</text>
+    </svg>
+  </div>
+
+  <!-- PUBLICATION PRODUIT -->
+  <div class="screen-block">
+    <div class="screen-info">
+      <h3><span class="sn-badge-red screen-num-badge">Écran 2</span> Publication d'un produit</h3>
+      <p>L'admin rédige la fiche produit complète après collecte. Toutes les sections obligatoires. Les défauts doivent être renseignés — jamais laisser vide sans raison. La fiche ne peut être publiée qu'avec photos officielles de l'agent.</p>
+      <div class="logic-block">
+        <div class="logic-item"><div class="logic-dot red">✗</div>Publication impossible sans photos officielles de l'agent. Les photos du vendeur ne suffisent pas.</div>
+        <div class="logic-item"><div class="logic-dot green">✓</div>Bloc défauts obligatoire. 3 options : liste des défauts / "Aucun défaut visible" / "Défauts internes non garantis". L'une des trois doit être cochée.</div>
+        <div class="logic-item"><div class="logic-dot blue">→</div>Prix affiché = Prix vendeur. La commission est calculée automatiquement selon la catégorie. L'admin ne fixe pas le prix.</div>
+        <div class="logic-item"><div class="logic-dot amber">!</div>Prévisualisation de la fiche avant publication. L'admin voit exactement ce que verra l'acheteur.</div>
+        <div class="logic-item"><div class="logic-dot gray">→</div>Après publication → notification automatique au vendeur : "Votre produit est maintenant en vente."</div>
+      </div>
+    </div>
+    <div class="mockup-wrap">
+      <svg viewBox="0 0 900 480" xmlns="http://www.w3.org/2000/svg">
+        <rect width="900" height="480" rx="16" fill="#F8FAFC"/>
+        <!-- sidebar mini -->
+        <rect x="0" y="0" width="180" height="480" rx="16" fill="#0F172A"/>
+        <rect x="130" y="0" width="50" height="480" fill="#0F172A"/>
+        <text x="90" y="36" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="11" fill="#fff">ADMIN PANEL</text>
+        <text x="30" y="72" font-family="sans-serif" font-size="12" fill="rgba(255,255,255,.4)">📊 Tableau de bord</text>
+        <text x="30" y="104" font-family="sans-serif" font-size="12" fill="rgba(255,255,255,.4)">📦 Demandes</text>
+        <rect x="14" y="116" width="160" height="28" rx="6" fill="#1E3A8A"/>
+        <text x="30" y="135" font-family="sans-serif" font-size="12" fill="#fff">🏪 Catalogue</text>
+        <!-- main -->
+        <rect x="180" y="0" width="720" height="56" fill="#fff"/>
+        <text x="200" y="28" font-family="sans-serif" font-weight="600" font-size="15" fill="#0F172A">← Publier un produit</text>
+        <text x="200" y="46" font-family="sans-serif" font-size="11" fill="#94A3B8">MacBook Pro 2020 · Demande #DEM-0052 · Mme Fouda</text>
+        <!-- 2 column form -->
+        <!-- Left col -->
+        <text x="200" y="82" font-family="sans-serif" font-weight="600" font-size="12" fill="#475569">TITRE ET DESCRIPTION</text>
+        <rect x="200" y="90" width="330" height="36" rx="8" fill="#fff" stroke="#2563EB" stroke-width="1.5"/>
+        <text x="212" y="112" font-family="sans-serif" font-size="12" fill="#0F172A">MacBook Pro 2020 — 13" — 8Go RAM — 256Go SSD</text>
+        <rect x="200" y="134" width="330" height="90" rx="8" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="212" y="152" font-family="sans-serif" font-size="11" fill="#0F172A">MacBook Pro 2020, processeur M1, 8Go RAM,</text>
+        <text x="212" y="168" font-family="sans-serif" font-size="11" fill="#0F172A">256Go SSD. MacOS Ventura. Chargeur inclus.</text>
+        <text x="212" y="184" font-family="sans-serif" font-size="11" fill="#0F172A">Batterie : 91%. Clavier AZERTY. Boîte présente.</text>
+        <!-- defauts -->
+        <text x="200" y="246" font-family="sans-serif" font-weight="600" font-size="12" fill="#475569">BLOC DÉFAUTS <tspan fill="#DC2626">*</tspan></text>
+        <rect x="200" y="254" width="330" height="84" rx="8" fill="#FFFBEB" stroke="#FDE68A" stroke-width="1"/>
+        <text x="212" y="276" font-family="sans-serif" font-size="11" fill="#92400E">Défauts constatés :</text>
+        <rect x="212" y="284" width="14" height="14" rx="3" fill="#F59E0B"/>
+        <text x="232" y="295" font-family="sans-serif" font-size="11" fill="#0F172A">Petite rayure sur le couvercle (côté gauche)</text>
+        <rect x="212" y="304" width="14" height="14" rx="3" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="232" y="315" font-family="sans-serif" font-size="11" fill="#CBD5E1">Aucun défaut visible constaté</text>
+        <rect x="212" y="322" width="14" height="14" rx="3" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="232" y="333" font-family="sans-serif" font-size="11" fill="#CBD5E1">Défauts internes non garantis</text>
+        <!-- prix -->
+        <text x="200" y="362" font-family="sans-serif" font-weight="600" font-size="12" fill="#475569">PRIX ET COMMISSION</text>
+        <rect x="200" y="370" width="330" height="72" rx="8" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="1"/>
+        <text x="212" y="392" font-family="sans-serif" font-size="11" fill="#64748B">Prix vendeur</text>
+        <text x="522" y="392" text-anchor="end" font-family="sans-serif" font-size="12" font-weight="600" fill="#0F172A">320 000 FCFA</text>
+        <text x="212" y="412" font-family="sans-serif" font-size="11" fill="#64748B">Commission (10%)</text>
+        <text x="522" y="412" text-anchor="end" font-family="sans-serif" font-size="12" fill="#DC2626">− 32 000 FCFA</text>
+        <text x="212" y="432" font-family="sans-serif" font-size="12" font-weight="700" fill="#15803D">Vendeur recevra</text>
+        <text x="522" y="432" text-anchor="end" font-family="sans-serif" font-size="13" font-weight="700" fill="#15803D">288 000 FCFA</text>
+        <!-- Right col -->
+        <text x="548" y="82" font-family="sans-serif" font-weight="600" font-size="12" fill="#475569">PHOTOS OFFICIELLES (agent)</text>
+        <rect x="548" y="90" width="80" height="80" rx="10" fill="#DBEAFE"/>
+        <text x="588" y="136" text-anchor="middle" font-family="sans-serif" font-size="30">💻</text>
+        <rect x="636" y="90" width="80" height="80" rx="10" fill="#DBEAFE"/>
+        <text x="676" y="136" text-anchor="middle" font-family="sans-serif" font-size="30">💻</text>
+        <rect x="724" y="90" width="80" height="80" rx="10" fill="#DBEAFE"/>
+        <text x="764" y="136" text-anchor="middle" font-family="sans-serif" font-size="30">💻</text>
+        <rect x="812" y="90" width="68" height="80" rx="10" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1" stroke-dasharray="4 2"/>
+        <text x="846" y="136" text-anchor="middle" font-family="sans-serif" font-size="20" fill="#CBD5E1">+</text>
+        <!-- livraison -->
+        <text x="548" y="206" font-family="sans-serif" font-weight="600" font-size="12" fill="#475569">OPTIONS LIVRAISON</text>
+        <rect x="548" y="214" width="152" height="52" rx="8" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="1"/>
+        <text x="624" y="236" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1E40AF">🏍️ Livraison</text>
+        <rect x="548" y="240" width="152" height="20" rx="4" fill="#EFF6FF"/>
+        <text x="562" y="256" font-family="sans-serif" font-size="10" fill="#64748B">Prix :</text>
+        <rect x="588" y="244" width="100" height="20" rx="6" fill="#fff" stroke="#BFDBFE" stroke-width="1"/>
+        <text x="610" y="258" font-family="sans-serif" font-size="11" fill="#0F172A">1 500 FCFA</text>
+        <rect x="708" y="214" width="152" height="52" rx="8" fill="#F0FDF4" stroke="#BBF7D0" stroke-width="1"/>
+        <text x="784" y="244" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#15803D">🏪 Retrait · Gratuit</text>
+        <!-- catégorie état -->
+        <text x="548" y="292" font-family="sans-serif" font-weight="600" font-size="12" fill="#475569">CATÉGORIE ET ÉTAT</text>
+        <rect x="548" y="300" width="152" height="36" rx="8" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="562" y="322" font-family="sans-serif" font-size="12" fill="#0F172A">💻 Informatique</text>
+        <rect x="708" y="300" width="152" height="36" rx="8" fill="#DCFCE7" stroke="#BBF7D0" stroke-width="1"/>
+        <text x="722" y="322" font-family="sans-serif" font-size="12" fill="#15803D">🟢 Bon état</text>
+        <!-- publish btns -->
+        <rect x="548" y="390" width="200" height="44" rx="12" fill="#2563EB"/>
+        <text x="648" y="417" text-anchor="middle" font-family="sans-serif" font-weight="600" font-size="13" fill="#fff">👁 Prévisualiser</text>
+        <rect x="760" y="390" width="120" height="44" rx="12" fill="#16A34A"/>
+        <text x="820" y="417" text-anchor="middle" font-family="sans-serif" font-weight="600" font-size="13" fill="#fff">✅ Publier</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <span class="callout-icon">⚙️</span>
+    <p><strong>Autres modules Admin :</strong> Gestion des commandes (filtres par état, assignation livraison), Gestion des utilisateurs (acheteurs et vendeurs, suspension de compte), Gestion des agents (zones, missions, performances), Litiges et réclamations (décision remboursement, clôture), Paiements et reversements (historique, export comptable).</p>
+  </div>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- ═══════════════════════════════════════
+     SCÉNARIO 09 — SUPER ADMIN
+═══════════════════════════════════════ -->
+<div class="scenario">
+  <div class="scenario-head">
+    <div class="scenario-num sn-gray">Scénario 09</div>
+    <h2>Panel Super Admin</h2>
+  </div>
+  <div class="scenario-desc">
+    Le Super Admin est le seul à avoir une vue à 360° sur toute l'entreprise. Il configure les règles, gère les admins, consulte les rapports financiers stratégiques. Il n'opère pas au quotidien — il pilote, analyse, décide. Son interface est orientée données et configuration, pas opérations.
+  </div>
+
+  <!-- DASHBOARD SUPER ADMIN -->
+  <div class="screen-block single">
+    <div class="screen-info">
+      <h3><span class="sn-badge-gray screen-num-badge">Écran 1</span> Tableau de bord Super Admin — Vue stratégique</h3>
+      <div class="logic-block">
+        <div class="logic-item"><div class="logic-dot gray">→</div>Seul à voir les revenus nets réels après reversements vendeurs. L'admin ordinaire ne voit que les commandes.</div>
+        <div class="logic-item"><div class="logic-dot green">✓</div>Logs complets de toutes les actions admin. Qui a fait quoi, quand, depuis quelle IP.</div>
+        <div class="logic-item"><div class="logic-dot red">✗</div>Suppression d'un compte admin → confirmation en deux étapes + mot de passe Super Admin requis. Aucune action irréversible en un seul clic.</div>
+        <div class="logic-item"><div class="logic-dot amber">!</div>Configuration des commissions → effet immédiat sur tous les nouveaux produits. Produits déjà publiés conservent leur ancienne commission.</div>
+        <div class="logic-item"><div class="logic-dot blue">→</div>Export des données en CSV/Excel pour analyses externes. Rapports hebdomadaires auto-générés et envoyés par email.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup-wrap" style="margin-bottom:32px">
+    <svg viewBox="0 0 900 500" xmlns="http://www.w3.org/2000/svg">
+      <rect width="900" height="500" rx="16" fill="#F8FAFC"/>
+      <!-- Sidebar -->
+      <rect x="0" y="0" width="190" height="500" rx="16" fill="#1E293B"/>
+      <rect x="140" y="0" width="50" height="500" fill="#1E293B"/>
+      <rect x="14" y="16" width="162" height="36" rx="8" fill="#334155"/>
+      <text x="95" y="38" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="11" fill="#fff">👑 SUPER ADMIN</text>
+      <text x="22" y="78" font-family="sans-serif" font-size="12" fill="rgba(255,255,255,.4)">📊 Vue globale</text>
+      <rect x="14" y="86" width="162" height="28" rx="6" fill="#2563EB"/>
+      <text x="30" y="104" font-family="sans-serif" font-size="12" fill="#fff">📊 Dashboard</text>
+      <text x="22" y="134" font-family="sans-serif" font-size="12" fill="rgba(255,255,255,.4)">⚙️ Configuration</text>
+      <text x="22" y="162" font-family="sans-serif" font-size="12" fill="rgba(255,255,255,.4)">👥 Gestion admins</text>
+      <text x="22" y="190" font-family="sans-serif" font-size="12" fill="rgba(255,255,255,.4)">💰 Finances</text>
+      <text x="22" y="218" font-family="sans-serif" font-size="12" fill="rgba(255,255,255,.4)">🗺️ Zones</text>
+      <text x="22" y="246" font-family="sans-serif" font-size="12" fill="rgba(255,255,255,.4)">📋 Logs & Audit</text>
+      <text x="22" y="274" font-family="sans-serif" font-size="12" fill="rgba(255,255,255,.4)">📈 Rapports</text>
+      <!-- Main -->
+      <rect x="190" y="0" width="710" height="52" fill="#fff"/>
+      <text x="208" y="24" font-family="sans-serif" font-weight="600" font-size="15" fill="#0F172A">Vue Stratégique Globale</text>
+      <text x="208" y="42" font-family="sans-serif" font-size="11" fill="#94A3B8">Semaine du 6 au 13 Janvier 2025</text>
+      <rect x="756" y="12" width="56" height="28" rx="6" fill="#EFF6FF"/>
+      <text x="784" y="30" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#2563EB">Export</text>
+      <rect x="820" y="12" width="66" height="28" rx="6" fill="#F0FDF4"/>
+      <text x="853" y="30" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#15803D">Rapport</text>
+      <!-- KPIs financiers -->
+      <rect x="198" y="60" width="160" height="88" rx="12" fill="#0F172A"/>
+      <text x="214" y="84" font-family="sans-serif" font-size="11" fill="rgba(255,255,255,.6)">Revenus nets (semaine)</text>
+      <text x="214" y="112" font-family="sans-serif" font-weight="700" font-size="24" fill="#60A5FA">1 247 500</text>
+      <text x="214" y="130" font-family="sans-serif" font-size="10" fill="rgba(255,255,255,.4)">FCFA · +18% vs S. préc.</text>
+      <rect x="370" y="60" width="156" height="88" rx="12" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+      <text x="386" y="84" font-family="sans-serif" font-size="11" fill="#64748B">Total transactions</text>
+      <text x="386" y="112" font-family="sans-serif" font-weight="700" font-size="24" fill="#0F172A">147</text>
+      <text x="386" y="130" font-family="sans-serif" font-size="10" fill="#94A3B8">dont 3 remboursements</text>
+      <rect x="538" y="60" width="156" height="88" rx="12" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+      <text x="554" y="84" font-family="sans-serif" font-size="11" fill="#64748B">Nouveaux utilisateurs</text>
+      <text x="554" y="112" font-family="sans-serif" font-weight="700" font-size="24" fill="#0F172A">38</text>
+      <text x="554" y="130" font-family="sans-serif" font-size="10" fill="#94A3B8">24 acheteurs · 14 vendeurs</text>
+      <rect x="706" y="60" width="182" height="88" rx="12" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+      <text x="722" y="84" font-family="sans-serif" font-size="11" fill="#64748B">Taux de conversion</text>
+      <text x="722" y="112" font-family="sans-serif" font-weight="700" font-size="24" fill="#16A34A">68%</text>
+      <text x="722" y="130" font-family="sans-serif" font-size="10" fill="#94A3B8">Vus → Achetés</text>
+      <!-- Config commissions -->
+      <rect x="198" y="160" width="326" height="220" rx="12" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+      <text x="214" y="184" font-family="sans-serif" font-weight="600" font-size="14" fill="#0F172A">⚙️ Configuration des commissions</text>
+      <text x="214" y="200" font-family="sans-serif" font-size="10" fill="#94A3B8">Modification → effet immédiat sur nouveaux produits</text>
+      <rect x="214" y="210" width="296" height="28" fill="#F8FAFC"/>
+      <text x="222" y="228" font-family="sans-serif" font-size="10" fill="#64748B">CATÉGORIE</text>
+      <text x="430" y="228" text-anchor="end" font-family="sans-serif" font-size="10" fill="#64748B">TAUX</text>
+      <text x="498" y="228" text-anchor="end" font-family="sans-serif" font-size="10" fill="#64748B">ACTION</text>
+      <text x="222" y="254" font-family="sans-serif" font-size="12" fill="#0F172A">📱 Téléphonie</text>
+      <rect x="400" y="240" width="44" height="22" rx="6" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="1"/>
+      <text x="422" y="255" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#2563EB">10%</text>
+      <text x="494" y="254" text-anchor="end" font-family="sans-serif" font-size="10" fill="#0D9488">Modifier</text>
+      <text x="222" y="280" font-family="sans-serif" font-size="12" fill="#0F172A">🏠 Électroménager</text>
+      <rect x="400" y="266" width="44" height="22" rx="6" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="1"/>
+      <text x="422" y="281" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#2563EB">12%</text>
+      <text x="494" y="280" text-anchor="end" font-family="sans-serif" font-size="10" fill="#0D9488">Modifier</text>
+      <text x="222" y="306" font-family="sans-serif" font-size="12" fill="#0F172A">🛋 Meubles</text>
+      <rect x="400" y="292" width="44" height="22" rx="6" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="1"/>
+      <text x="422" y="307" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#2563EB">15%</text>
+      <text x="494" y="306" text-anchor="end" font-family="sans-serif" font-size="10" fill="#0D9488">Modifier</text>
+      <text x="222" y="332" font-family="sans-serif" font-size="12" fill="#0F172A">👗 Vêtements</text>
+      <rect x="400" y="318" width="44" height="22" rx="6" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="1"/>
+      <text x="422" y="333" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#2563EB">20%</text>
+      <text x="494" y="332" text-anchor="end" font-family="sans-serif" font-size="10" fill="#0D9488">Modifier</text>
+      <text x="222" y="358" font-family="sans-serif" font-size="12" fill="#0F172A">🏍️ Véhicules</text>
+      <rect x="400" y="344" width="44" height="22" rx="6" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="1"/>
+      <text x="422" y="359" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#2563EB">6%</text>
+      <text x="494" y="358" text-anchor="end" font-family="sans-serif" font-size="10" fill="#0D9488">Modifier</text>
+      <!-- Gestion admins -->
+      <rect x="536" y="160" width="352" height="220" rx="12" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+      <text x="552" y="184" font-family="sans-serif" font-weight="600" font-size="14" fill="#0F172A">👥 Gestion des admins</text>
+      <rect x="826" y="168" width="50" height="24" rx="6" fill="#EFF6FF"/>
+      <text x="851" y="184" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#2563EB">+ Ajouter</text>
+      <!-- admin rows -->
+      <rect x="548" y="196" width="328" height="40" rx="8" fill="#F8FAFC"/>
+      <circle cx="566" cy="216" r="12" fill="#DBEAFE"/>
+      <text x="566" y="220" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#1D4ED8">MB</text>
+      <text x="586" y="210" font-family="sans-serif" font-weight="600" font-size="12" fill="#0F172A">Marie Bello</text>
+      <text x="586" y="226" font-family="sans-serif" font-size="10" fill="#94A3B8">Admin · Actif · 127 actions ce mois</text>
+      <rect x="824" y="206" width="44" height="20" rx="5" fill="#DCFCE7"/>
+      <text x="846" y="220" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#15803D">Actif</text>
+      <rect x="548" y="242" width="328" height="40" rx="8" fill="#fff"/>
+      <circle cx="566" cy="262" r="12" fill="#FEF3C7"/>
+      <text x="566" y="266" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#B45309">PK</text>
+      <text x="586" y="256" font-family="sans-serif" font-weight="600" font-size="12" fill="#0F172A">Paul Kamga</text>
+      <text x="586" y="272" font-family="sans-serif" font-size="10" fill="#94A3B8">Admin · Actif · 89 actions ce mois</text>
+      <rect x="824" y="252" width="44" height="20" rx="5" fill="#DCFCE7"/>
+      <text x="846" y="266" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#15803D">Actif</text>
+      <rect x="548" y="288" width="328" height="40" rx="8" fill="#FFF1F2"/>
+      <circle cx="566" cy="308" r="12" fill="#FEE2E2"/>
+      <text x="566" y="312" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#DC2626">AT</text>
+      <text x="586" y="302" font-family="sans-serif" font-weight="600" font-size="12" fill="#64748B">Alice Tamba</text>
+      <text x="586" y="318" font-family="sans-serif" font-size="10" fill="#94A3B8">Admin · Suspendu · Raison : Vérification</text>
+      <rect x="800" y="298" width="68" height="20" rx="5" fill="#FEE2E2"/>
+      <text x="834" y="312" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#DC2626">Suspendu</text>
+      <rect x="548" y="334" width="328" height="40" rx="8" fill="#fff"/>
+      <circle cx="566" cy="354" r="12" fill="#DBEAFE"/>
+      <text x="566" y="358" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#1D4ED8">CN</text>
+      <text x="586" y="348" font-family="sans-serif" font-weight="600" font-size="12" fill="#0F172A">Claude Nkono</text>
+      <text x="586" y="364" font-family="sans-serif" font-size="10" fill="#94A3B8">Admin · Actif · 203 actions ce mois</text>
+      <rect x="824" y="344" width="44" height="20" rx="5" fill="#DCFCE7"/>
+      <text x="846" y="358" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#15803D">Actif</text>
+      <!-- Audit log -->
+      <rect x="198" y="390" width="690" height="96" rx="12" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+      <text x="214" y="412" font-family="sans-serif" font-weight="600" font-size="14" fill="#0F172A">📋 Journal d'audit récent</text>
+      <text x="876" y="412" text-anchor="end" font-family="sans-serif" font-size="11" fill="#2563EB">Voir tout →</text>
+      <text x="214" y="434" font-family="sans-serif" font-size="11" fill="#64748B">13/01 16:47</text>
+      <text x="300" y="434" font-family="sans-serif" font-size="11" fill="#0F172A">Marie Bello a publié le produit <tspan font-weight="600">MacBook Pro 2020</tspan></text>
+      <text x="214" y="454" font-family="sans-serif" font-size="11" fill="#64748B">13/01 15:30</text>
+      <text x="300" y="454" font-family="sans-serif" font-size="11" fill="#0F172A">Paul Kamga a assigné la mission <tspan font-weight="600">#DEM-0047</tspan> à l'agent Jean-Pierre</text>
+      <text x="214" y="474" font-family="sans-serif" font-size="11" fill="#64748B">13/01 14:12</text>
+      <text x="300" y="474" font-family="sans-serif" font-size="11" fill="#DC2626">Claude Nkono a remboursé <tspan font-weight="600">46 500 FCFA</tspan> pour commande #CM-0044</text>
+    </svg>
+  </div>
+
+  <div class="feature-grid">
+    <div class="feature-card">
+      <h4>⚙️ Configuration système</h4>
+      <ul>
+        <li>Taux de commission par catégorie</li>
+        <li>Zones géographiques couvertes</li>
+        <li>Délais d'expiration réservation</li>
+        <li>Prix livraison par zone</li>
+        <li>Délai de réclamation post-livraison</li>
+        <li>Messages automatiques personnalisables</li>
+      </ul>
+    </div>
+    <div class="feature-card">
+      <h4>💰 Rapports financiers</h4>
+      <ul>
+        <li>Revenus nets par jour/semaine/mois</li>
+        <li>Commissions par catégorie</li>
+        <li>Reversements effectués aux vendeurs</li>
+        <li>Remboursements et leurs raisons</li>
+        <li>Projection de croissance</li>
+        <li>Export CSV/Excel pour comptabilité</li>
+      </ul>
+    </div>
+    <div class="feature-card">
+      <h4>👥 Gestion des admins</h4>
+      <ul>
+        <li>Créer un compte admin</li>
+        <li>Définir les permissions par admin</li>
+        <li>Suspendre / Réactiver un admin</li>
+        <li>Voir l'activité de chaque admin</li>
+        <li>Supprimer (double confirmation)</li>
+        <li>Historique des connexions</li>
+      </ul>
+    </div>
+    <div class="feature-card">
+      <h4>📋 Audit & Sécurité</h4>
+      <ul>
+        <li>Log de toutes les actions admin</li>
+        <li>IP de connexion tracée</li>
+        <li>Détection connexions suspectes</li>
+        <li>Export du journal d'audit</li>
+        <li>Alertes en cas d'activité anormale</li>
+        <li>Sauvegarde des données automatique</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div style="text-align:center;margin-top:80px;padding:40px 0;border-top:1px solid #E2E8F0;color:#94A3B8;font-size:13px">
+  <p>Scénarios UX v1.0 · Scénarios 06–09 · Plateforme de Revente Seconde Main · Cameroun</p>
+  <p style="margin-top:6px">Vendeur · Agent Terrain · Admin · Super Admin · Spring Boot & Flutter</p>
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,71 @@
+name: afrideal
+description: "AfriDeal — Plateforme de revente de produits de seconde main au Cameroun."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.5.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # ── Icônes Material (utilisées avec parcimonie, pas d'emoji) ──
+  cupertino_icons: ^1.0.8
+
+  # ── Gestion d'état ──
+  flutter_riverpod: ^2.5.1
+
+  # ── Navigation (mobile + web, URLs propres pour l'admin) ──
+  go_router: ^14.6.2
+
+  # ── Stockage local persistant (fork maintenu de Hive) ──
+  hive_ce: ^2.10.1
+  hive_ce_flutter: ^2.2.0
+  path_provider: ^2.1.4
+
+  # ── Client HTTP (prêt pour l'API Spring Boot, inactif pour l'instant) ──
+  dio: ^5.7.0
+
+  # ── Stockage sécurisé (token de session, pour plus tard) ──
+  flutter_secure_storage: ^9.2.2
+
+  # ── Détection de connectivité réseau ──
+  connectivity_plus: ^6.1.0
+
+  # ── Sélection de photos (galerie + caméra), supporte Web nativement ──
+  image_picker: ^1.1.2
+
+  # ── Illustrations vectorielles SVG ──
+  flutter_svg: ^2.0.16
+
+  # ── Formatage des dates et montants (FCFA) ──
+  intl: ^0.19.0
+
+  # ── Identifiants uniques (pour les entités créées en local) ──
+  uuid: ^4.5.1
+
+  # ── Hash de mot de passe (package officiel dart-lang, zéro risque) ──
+  crypto: ^3.0.6
+
+  # ── Égalité de valeur pour nos modèles (sans génération de code) ──
+  equatable: ^2.0.5
+
+  # ── Cache d'images réseau (utile dès qu'on passera à l'API) ──
+  cached_network_image: ^3.4.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/illustrations/
+
+  # Les polices seront ajoutées par le script de thème (02) une fois
+  # les fichiers de police placés dans assets/fonts/.

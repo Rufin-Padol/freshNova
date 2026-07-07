@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scénarios UX — Plateforme Seconde Main</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;600;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#F8FAFC;color:#0F172A;font-size:15px;line-height:1.7}
+
+/* COVER */
+.cover{background:linear-gradient(135deg,#0F172A 0%,#1E3A8A 55%,#1D4ED8 100%);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 40px;position:relative;overflow:hidden}
+.cover::before{content:'';position:absolute;top:-100px;right:-100px;width:600px;height:600px;border-radius:50%;background:rgba(37,99,235,.15)}
+.cover::after{content:'';position:absolute;bottom:-80px;left:-80px;width:400px;height:400px;border-radius:50%;background:rgba(20,184,166,.1)}
+.cover-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:50px;padding:6px 20px;font-size:12px;color:rgba(255,255,255,.8);letter-spacing:.08em;text-transform:uppercase;margin-bottom:32px;position:relative;z-index:1}
+.cover-badge::before{content:'';width:6px;height:6px;background:#14B8A6;border-radius:50%}
+.cover h1{font-family:'Sora',sans-serif;font-size:clamp(32px,5vw,60px);font-weight:800;color:#fff;line-height:1.15;margin-bottom:16px;position:relative;z-index:1}
+.cover h1 span{background:linear-gradient(90deg,#60A5FA,#14B8A6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.cover-sub{font-size:17px;color:rgba(255,255,255,.6);max-width:540px;margin:0 auto 48px;position:relative;z-index:1}
+.cover-pills{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;position:relative;z-index:1}
+.cover-pill{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:8px 18px;font-size:13px;color:rgba(255,255,255,.75)}
+
+/* LAYOUT */
+.doc{max-width:1000px;margin:0 auto;padding:0 24px 100px}
+
+/* SCENARIO HEADER */
+.scenario{margin-top:72px}
+.scenario-head{display:flex;align-items:center;gap:16px;margin-bottom:12px;padding-bottom:18px;border-bottom:2px solid #DBEAFE}
+.scenario-num{background:#2563EB;color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;padding:4px 12px;border-radius:6px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.scenario-head h2{font-family:'Sora',sans-serif;font-size:24px;font-weight:700;color:#0F172A}
+.scenario-desc{font-size:14px;color:#64748B;background:#F1F5F9;border-left:4px solid #2563EB;border-radius:0 8px 8px 0;padding:14px 18px;margin-bottom:32px;line-height:1.7}
+
+/* SCREEN BLOCK */
+.screen-block{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:40px;align-items:start}
+.screen-block.single{grid-template-columns:1fr}
+.screen-block.reverse{direction:rtl}
+.screen-block.reverse > *{direction:ltr}
+
+.screen-info h3{font-family:'Sora',sans-serif;font-size:17px;font-weight:600;color:#1E293B;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.screen-num-badge{background:#EFF6FF;color:#2563EB;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.04em}
+.screen-info p{font-size:13px;color:#475569;line-height:1.75;margin-bottom:12px}
+.screen-info p:last-child{margin-bottom:0}
+
+/* LOGIC CARDS */
+.logic-block{margin-top:14px}
+.logic-item{display:flex;gap:10px;align-items:flex-start;background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:10px 14px;margin-bottom:8px;font-size:12px;color:#475569;line-height:1.6}
+.logic-dot{width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;margin-top:1px}
+.logic-dot.blue{background:#DBEAFE;color:#1D4ED8}
+.logic-dot.green{background:#DCFCE7;color:#15803D}
+.logic-dot.red{background:#FEE2E2;color:#DC2626}
+.logic-dot.amber{background:#FEF3C7;color:#B45309}
+.logic-dot.gray{background:#F1F5F9;color:#475569}
+
+/* SVG MOCKUP WRAPPER */
+.mockup-wrap{background:#fff;border:1px solid #E2E8F0;border-radius:16px;padding:20px;box-shadow:0 4px 24px rgba(0,0,0,.06)}
+.mockup-wrap svg{width:100%;height:auto;display:block}
+
+/* FLOW SECTION */
+.flow-section{background:#fff;border:1px solid #E2E8F0;border-radius:16px;padding:28px;margin-bottom:32px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.flow-section h3{font-family:'Sora',sans-serif;font-size:16px;font-weight:600;color:#1E293B;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+
+/* STATES ROW */
+.states-row{display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin:16px 0}
+.state-box{display:flex;flex-direction:column;align-items:center;gap:4px}
+.state-pill-sm{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
+.state-arrow-sm{font-size:14px;color:#CBD5E1;padding:0 2px;align-self:center;margin-bottom:10px}
+
+/* CALLOUT */
+.callout{display:flex;gap:12px;padding:14px 18px;border-radius:10px;margin:16px 0;align-items:flex-start;font-size:13px;line-height:1.65}
+.callout.info{background:#EFF6FF;border:1px solid #BFDBFE;color:#1E40AF}
+.callout.warning{background:#FFFBEB;border:1px solid #FDE68A;color:#92400E}
+.callout.success{background:#F0FDF4;border:1px solid #BBF7D0;color:#14532D}
+.callout.danger{background:#FFF1F2;border:1px solid #FECDD3;color:#9F1239}
+.callout-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+
+/* DIVIDER */
+.section-divider{height:1px;background:linear-gradient(90deg,transparent,#E2E8F0 20%,#E2E8F0 80%,transparent);margin:60px 0}
+
+/* TABLE */
+.info-table{width:100%;border-collapse:collapse;font-size:13px;margin:12px 0}
+.info-table th{background:#F8FAFC;color:#475569;padding:8px 12px;text-align:left;font-weight:500;border-bottom:1px solid #E2E8F0;font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+.info-table td{padding:9px 12px;border-bottom:1px solid #F1F5F9;color:#334155}
+.info-table tr:last-child td{border-bottom:none}
+
+/* NOTIF EXAMPLES */
+.notif-list{display:flex;flex-direction:column;gap:8px;margin:12px 0}
+.notif-item{background:#fff;border:1px solid #E2E8F0;border-radius:10px;padding:10px 14px;display:flex;gap:10px;align-items:flex-start}
+.notif-app{width:32px;height:32px;border-radius:8px;background:#2563EB;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.notif-content{flex:1}
+.notif-title{font-size:12px;font-weight:600;color:#1E293B}
+.notif-body{font-size:11px;color:#64748B;margin-top:1px}
+.notif-time{font-size:10px;color:#94A3B8;margin-left:auto;flex-shrink:0;margin-top:2px}
+
+@media(max-width:700px){.screen-block{grid-template-columns:1fr}.cover h1{font-size:28px}.doc{padding:0 16px 60px}}
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="cover-badge">Document UX · Version 1.0</div>
+  <h1>Scénarios Complets<br><span>de l'Application</span></h1>
+  <p class="cover-sub">Chaque écran, chaque bouton, chaque logique — pensés pour l'utilisateur camerounais</p>
+  <div class="cover-pills">
+    <div class="cover-pill">Scénario 01 — Premier lancement</div>
+    <div class="cover-pill">Scénario 02 — Inscription & Connexion</div>
+    <div class="cover-pill">Scénario 03 — Boutique & Navigation</div>
+    <div class="cover-pill">Scénario 04 — Fiche Produit & Achat</div>
+    <div class="cover-pill">Scénario 05 — Suivi de Commande</div>
+  </div>
+</div>
+
+<div class="doc">
+
+<!-- ═══════════════════════════════════════
+     SCÉNARIO 01 — PREMIER LANCEMENT
+═══════════════════════════════════════ -->
+<div class="scenario">
+  <div class="scenario-head">
+    <div class="scenario-num">Scénario 01</div>
+    <h2>Premier lancement de l'application</h2>
+  </div>
+  <div class="scenario-desc">
+    Un utilisateur entend parler de la plateforme pour la première fois. Il télécharge l'app. Ces premiers secondes décident s'il reste ou s'il désinstalle. Chaque milliseconde compte. L'objectif : montrer la valeur avant de demander quoi que ce soit.
+  </div>
+
+  <!-- ÉCRAN 1 — SPLASH -->
+  <div class="screen-block">
+    <div class="screen-info">
+      <h3><span class="screen-num-badge">Écran 1</span> Splash Screen</h3>
+      <p>Logo centré sur fond blanc. Aucun texte superflu. Durée : 1.5 secondes maximum. En arrière-plan, l'app vérifie silencieusement si une session existe déjà.</p>
+      <div class="logic-block">
+        <div class="logic-item"><div class="logic-dot green">✓</div>Session existante détectée → redirection directe vers la Boutique. L'utilisateur ne revoit jamais l'onboarding.</div>
+        <div class="logic-item"><div class="logic-dot blue">→</div>Aucune session → passage automatique vers l'Onboarding.</div>
+        <div class="logic-item"><div class="logic-dot red">✗</div>Jamais de splash screen de plus de 2 secondes. L'attente frustrante fait fuir.</div>
+      </div>
+    </div>
+    <div class="mockup-wrap">
+      <svg viewBox="0 0 280 500" xmlns="http://www.w3.org/2000/svg">
+        <rect width="280" height="500" rx="24" fill="#0F172A"/>
+        <rect x="10" y="10" width="260" height="480" rx="20" fill="#FFFFFF"/>
+        <!-- status bar -->
+        <rect x="20" y="20" width="60" height="8" rx="4" fill="#CBD5E1"/>
+        <rect x="200" y="20" width="60" height="8" rx="4" fill="#CBD5E1"/>
+        <!-- Logo area -->
+        <circle cx="140" cy="220" r="48" fill="#EFF6FF"/>
+        <circle cx="140" cy="220" r="36" fill="#2563EB"/>
+        <text x="140" y="228" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="22" fill="#fff">S</text>
+        <text x="140" y="288" text-anchor="middle" font-family="sans-serif" font-weight="600" font-size="14" fill="#1E293B">SecondaireShop</text>
+        <text x="140" y="306" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#94A3B8">Produits vérifiés · Livrés chez vous</text>
+        <!-- loader -->
+        <rect x="110" y="420" width="60" height="4" rx="2" fill="#E2E8F0"/>
+        <rect x="110" y="420" width="28" height="4" rx="2" fill="#2563EB"/>
+        <!-- home indicator -->
+        <rect x="110" y="470" width="60" height="4" rx="2" fill="#E2E8F0"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ÉCRAN 2 — ONBOARDING -->
+  <div class="screen-block reverse">
+    <div class="screen-info">
+      <h3><span class="screen-num-badge">Écran 2</span> Onboarding — 3 slides</h3>
+      <p>3 slides uniquement. Chacune : une image simple, une phrase courte, un sous-titre de 6 mots maximum. Pas de roman. L'utilisateur comprend en 15 secondes ce que fait l'app.</p>
+      <div class="logic-block">
+        <div class="logic-item"><div class="logic-dot gray">1</div><strong>Slide 1 :</strong> "Des produits vérifiés, livrés chez vous" — illustration produit vérifié par agent.</div>
+        <div class="logic-item"><div class="logic-dot gray">2</div><strong>Slide 2 :</strong> "Vendez sans vous déplacer — on vient chez vous" — illustration agent terrain.</div>
+        <div class="logic-item"><div class="logic-dot gray">3</div><strong>Slide 3 :</strong> "Sécurisé, transparent, 100% local" — bouton Commencer.</div>
+        <div class="logic-item"><div class="logic-dot amber">!</div>Bouton "Passer" visible dès la slide 1, en haut à droite. Respecter le temps de l'utilisateur.</div>
+        <div class="logic-item"><div class="logic-dot red">✗</div>Pas de scroll vertical dans l'onboarding. Swipe horizontal uniquement, naturel et intuitif.</div>
+      </div>
+    </div>
+    <div class="mockup-wrap">
+      <svg viewBox="0 0 280 500" xmlns="http://www.w3.org/2000/svg">
+        <rect width="280" height="500" rx="24" fill="#0F172A"/>
+        <rect x="10" y="10" width="260" height="480" rx="20" fill="#FFFFFF"/>
+        <!-- Passer btn -->
+        <text x="238" y="46" text-anchor="end" font-family="sans-serif" font-size="12" fill="#94A3B8">Passer</text>
+        <!-- Illustration zone -->
+        <rect x="40" y="70" width="200" height="170" rx="16" fill="#EFF6FF"/>
+        <!-- Agent SVG simple -->
+        <circle cx="140" cy="120" r="28" fill="#DBEAFE"/>
+        <circle cx="140" cy="108" r="16" fill="#2563EB"/>
+        <rect x="112" y="126" width="56" height="36" rx="10" fill="#2563EB"/>
+        <!-- checkmark -->
+        <circle cx="168" cy="90" r="12" fill="#DCFCE7" stroke="#16A34A" stroke-width="1.5"/>
+        <text x="168" y="95" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#16A34A">✓</text>
+        <!-- box -->
+        <rect x="94" y="178" width="40" height="32" rx="6" fill="#BFDBFE"/>
+        <rect x="146" y="178" width="40" height="32" rx="6" fill="#BFDBFE"/>
+        <text x="114" y="199" text-anchor="middle" font-family="sans-serif" font-size="18" fill="#2563EB">📦</text>
+        <text x="166" y="199" text-anchor="middle" font-family="sans-serif" font-size="18" fill="#2563EB">📦</text>
+        <!-- Slide text -->
+        <text x="140" y="278" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="16" fill="#0F172A">Produits vérifiés</text>
+        <text x="140" y="298" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#64748B">livrés directement chez vous</text>
+        <!-- dots -->
+        <circle cx="126" cy="326" r="4" fill="#2563EB"/>
+        <circle cx="140" cy="326" r="3" fill="#CBD5E1"/>
+        <circle cx="154" cy="326" r="3" fill="#CBD5E1"/>
+        <!-- next btn -->
+        <rect x="60" y="400" width="160" height="44" rx="12" fill="#2563EB"/>
+        <text x="140" y="427" text-anchor="middle" font-family="sans-serif" font-weight="600" font-size="14" fill="#fff">Suivant →</text>
+        <!-- home indicator -->
+        <rect x="110" y="470" width="60" height="4" rx="2" fill="#E2E8F0"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ÉCRAN 3 — CHOIX D'ENTRÉE -->
+  <div class="screen-block">
+    <div class="screen-info">
+      <h3><span class="screen-num-badge">Écran 3</span> Choix d'entrée</h3>
+      <p>Deux chemins clairs. L'utilisateur sait immédiatement quoi faire. Pas de menu, pas de liste d'options. Deux boutons, deux destinations.</p>
+      <div class="logic-block">
+        <div class="logic-item"><div class="logic-dot blue">🛒</div><strong>Acheter</strong> → Boutique directement. Aucun compte requis pour parcourir.</div>
+        <div class="logic-item"><div class="logic-dot green">📦</div><strong>Vendre</strong> → Formulaire de soumission. Compte requis, redirection vers connexion si non connecté.</div>
+        <div class="logic-item"><div class="logic-dot gray">→</div>Lien discret en bas : "J'ai déjà un compte — Se connecter". Petit, pas intrusif.</div>
+        <div class="logic-item"><div class="logic-dot amber">!</div>Un acheteur peut voir tous les produits SANS créer de compte. On ne force jamais l'inscription avant de montrer la valeur. Règle absolue.</div>
+      </div>
+    </div>
+    <div class="mockup-wrap">
+      <svg viewBox="0 0 280 500" xmlns="http://www.w3.org/2000/svg">
+        <rect width="280" height="500" rx="24" fill="#0F172A"/>
+        <rect x="10" y="10" width="260" height="480" rx="20" fill="#FFFFFF"/>
+        <!-- Logo small -->
+        <circle cx="140" cy="80" r="24" fill="#EFF6FF"/>
+        <circle cx="140" cy="80" r="18" fill="#2563EB"/>
+        <text x="140" y="87" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="13" fill="#fff">S</text>
+        <text x="140" y="124" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="15" fill="#0F172A">Bienvenue</text>
+        <text x="140" y="142" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#94A3B8">Que souhaitez-vous faire ?</text>
+        <!-- Acheter card -->
+        <rect x="30" y="174" width="220" height="100" rx="14" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="1.5"/>
+        <text x="70" y="214" font-family="sans-serif" font-size="28">🛒</text>
+        <text x="108" y="207" font-family="sans-serif" font-weight="700" font-size="14" fill="#1E293B">Je veux acheter</text>
+        <text x="108" y="224" font-family="sans-serif" font-size="11" fill="#64748B">Parcourir les produits</text>
+        <text x="108" y="240" font-family="sans-serif" font-size="11" fill="#64748B">disponibles près de vous</text>
+        <text x="228" y="228" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#2563EB">→</text>
+        <!-- Vendre card -->
+        <rect x="30" y="290" width="220" height="100" rx="14" fill="#F0FDF4" stroke="#BBF7D0" stroke-width="1.5"/>
+        <text x="70" y="330" font-family="sans-serif" font-size="28">📦</text>
+        <text x="108" y="323" font-family="sans-serif" font-weight="700" font-size="14" fill="#1E293B">Je veux vendre</text>
+        <text x="108" y="340" font-family="sans-serif" font-size="11" fill="#64748B">Soumettre un produit</text>
+        <text x="108" y="356" font-family="sans-serif" font-size="11" fill="#64748B">on vient le récupérer</text>
+        <text x="228" y="344" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#16A34A">→</text>
+        <!-- Login link -->
+        <text x="140" y="420" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#94A3B8">J'ai déjà un compte —</text>
+        <text x="140" y="436" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#2563EB" text-decoration="underline">Se connecter</text>
+        <rect x="110" y="470" width="60" height="4" rx="2" fill="#E2E8F0"/>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- ═══════════════════════════════════════
+     SCÉNARIO 02 — INSCRIPTION & CONNEXION
+═══════════════════════════════════════ -->
+<div class="scenario">
+  <div class="scenario-head">
+    <div class="scenario-num">Scénario 02</div>
+    <h2>Inscription & Connexion</h2>
+  </div>
+  <div class="scenario-desc">
+    Le numéro de téléphone remplace l'email — c'est la réalité camerounaise. Tout le monde a un numéro, pas forcément une adresse email mémorisable. La vérification OTP par SMS est le standard. Le processus doit être fluide, sans friction inutile, sécurisé sans être pesant.
+  </div>
+
+  <!-- CONNEXION -->
+  <div class="screen-block">
+    <div class="screen-info">
+      <h3><span class="screen-num-badge">Écran 1</span> Connexion</h3>
+      <p>Champs minimalistes. Numéro de téléphone + mot de passe. Rien d'autre. Le clavier numérique s'ouvre automatiquement pour le numéro.</p>
+      <div class="logic-block">
+        <div class="logic-item"><div class="logic-dot red">✗</div>3 tentatives échouées → blocage 5 min. Message précis : "Trop de tentatives. Réessayez dans 5:00".</div>
+        <div class="logic-item"><div class="logic-dot blue">→</div>Numéro inexistant → "Ce numéro n'est pas enregistré." avec lien vers inscription.</div>
+        <div class="logic-item"><div class="logic-dot amber">!</div>Mot de passe incorrect → "Mot de passe incorrect." Jamais "identifiants incorrects" — trop vague.</div>
+        <div class="logic-item"><div class="logic-dot green">✓</div>Icône œil sur le champ mot de passe pour afficher/masquer. Standard attendu par les utilisateurs.</div>
+        <div class="logic-item"><div class="logic-dot gray">→</div>Connexion réussie → retour là où l'utilisateur était avant. Si nouveau → Boutique.</div>
+      </div>
+    </div>
+    <div class="mockup-wrap">
+      <svg viewBox="0 0 280 500" xmlns="http://www.w3.org/2000/svg">
+        <rect width="280" height="500" rx="24" fill="#0F172A"/>
+        <rect x="10" y="10" width="260" height="480" rx="20" fill="#FFFFFF"/>
+        <!-- back arrow -->
+        <text x="30" y="46" font-family="sans-serif" font-size="18" fill="#64748B">←</text>
+        <text x="140" y="46" text-anchor="middle" font-family="sans-serif" font-weight="600" font-size="15" fill="#0F172A">Connexion</text>
+        <!-- title -->
+        <text x="30" y="88" font-family="sans-serif" font-weight="700" font-size="20" fill="#0F172A">Bon retour 👋</text>
+        <text x="30" y="108" font-family="sans-serif" font-size="12" fill="#94A3B8">Connectez-vous à votre compte</text>
+        <!-- Phone field -->
+        <text x="30" y="148" font-family="sans-serif" font-size="11" font-weight="600" fill="#475569">Numéro de téléphone</text>
+        <rect x="30" y="156" width="220" height="44" rx="10" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5"/>
+        <text x="46" y="183" font-family="sans-serif" font-size="13" fill="#CBD5E1">+237 6XX XXX XXX</text>
+        <!-- Password field -->
+        <text x="30" y="222" font-family="sans-serif" font-size="11" font-weight="600" fill="#475569">Mot de passe</text>
+        <rect x="30" y="230" width="220" height="44" rx="10" fill="#F8FAFC" stroke="#2563EB" stroke-width="1.5"/>
+        <text x="46" y="257" font-family="sans-serif" font-size="13" fill="#0F172A">••••••••</text>
+        <text x="230" y="257" font-family="sans-serif" font-size="13" fill="#94A3B8">👁</text>
+        <!-- forgot -->
+        <text x="250" y="292" text-anchor="end" font-family="sans-serif" font-size="11" fill="#2563EB">Mot de passe oublié ?</text>
+        <!-- error state example -->
+        <rect x="30" y="304" width="220" height="34" rx="8" fill="#FFF1F2"/>
+        <text x="46" y="325" font-family="sans-serif" font-size="11" fill="#DC2626">⚠ Mot de passe incorrect. 2 tentatives restantes.</text>
+        <!-- Login btn -->
+        <rect x="30" y="352" width="220" height="46" rx="12" fill="#2563EB"/>
+        <text x="140" y="380" text-anchor="middle" font-family="sans-serif" font-weight="600" font-size="14" fill="#fff">Se connecter</text>
+        <!-- divider -->
+        <line x1="30" y1="416" x2="120" y2="416" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="140" y="420" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#CBD5E1">ou</text>
+        <line x1="160" y1="416" x2="250" y2="416" stroke="#E2E8F0" stroke-width="1"/>
+        <!-- Register link -->
+        <text x="140" y="444" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#64748B">Pas de compte ?</text>
+        <text x="140" y="460" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#2563EB" font-weight="600">Créer un compte</text>
+        <rect x="110" y="475" width="60" height="4" rx="2" fill="#E2E8F0"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- INSCRIPTION -->
+  <div class="screen-block reverse">
+    <div class="screen-info">
+      <h3><span class="screen-num-badge">Écran 2</span> Inscription — Étape 1/2</h3>
+      <p>Formulaire en deux étapes pour ne pas décourager avec un écran surchargé. Étape 1 : informations de base. Les règles du mot de passe sont visibles et se valident en temps réel avec des coches vertes.</p>
+      <div class="logic-block">
+        <div class="logic-item"><div class="logic-dot red">✗</div>Numéro déjà utilisé → "Ce numéro est déjà enregistré." avec lien Se connecter. Jamais laisser l'utilisateur dans le flou.</div>
+        <div class="logic-item"><div class="logic-dot green">✓</div>Règles mot de passe visibles en temps réel : 8 car. min ✓, Majuscule ✓, Chiffre ✓. Coches vertes qui s'allument progressivement.</div>
+        <div class="logic-item"><div class="logic-dot amber">!</div>Aucune donnée n'est enregistrée en base avant la validation OTP. Évite les comptes fantômes.</div>
+        <div class="logic-item"><div class="logic-dot blue">→</div>Bouton "Continuer" inactif tant que tous les champs ne sont pas valides. Il devient actif progressivement.</div>
+      </div>
+    </div>
+    <div class="mockup-wrap">
+      <svg viewBox="0 0 280 500" xmlns="http://www.w3.org/2000/svg">
+        <rect width="280" height="500" rx="24" fill="#0F172A"/>
+        <rect x="10" y="10" width="260" height="480" rx="20" fill="#FFFFFF"/>
+        <text x="30" y="46" font-family="sans-serif" font-size="18" fill="#64748B">←</text>
+        <text x="140" y="46" text-anchor="middle" font-family="sans-serif" font-weight="600" font-size="15" fill="#0F172A">Créer un compte</text>
+        <!-- progress -->
+        <rect x="30" y="58" width="220" height="4" rx="2" fill="#E2E8F0"/>
+        <rect x="30" y="58" width="110" height="4" rx="2" fill="#2563EB"/>
+        <text x="30" y="76" font-family="sans-serif" font-size="10" fill="#94A3B8">Étape 1 sur 2</text>
+        <!-- fields -->
+        <text x="30" y="100" font-family="sans-serif" font-size="11" font-weight="600" fill="#475569">Prénom</text>
+        <rect x="30" y="108" width="100" height="38" rx="8" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5"/>
+        <text x="80" y="131" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#94A3B8">Prénom</text>
+        <text x="152" y="100" font-family="sans-serif" font-size="11" font-weight="600" fill="#475569">Nom</text>
+        <rect x="150" y="108" width="100" height="38" rx="8" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5"/>
+        <text x="200" y="131" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#94A3B8">Nom</text>
+        <text x="30" y="164" font-family="sans-serif" font-size="11" font-weight="600" fill="#475569">Numéro de téléphone</text>
+        <rect x="30" y="172" width="220" height="38" rx="8" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5"/>
+        <text x="46" y="195" font-family="sans-serif" font-size="12" fill="#94A3B8">+237 6XX XXX XXX</text>
+        <text x="30" y="228" font-family="sans-serif" font-size="11" font-weight="600" fill="#475569">Mot de passe</text>
+        <rect x="30" y="236" width="220" height="38" rx="8" fill="#F8FAFC" stroke="#2563EB" stroke-width="1.5"/>
+        <text x="46" y="259" font-family="sans-serif" font-size="12" fill="#0F172A">••••••••</text>
+        <!-- rules -->
+        <rect x="30" y="282" width="220" height="66" rx="8" fill="#F0FDF4"/>
+        <text x="44" y="298" font-family="sans-serif" font-size="10" fill="#16A34A">✓ 8 caractères minimum</text>
+        <text x="44" y="314" font-family="sans-serif" font-size="10" fill="#16A34A">✓ Une majuscule</text>
+        <text x="44" y="330" font-family="sans-serif" font-size="10" fill="#94A3B8">○ Un chiffre (manquant)</text>
+        <!-- confirm pwd -->
+        <text x="30" y="366" font-family="sans-serif" font-size="11" font-weight="600" fill="#475569">Confirmer le mot de passe</text>
+        <rect x="30" y="374" width="220" height="38" rx="8" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5"/>
+        <text x="46" y="397" font-family="sans-serif" font-size="12" fill="#94A3B8">Répétez le mot de passe</text>
+        <!-- btn -->
+        <rect x="30" y="426" width="220" height="44" rx="12" fill="#CBD5E1"/>
+        <text x="140" y="453" text-anchor="middle" font-family="sans-serif" font-weight="600" font-size="14" fill="#fff">Continuer →</text>
+        <rect x="110" y="475" width="60" height="4" rx="2" fill="#E2E8F0"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- OTP -->
+  <div class="screen-block">
+    <div class="screen-info">
+      <h3><span class="screen-num-badge">Écran 3</span> Vérification OTP — Étape 2/2</h3>
+      <p>4 cases séparées pour le code, pas un champ texte. Le code se colle automatiquement si reçu par SMS. Compte à rebours visible. Renvoyer disponible après expiration.</p>
+      <div class="logic-block">
+        <div class="logic-item"><div class="logic-dot green">✓</div>Code OTP copié depuis SMS → collé automatiquement dans les 4 cases. L'utilisateur n'a rien à taper.</div>
+        <div class="logic-item"><div class="logic-dot blue">→</div>Code expire après 10 minutes. Compte à rebours visible en temps réel.</div>
+        <div class="logic-item"><div class="logic-dot red">✗</div>Maximum 3 renvois. Après : "Trop de demandes. Contactez le support." Évite les abus.</div>
+        <div class="logic-item"><div class="logic-dot amber">!</div>Code invalide → cases rougissent avec animation légère. Message : "Code incorrect. 2 essais restants."</div>
+        <div class="logic-item"><div class="logic-dot gray">→</div>Validation réussie → compte créé, connexion automatique, redirection Boutique.</div>
+      </div>
+    </div>
+    <div class="mockup-wrap">
+      <svg viewBox="0 0 280 500" xmlns="http://www.w3.org/2000/svg">
+        <rect width="280" height="500" rx="24" fill="#0F172A"/>
+        <rect x="10" y="10" width="260" height="480" rx="20" fill="#FFFFFF"/>
+        <text x="30" y="46" font-family="sans-serif" font-size="18" fill="#64748B">←</text>
+        <text x="140" y="46" text-anchor="middle" font-family="sans-serif" font-weight="600" font-size="15" fill="#0F172A">Vérification</text>
+        <rect x="30" y="58" width="220" height="4" rx="2" fill="#E2E8F0"/>
+        <rect x="30" y="58" width="220" height="4" rx="2" fill="#2563EB"/>
+        <text x="30" y="76" font-family="sans-serif" font-size="10" fill="#94A3B8">Étape 2 sur 2</text>
+        <!-- SMS icon -->
+        <text x="140" y="136" text-anchor="middle" font-family="sans-serif" font-size="44">📱</text>
+        <text x="140" y="172" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="16" fill="#0F172A">Code de vérification</text>
+        <text x="140" y="192" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#64748B">Envoyé au +237 699 XXX X42</text>
+        <!-- OTP boxes -->
+        <rect x="32" y="214" width="48" height="56" rx="12" fill="#F8FAFC" stroke="#2563EB" stroke-width="2"/>
+        <text x="56" y="250" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="24" fill="#0F172A">7</text>
+        <rect x="88" y="214" width="48" height="56" rx="12" fill="#F8FAFC" stroke="#2563EB" stroke-width="2"/>
+        <text x="112" y="250" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="24" fill="#0F172A">4</text>
+        <rect x="144" y="214" width="48" height="56" rx="12" fill="#F8FAFC" stroke="#2563EB" stroke-width="2"/>
+        <text x="168" y="250" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="24" fill="#0F172A">2</text>
+        <rect x="200" y="214" width="48" height="56" rx="12" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5"/>
+        <text x="224" y="250" text-anchor="middle" font-family="sans-serif" font-size="24" fill="#CBD5E1">_</text>
+        <!-- timer -->
+        <text x="140" y="294" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#64748B">Code valide encore <tspan font-weight="600" fill="#2563EB">08:34</tspan></text>
+        <text x="140" y="316" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#CBD5E1">Renvoyer le code (disponible dans 01:26)</text>
+        <!-- validate btn -->
+        <rect x="30" y="346" width="220" height="46" rx="12" fill="#2563EB"/>
+        <text x="140" y="374" text-anchor="middle" font-family="sans-serif" font-weight="600" font-size="14" fill="#fff">Valider mon compte</text>
+        <!-- security note -->
+        <rect x="30" y="408" width="220" height="46" rx="10" fill="#F8FAFC"/>
+        <text x="46" y="428" font-family="sans-serif" font-size="10" fill="#94A3B8">🔒 Code à usage unique. Ne le partagez</text>
+        <text x="46" y="442" font-family="sans-serif" font-size="10" fill="#94A3B8">jamais avec personne.</text>
+        <rect x="110" y="475" width="60" height="4" rx="2" fill="#E2E8F0"/>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- ═══════════════════════════════════════
+     SCÉNARIO 03 — BOUTIQUE & NAVIGATION
+═══════════════════════════════════════ -->
+<div class="scenario">
+  <div class="scenario-head">
+    <div class="scenario-num">Scénario 03</div>
+    <h2>Boutique & Navigation Acheteur</h2>
+  </div>
+  <div class="scenario-desc">
+    L'écran principal de l'application. C'est la vitrine. Si cet écran est confus, surchargé ou lent — l'utilisateur part et ne revient jamais. Principe : montrer les produits le plus vite possible, avec le minimum de friction. Chaque élément affiché doit avoir une raison d'être.
+  </div>
+
+  <!-- ACCUEIL -->
+  <div class="screen-block reverse">
+    <div class="screen-info">
+      <h3><span class="screen-num-badge">Écran 1</span> Accueil Boutique</h3>
+      <p>Header léger. Navigation par barre du bas uniquement — pas de menu hamburger. Corps centré sur les produits. Deux blocs d'entrée : catégories rapides, puis grille produits.</p>
+      <div class="logic-block">
+        <div class="logic-item"><div class="logic-dot blue">→</div>Chargement lent → skeleton loading (rectangles animés). Jamais un écran blanc ou un spinner seul.</div>
+        <div class="logic-item"><div class="logic-dot red">✗</div>Produit réservé → carte grisée + badge "Réservé". Non cliquable. Retiré automatiquement si vendu.</div>
+        <div class="logic-item"><div class="logic-dot amber">!</div>Hors ligne → bannière discrète en haut. L'app affiche le cache. Pas de page d'erreur blanche.</div>
+        <div class="logic-item"><div class="logic-dot green">✓</div>Scroll infini par lot de 20 produits. Retour depuis une fiche → même position dans la liste. Jamais renvoyé au début.</div>
+        <div class="logic-item"><div class="logic-dot gray">→</div>Badge rouge sur l'icône panier si articles dedans. Badge bleu sur notifications si non lues.</div>
+      </div>
+    </div>
+    <div class="mockup-wrap">
+      <svg viewBox="0 0 280 560" xmlns="http://www.w3.org/2000/svg">
+        <rect width="280" height="560" rx="24" fill="#0F172A"/>
+        <rect x="10" y="10" width="260" height="540" rx="20" fill="#F8FAFC"/>
+        <!-- Header -->
+        <rect x="10" y="10" width="260" height="64" rx="20" fill="#FFFFFF"/>
+        <rect x="10" y="54" width="260" height="20" fill="#FFFFFF"/>
+        <circle cx="34" cy="40" r="14" fill="#EFF6FF"/>
+        <circle cx="34" cy="40" r="10" fill="#2563EB"/>
+        <text x="34" y="44" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="8" fill="#fff">S</text>
+        <rect x="56" y="30" width="140" height="20" rx="10" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="90" y="44" font-family="sans-serif" font-size="10" fill="#CBD5E1">Chercher un produit...</text>
+        <text x="216" y="44" font-family="sans-serif" font-size="16" fill="#64748B">🛒</text>
+        <circle cx="228" cy="32" r="5" fill="#EF4444"/>
+        <text x="228" y="36" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#fff">2</text>
+        <text x="242" y="44" font-family="sans-serif" font-size="16" fill="#64748B">🔔</text>
+        <!-- Banner -->
+        <rect x="20" y="84" width="240" height="50" rx="12" fill="#2563EB"/>
+        <text x="36" y="104" font-family="sans-serif" font-weight="600" font-size="12" fill="#fff">Produits vérifiés ✓</text>
+        <text x="36" y="120" font-family="sans-serif" font-size="10" fill="rgba(255,255,255,.75)">Livrés à Douala sous 48h</text>
+        <text x="230" y="118" text-anchor="middle" font-family="sans-serif" font-size="22" fill="rgba(255,255,255,.3)">📦</text>
+        <!-- Categories -->
+        <text x="20" y="152" font-family="sans-serif" font-weight="600" font-size="11" fill="#1E293B">Catégories</text>
+        <!-- cat chips -->
+        <rect x="20" y="160" width="60" height="30" rx="8" fill="#EFF6FF"/>
+        <text x="50" y="180" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#2563EB">📱 Tél.</text>
+        <rect x="86" y="160" width="62" height="30" rx="8" fill="#F0FDF4"/>
+        <text x="117" y="180" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#16A34A">🏠 Élec.</text>
+        <rect x="154" y="160" width="56" height="30" rx="8" fill="#FFFBEB"/>
+        <text x="182" y="180" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#B45309">🛋 Meu.</text>
+        <rect x="216" y="160" width="44" height="30" rx="8" fill="#FFF1F2"/>
+        <text x="238" y="180" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#DC2626">👗 Vêt.</text>
+        <!-- Products title -->
+        <text x="20" y="210" font-family="sans-serif" font-weight="600" font-size="11" fill="#1E293B">Arrivées récentes</text>
+        <text x="234" y="210" text-anchor="end" font-family="sans-serif" font-size="10" fill="#2563EB">Voir tout</text>
+        <!-- Product cards grid -->
+        <!-- Card 1 -->
+        <rect x="20" y="218" width="112" height="140" rx="12" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+        <rect x="20" y="218" width="112" height="80" rx="12" fill="#DBEAFE"/>
+        <rect x="20" y="266" width="112" height="32" fill="#DBEAFE"/>
+        <text x="76" y="264" text-anchor="middle" font-family="sans-serif" font-size="28">📱</text>
+        <text x="30" y="310" font-family="sans-serif" font-size="10" font-weight="600" fill="#1E293B">iPhone 11</text>
+        <text x="30" y="324" font-family="sans-serif" font-size="9" fill="#64748B">85 000 FCFA</text>
+        <rect x="30" y="332" width="38" height="14" rx="4" fill="#DCFCE7"/>
+        <text x="49" y="343" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#16A34A">🟢 Bon état</text>
+        <text x="120" y="343" text-anchor="end" font-family="sans-serif" font-size="10" fill="#F59E0B">♥</text>
+        <!-- Card 2 -->
+        <rect x="144" y="218" width="112" height="140" rx="12" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+        <rect x="144" y="218" width="112" height="80" rx="12" fill="#DCFCE7"/>
+        <rect x="144" y="266" width="112" height="32" fill="#DCFCE7"/>
+        <text x="200" y="264" text-anchor="middle" font-family="sans-serif" font-size="28">📺</text>
+        <text x="154" y="310" font-family="sans-serif" font-size="10" font-weight="600" fill="#1E293B">TV Samsung 43"</text>
+        <text x="154" y="324" font-family="sans-serif" font-size="9" fill="#64748B">120 000 FCFA</text>
+        <rect x="154" y="332" width="42" height="14" rx="4" fill="#FEF3C7"/>
+        <text x="175" y="343" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#B45309">🟡 Correct</text>
+        <text x="244" y="343" text-anchor="end" font-family="sans-serif" font-size="10" fill="#CBD5E1">♥</text>
+        <!-- Card 3 - Reserved -->
+        <rect x="20" y="368" width="112" height="140" rx="12" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+        <rect x="20" y="368" width="112" height="80" rx="12" fill="#F1F5F9"/>
+        <rect x="20" y="416" width="112" height="32" fill="#F1F5F9"/>
+        <text x="76" y="414" text-anchor="middle" font-family="sans-serif" font-size="28">💻</text>
+        <!-- reserved overlay -->
+        <rect x="20" y="368" width="112" height="140" rx="12" fill="rgba(15,23,42,.5)"/>
+        <rect x="36" y="428" width="80" height="22" rx="6" fill="#475569"/>
+        <text x="76" y="443" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="600" fill="#fff">Réservé</text>
+        <!-- Card 4 -->
+        <rect x="144" y="368" width="112" height="140" rx="12" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+        <rect x="144" y="368" width="112" height="80" rx="12" fill="#FEE2E2"/>
+        <rect x="144" y="416" width="112" height="32" fill="#FEE2E2"/>
+        <text x="200" y="414" text-anchor="middle" font-family="sans-serif" font-size="28">🛋</text>
+        <text x="154" y="460" font-family="sans-serif" font-size="10" font-weight="600" fill="#1E293B">Canapé 3 places</text>
+        <text x="154" y="474" font-family="sans-serif" font-size="9" fill="#64748B">45 000 FCFA</text>
+        <rect x="154" y="480" width="38" height="14" rx="4" fill="#FEE2E2"/>
+        <text x="173" y="491" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#DC2626">🔴 Réparer</text>
+        <!-- Bottom nav -->
+        <rect x="10" y="514" width="260" height="36" rx="0" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+        <rect x="10" y="530" width="260" height="20" rx="0" fill="#fff"/>
+        <rect x="10" y="538" width="260" height="12" rx="0 0 20 20" fill="#fff"/>
+        <text x="50" y="532" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#2563EB">🏠</text>
+        <text x="50" y="543" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#2563EB">Accueil</text>
+        <text x="100" y="532" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#94A3B8">🔍</text>
+        <text x="100" y="543" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#94A3B8">Catégories</text>
+        <text x="150" y="532" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#94A3B8">❤️</text>
+        <text x="150" y="543" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#94A3B8">Favoris</text>
+        <text x="200" y="532" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#94A3B8">📦</text>
+        <text x="200" y="543" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#94A3B8">Commandes</text>
+        <text x="240" y="532" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#94A3B8">👤</text>
+        <text x="240" y="543" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#94A3B8">Compte</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- RECHERCHE -->
+  <div class="screen-block">
+    <div class="screen-info">
+      <h3><span class="screen-num-badge">Écran 2</span> Recherche & Filtres</h3>
+      <p>Suggestions automatiques pendant la frappe. Filtres instantanés sans rechargement. Résultat vide → message humain, pas technique.</p>
+      <div class="logic-block">
+        <div class="logic-item"><div class="logic-dot green">✓</div>Suggestions apparaissent dès 2 caractères tapés. Format : "iPhone 11 (Téléphones)".</div>
+        <div class="logic-item"><div class="logic-dot blue">→</div>Filtres s'appliquent instantanément. L'utilisateur voit les résultats changer en temps réel.</div>
+        <div class="logic-item"><div class="logic-dot amber">!</div>0 résultats → "Aucun produit pour 'xxx'. Il sera peut-être disponible bientôt." Jamais "Aucun résultat".</div>
+        <div class="logic-item"><div class="logic-dot gray">→</div>5 dernières recherches mémorisées. Affichées quand l'utilisateur retape dans la barre.</div>
+      </div>
+    </div>
+    <div class="mockup-wrap">
+      <svg viewBox="0 0 280 500" xmlns="http://www.w3.org/2000/svg">
+        <rect width="280" height="500" rx="24" fill="#0F172A"/>
+        <rect x="10" y="10" width="260" height="480" rx="20" fill="#F8FAFC"/>
+        <rect x="10" y="10" width="260" height="70" rx="20" fill="#fff"/>
+        <rect x="10" y="60" width="260" height="20" fill="#fff"/>
+        <text x="30" y="46" font-family="sans-serif" font-size="18" fill="#64748B">←</text>
+        <rect x="54" y="28" width="180" height="28" rx="10" fill="#F8FAFC" stroke="#2563EB" stroke-width="1.5"/>
+        <text x="68" y="46" font-family="sans-serif" font-size="11" fill="#0F172A">iPhone</text>
+        <text x="222" y="46" text-anchor="end" font-family="sans-serif" font-size="11" fill="#94A3B8">✕</text>
+        <text x="246" y="46" font-family="sans-serif" font-size="11" fill="#2563EB">OK</text>
+        <!-- suggestions -->
+        <rect x="54" y="58" width="180" height="96" rx="8" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+        <rect x="54" y="58" width="180" height="24" rx="8" fill="#EFF6FF"/>
+        <rect x="54" y="74" width="180" height="8" fill="#EFF6FF"/>
+        <text x="66" y="75" font-family="sans-serif" font-size="11" fill="#2563EB">📱 iPhone 11 (Téléphones)</text>
+        <line x1="54" y1="82" x2="234" y2="82" stroke="#F1F5F9" stroke-width="1"/>
+        <text x="66" y="99" font-family="sans-serif" font-size="11" fill="#475569">📱 iPhone 12 (Téléphones)</text>
+        <line x1="54" y1="106" x2="234" y2="106" stroke="#F1F5F9" stroke-width="1"/>
+        <text x="66" y="122" font-family="sans-serif" font-size="11" fill="#475569">📱 iPhone 13 Pro (Téléphones)</text>
+        <!-- filters bar -->
+        <text x="20" y="174" font-family="sans-serif" font-size="10" font-weight="600" fill="#64748B">14 résultats · Filtres :</text>
+        <rect x="20" y="180" width="60" height="24" rx="8" fill="#EFF6FF" stroke="#2563EB" stroke-width="1"/>
+        <text x="50" y="196" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#2563EB">Bon état ✓</text>
+        <rect x="86" y="180" width="72" height="24" rx="8" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="122" y="196" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#64748B">Prix max ▼</text>
+        <rect x="164" y="180" width="72" height="24" rx="8" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="200" y="196" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#64748B">Livraison ▼</text>
+        <!-- results -->
+        <rect x="20" y="214" width="112" height="130" rx="12" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+        <rect x="20" y="214" width="112" height="74" rx="12" fill="#DBEAFE"/>
+        <rect x="20" y="262" width="112" height="26" fill="#DBEAFE"/>
+        <text x="76" y="258" text-anchor="middle" font-family="sans-serif" font-size="26">📱</text>
+        <text x="30" y="302" font-family="sans-serif" font-size="10" font-weight="600" fill="#1E293B">iPhone 11 64Go</text>
+        <text x="30" y="316" font-family="sans-serif" font-size="10" fill="#2563EB" font-weight="600">85 000 FCFA</text>
+        <rect x="30" y="322" width="38" height="14" rx="4" fill="#DCFCE7"/>
+        <text x="49" y="333" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#16A34A">🟢 Bon état</text>
+        <rect x="144" y="214" width="112" height="130" rx="12" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+        <rect x="144" y="214" width="112" height="74" rx="12" fill="#DBEAFE"/>
+        <rect x="144" y="262" width="112" height="26" fill="#DBEAFE"/>
+        <text x="200" y="258" text-anchor="middle" font-family="sans-serif" font-size="26">📱</text>
+        <text x="154" y="302" font-family="sans-serif" font-size="10" font-weight="600" fill="#1E293B">iPhone 12 128Go</text>
+        <text x="154" y="316" font-family="sans-serif" font-size="10" fill="#2563EB" font-weight="600">110 000 FCFA</text>
+        <rect x="154" y="322" width="38" height="14" rx="4" fill="#DCFCE7"/>
+        <text x="173" y="333" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#16A34A">🟢 Bon état</text>
+        <!-- bottom nav -->
+        <rect x="10" y="460" width="260" height="30" rx="0" fill="#fff"/>
+        <rect x="10" y="470" width="260" height="20" rx="0 0 20 20" fill="#fff"/>
+        <text x="50" y="476" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#94A3B8">🏠</text>
+        <text x="100" y="476" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#2563EB">🔍</text>
+        <text x="150" y="476" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#94A3B8">❤️</text>
+        <text x="200" y="476" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#94A3B8">📦</text>
+        <text x="240" y="476" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#94A3B8">👤</text>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- ═══════════════════════════════════════
+     SCÉNARIO 04 — FICHE PRODUIT & ACHAT
+═══════════════════════════════════════ -->
+<div class="scenario">
+  <div class="scenario-head">
+    <div class="scenario-num">Scénario 04</div>
+    <h2>Fiche Produit & Processus d'Achat</h2>
+  </div>
+  <div class="scenario-desc">
+    L'écran de décision. L'utilisateur dit oui ou non ici. Les informations sont dans un ordre précis, pensé pour guider naturellement vers l'achat. La transparence totale sur les défauts est notre différenciateur. Aucune surprise au moment du paiement — jamais.
+  </div>
+
+  <!-- FICHE PRODUIT -->
+  <div class="screen-block reverse">
+    <div class="screen-info">
+      <h3><span class="screen-num-badge">Écran 1</span> Fiche Produit</h3>
+      <p>Galerie plein écran en haut. Informations dans un ordre précis et réfléchi. Le bloc "Ce que vous devez savoir" est le plus important — jamais vide, toujours honnête.</p>
+      <div class="logic-block">
+        <div class="logic-item"><div class="logic-dot blue">→</div>Non connecté + tap "Acheter" → modal de connexion par-dessus la fiche. La fiche reste visible derrière. On ne redirige pas ailleurs.</div>
+        <div class="logic-item"><div class="logic-dot red">✗</div>Produit réservé pendant la consultation → bouton devient "Réservé — Indisponible" en temps réel. Sans rechargement.</div>
+        <div class="logic-item"><div class="logic-dot amber">!</div>Dernière unité et quelqu'un est en cours de paiement → message discret : "Un acheteur est en cours de paiement. Agissez vite."</div>
+        <div class="logic-item"><div class="logic-dot green">✓</div>Tap sur photo → zoom plein écran avec swipe. Minimum 3 photos par produit (face, dos, défauts).</div>
+        <div class="logic-item"><div class="logic-dot gray">→</div>Bouton "Acheter maintenant" fixe en bas, toujours visible pendant le scroll.</div>
+      </div>
+    </div>
+    <div class="mockup-wrap">
+      <svg viewBox="0 0 280 560" xmlns="http://www.w3.org/2000/svg">
+        <rect width="280" height="560" rx="24" fill="#0F172A"/>
+        <rect x="10" y="10" width="260" height="540" rx="20" fill="#F8FAFC"/>
+        <!-- Photo gallery -->
+        <rect x="10" y="10" width="260" height="170" rx="20" fill="#DBEAFE"/>
+        <rect x="10" y="140" width="260" height="40" fill="#DBEAFE"/>
+        <text x="140" y="104" text-anchor="middle" font-family="sans-serif" font-size="52">📱</text>
+        <!-- nav overlay -->
+        <text x="30" y="42" font-family="sans-serif" font-size="18" fill="#fff">←</text>
+        <text x="250" y="42" font-family="sans-serif" font-size="18" fill="#fff">♥</text>
+        <!-- photo dots -->
+        <circle cx="128" cy="166" r="3" fill="#2563EB"/>
+        <circle cx="140" cy="166" r="3" fill="rgba(255,255,255,.6)"/>
+        <circle cx="152" cy="166" r="3" fill="rgba(255,255,255,.6)"/>
+        <!-- Content -->
+        <rect x="10" y="178" width="260" height="350" rx="0" fill="#fff"/>
+        <rect x="10" y="488" width="260" height="40" rx="0 0 20 20" fill="#fff"/>
+        <text x="22" y="204" font-family="sans-serif" font-weight="700" font-size="16" fill="#0F172A">iPhone 11 — 64 Go Noir</text>
+        <text x="22" y="224" font-family="sans-serif" font-weight="700" font-size="20" fill="#2563EB">85 000 FCFA</text>
+        <rect x="160" y="210" width="54" height="20" rx="6" fill="#DCFCE7"/>
+        <text x="187" y="225" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#16A34A">🟢 Bon état</text>
+        <rect x="218" y="210" width="50" height="20" rx="6" fill="#DBEAFE"/>
+        <text x="243" y="225" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#1D4ED8">1 en stock</text>
+        <!-- Transparency block -->
+        <rect x="16" y="240" width="248" height="88" rx="10" fill="#FFFBEB" stroke="#FDE68A" stroke-width="1"/>
+        <text x="28" y="258" font-family="sans-serif" font-weight="600" font-size="11" fill="#92400E">⚠ Ce que vous devez savoir</text>
+        <text x="28" y="276" font-family="sans-serif" font-size="10" fill="#78350F">✓ Micro-rayure bas écran (invisible allumé)</text>
+        <text x="28" y="292" font-family="sans-serif" font-size="10" fill="#78350F">✓ Batterie : 84% de capacité</text>
+        <text x="28" y="308" font-family="sans-serif" font-size="10" fill="#78350F">✓ Chargeur inclus · Boîte non disponible</text>
+        <text x="28" y="322" font-family="sans-serif" font-size="10" fill="#94A3B8">❓ Défauts internes non garantis</text>
+        <!-- Description -->
+        <text x="22" y="346" font-family="sans-serif" font-weight="600" font-size="11" fill="#1E293B">Description</text>
+        <text x="22" y="362" font-family="sans-serif" font-size="10" fill="#64748B">iPhone 11, 64Go, coloris Noir. iOS 16. Face</text>
+        <text x="22" y="376" font-family="sans-serif" font-size="10" fill="#64748B">ID fonctionnel. Double caméra arrière. Vendu</text>
+        <text x="22" y="390" font-family="sans-serif" font-size="10" fill="#64748B">avec chargeur Lightning.</text>
+        <!-- Livraison -->
+        <text x="22" y="414" font-family="sans-serif" font-weight="600" font-size="11" fill="#1E293B">Options de remise</text>
+        <rect x="16" y="420" width="118" height="44" rx="8" fill="#EFF6FF" stroke="#2563EB" stroke-width="1.5"/>
+        <text x="75" y="438" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#1E40AF">🏍️ Livraison</text>
+        <text x="75" y="453" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#2563EB" font-weight="600">1 500 FCFA</text>
+        <rect x="146" y="420" width="118" height="44" rx="8" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="205" y="438" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#64748B">🏪 Retrait</text>
+        <text x="205" y="453" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#16A34A" font-weight="600">Gratuit</text>
+        <!-- Buy btn -->
+        <rect x="16" y="474" width="248" height="44" rx="12" fill="#2563EB"/>
+        <text x="140" y="501" text-anchor="middle" font-family="sans-serif" font-weight="600" font-size="14" fill="#fff">Acheter maintenant</text>
+        <rect x="110" y="528" width="60" height="4" rx="2" fill="#E2E8F0"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- RECAP + PAIEMENT -->
+  <div class="screen-block">
+    <div class="screen-info">
+      <h3><span class="screen-num-badge">Écrans 2 & 3</span> Récapitulatif & Paiement</h3>
+      <p>Avant tout paiement : récapitulatif complet. Zéro frais caché. Ce que l'utilisateur voit = ce qu'il paie. Paiement Mobile Money : Orange ou MTN. Instructions claires. États de paiement gérés.</p>
+      <div class="logic-block">
+        <div class="logic-item"><div class="logic-dot green">✓</div>Double tap impossible : le serveur génère un ID unique de transaction avant le paiement. Zéro double débit.</div>
+        <div class="logic-item"><div class="logic-dot blue">→</div>Délai d'approbation Mobile Money : 5 minutes. Après expiration → commande annulée, stock libéré automatiquement.</div>
+        <div class="logic-item"><div class="logic-dot red">✗</div>Paiement passe mais serveur ne répond pas → "Vérification en cours..." L'utilisateur n'est jamais débité deux fois.</div>
+        <div class="logic-item"><div class="logic-dot amber">!</div>Paiement refusé → message clair + bouton "Réessayer". Jamais une page d'erreur technique.</div>
+      </div>
+    </div>
+    <div class="mockup-wrap">
+      <svg viewBox="0 0 280 500" xmlns="http://www.w3.org/2000/svg">
+        <rect width="280" height="500" rx="24" fill="#0F172A"/>
+        <rect x="10" y="10" width="260" height="480" rx="20" fill="#F8FAFC"/>
+        <rect x="10" y="10" width="260" height="56" rx="20" fill="#fff"/>
+        <rect x="10" y="46" width="260" height="20" fill="#fff"/>
+        <text x="30" y="42" font-family="sans-serif" font-size="18" fill="#64748B">←</text>
+        <text x="140" y="42" text-anchor="middle" font-family="sans-serif" font-weight="600" font-size="15" fill="#0F172A">Récapitulatif</text>
+        <!-- order summary card -->
+        <rect x="16" y="74" width="248" height="90" rx="12" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+        <rect x="28" y="86" width="56" height="56" rx="10" fill="#DBEAFE"/>
+        <text x="56" y="122" text-anchor="middle" font-family="sans-serif" font-size="28">📱</text>
+        <text x="96" y="102" font-family="sans-serif" font-weight="600" font-size="12" fill="#0F172A">iPhone 11 — 64 Go</text>
+        <text x="96" y="118" font-family="sans-serif" font-size="11" fill="#64748B">🏍️ Livraison à domicile</text>
+        <text x="96" y="134" font-family="sans-serif" font-size="11" fill="#64748B">Akwa, Douala</text>
+        <text x="252" y="102" text-anchor="end" font-family="sans-serif" font-size="12" font-weight="600" fill="#2563EB">85 000</text>
+        <!-- price breakdown -->
+        <rect x="16" y="174" width="248" height="100" rx="12" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="28" y="198" font-family="sans-serif" font-size="12" fill="#64748B">Produit</text>
+        <text x="252" y="198" text-anchor="end" font-family="sans-serif" font-size="12" fill="#1E293B">85 000 FCFA</text>
+        <line x1="28" y1="208" x2="252" y2="208" stroke="#F1F5F9" stroke-width="1"/>
+        <text x="28" y="228" font-family="sans-serif" font-size="12" fill="#64748B">Livraison</text>
+        <text x="252" y="228" text-anchor="end" font-family="sans-serif" font-size="12" fill="#1E293B">1 500 FCFA</text>
+        <line x1="28" y1="238" x2="252" y2="238" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="28" y="258" font-family="sans-serif" font-weight="700" font-size="14" fill="#0F172A">Total à payer</text>
+        <text x="252" y="258" text-anchor="end" font-family="sans-serif" font-weight="700" font-size="16" fill="#2563EB">86 500 FCFA</text>
+        <!-- payment method -->
+        <text x="20" y="290" font-family="sans-serif" font-weight="600" font-size="12" fill="#1E293B">Mode de paiement</text>
+        <rect x="16" y="298" width="116" height="52" rx="10" fill="#FFF7ED" stroke="#F97316" stroke-width="1.5"/>
+        <text x="74" y="322" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="600" fill="#C2410C">🟠 Orange Money</text>
+        <text x="74" y="338" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#EA580C">Sélectionné</text>
+        <rect x="148" y="298" width="116" height="52" rx="10" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="206" y="322" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#64748B">🟡 MTN MoMo</text>
+        <text x="206" y="338" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#94A3B8">Appuyer pour choisir</text>
+        <!-- phone number -->
+        <text x="20" y="370" font-family="sans-serif" font-size="11" font-weight="600" fill="#475569">Numéro Orange Money</text>
+        <rect x="16" y="378" width="248" height="40" rx="10" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5"/>
+        <text x="30" y="402" font-family="sans-serif" font-size="12" fill="#0F172A">+237 699 XXX X42</text>
+        <!-- instruction -->
+        <rect x="16" y="428" width="248" height="28" rx="8" fill="#EFF6FF"/>
+        <text x="28" y="446" font-family="sans-serif" font-size="9" fill="#1E40AF">💡 Vous recevrez une demande sur ce numéro à approuver</text>
+        <!-- confirm btn -->
+        <rect x="16" y="466" width="248" height="44" rx="12" fill="#2563EB"/>
+        <text x="140" y="493" text-anchor="middle" font-family="sans-serif" font-weight="600" font-size="13" fill="#fff">Confirmer et payer — 86 500 FCFA</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- CONFIRMATION -->
+  <div class="screen-block">
+    <div class="screen-info">
+      <h3><span class="screen-num-badge">Écran 4</span> Confirmation de commande</h3>
+      <p>Après paiement réussi. Numéro de commande unique. Récapitulatif compact. Deux actions possibles. Notification push envoyée simultanément.</p>
+      <div class="logic-block">
+        <div class="logic-item"><div class="logic-dot green">✓</div>Numéro de commande généré côté serveur, format lisible : #CM-2024-0047. Jamais un UUID technique.</div>
+        <div class="logic-item"><div class="logic-dot blue">→</div>Notification push envoyée immédiatement avec le même récapitulatif.</div>
+        <div class="logic-item"><div class="logic-dot gray">→</div>Deux boutons : "Suivre ma commande" + "Retour boutique". Pas de page intermédiaire.</div>
+      </div>
+    </div>
+    <div class="mockup-wrap">
+      <svg viewBox="0 0 280 500" xmlns="http://www.w3.org/2000/svg">
+        <rect width="280" height="500" rx="24" fill="#0F172A"/>
+        <rect x="10" y="10" width="260" height="480" rx="20" fill="#FFFFFF"/>
+        <!-- success animation circle -->
+        <circle cx="140" cy="140" r="60" fill="#F0FDF4"/>
+        <circle cx="140" cy="140" r="44" fill="#DCFCE7"/>
+        <circle cx="140" cy="140" r="30" fill="#16A34A"/>
+        <text x="140" y="150" text-anchor="middle" font-family="sans-serif" font-size="24" fill="#fff">✓</text>
+        <text x="140" y="224" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="18" fill="#0F172A">Commande confirmée !</text>
+        <text x="140" y="244" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#64748B">Paiement reçu avec succès</text>
+        <!-- order recap -->
+        <rect x="24" y="262" width="232" height="120" rx="12" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="40" y="284" font-family="sans-serif" font-size="11" fill="#94A3B8">Numéro de commande</text>
+        <text x="40" y="302" font-family="sans-serif" font-weight="700" font-size="14" fill="#2563EB">#CM-2024-0047</text>
+        <line x1="40" y1="312" x2="244" y2="312" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="40" y="330" font-family="sans-serif" font-size="11" fill="#64748B">Produit</text>
+        <text x="244" y="330" text-anchor="end" font-family="sans-serif" font-size="11" fill="#1E293B">iPhone 11 — 64 Go</text>
+        <text x="40" y="350" font-family="sans-serif" font-size="11" fill="#64748B">Total payé</text>
+        <text x="244" y="350" text-anchor="end" font-family="sans-serif" font-size="11" font-weight="600" fill="#1E293B">86 500 FCFA</text>
+        <text x="40" y="370" font-family="sans-serif" font-size="11" fill="#64748B">Délai estimé</text>
+        <text x="244" y="370" text-anchor="end" font-family="sans-serif" font-size="11" fill="#16A34A">Livraison sous 48h</text>
+        <!-- buttons -->
+        <rect x="24" y="396" width="232" height="44" rx="12" fill="#2563EB"/>
+        <text x="140" y="423" text-anchor="middle" font-family="sans-serif" font-weight="600" font-size="13" fill="#fff">Suivre ma commande</text>
+        <rect x="24" y="450" width="232" height="40" rx="12" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="140" y="475" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#64748B">Retour à la boutique</text>
+        <rect x="110" y="480" width="60" height="4" rx="2" fill="#E2E8F0"/>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- ═══════════════════════════════════════
+     SCÉNARIO 05 — SUIVI DE COMMANDE
+═══════════════════════════════════════ -->
+<div class="scenario">
+  <div class="scenario-head">
+    <div class="scenario-num">Scénario 05</div>
+    <h2>Suivi de Commande</h2>
+  </div>
+  <div class="scenario-desc">
+    Après le paiement, l'acheteur entre dans une phase d'attente. C'est ici que la confiance se construit ou se détruit. Une app qui garde l'utilisateur dans le noir après paiement est une app qu'on désinstalle. Chaque changement d'état doit être communiqué proactivement, avec un message humain, pas technique.
+  </div>
+
+  <!-- LISTE COMMANDES -->
+  <div class="screen-block reverse">
+    <div class="screen-info">
+      <h3><span class="screen-num-badge">Écran 1</span> Liste des commandes</h3>
+      <p>Vue claire de toutes les commandes. Filtres rapides pour naviguer. Badge état coloré immédiatement lisible sans même lire le texte.</p>
+      <div class="logic-block">
+        <div class="logic-item"><div class="logic-dot blue">→</div>Tri par défaut : plus récente en haut. L'utilisateur voit immédiatement sa dernière commande.</div>
+        <div class="logic-item"><div class="logic-dot green">✓</div>Filtres : Toutes / En cours / Livrées / Annulées. Filtre instantané, sans rechargement.</div>
+        <div class="logic-item"><div class="logic-dot amber">!</div>Aucune commande → "Vous n'avez pas encore de commande." + bouton "Voir la boutique". Jamais une liste vide sans contexte.</div>
+      </div>
+    </div>
+    <div class="mockup-wrap">
+      <svg viewBox="0 0 280 520" xmlns="http://www.w3.org/2000/svg">
+        <rect width="280" height="520"
