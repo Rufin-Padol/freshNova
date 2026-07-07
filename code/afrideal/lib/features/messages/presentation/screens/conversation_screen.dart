@@ -6,7 +6,9 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/errors/error_view.dart';
 import '../../../../shared/widgets/feedback/app_loading_indicator.dart';
+import '../../../../shared/widgets/illustrations/empty_image_illustration.dart';
 import '../../../auth/providers/session_provider.dart';
+import '../../../shop/providers/product_list_provider.dart';
 import '../../providers/message_provider.dart';
 
 class ConversationScreen extends ConsumerStatefulWidget {
@@ -48,12 +50,21 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
   Widget build(BuildContext context) {
     final msgsState = ref.watch(conversationNotifierProvider(widget.conversationId));
     final moi = ref.watch(currentUserProvider);
+    final conversationAsync = ref.watch(conversationByIdProvider(widget.conversationId));
 
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(title: const Text('Conversation')),
       body: Column(
         children: [
+          conversationAsync.maybeWhen(
+            data: (conv) {
+              final produitId = conv?.produitId;
+              if (produitId == null) return const SizedBox.shrink();
+              return _BandeauProduit(produitId: produitId);
+            },
+            orElse: () => const SizedBox.shrink(),
+          ),
           Expanded(
             child: msgsState.when(
               loading: () => const AppLoadingIndicator(),
@@ -146,6 +157,53 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Bandeau de contexte affiché en haut du fil quand la conversation
+/// porte sur un produit précis — rappelle de quoi il est question
+/// sans jamais exposer d'information sur le propriétaire du bien.
+class _BandeauProduit extends ConsumerWidget {
+  final String produitId;
+  const _BandeauProduit({required this.produitId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final produitAsync = ref.watch(productDetailProvider(produitId));
+
+    return produitAsync.maybeWhen(
+      data: (produit) {
+        if (produit == null) return const SizedBox.shrink();
+        return Container(
+          padding: const EdgeInsets.all(AppSpacing.sm),
+          color: AppColors.violetSurface,
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: AppRadius.smRadius,
+                child: SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: produit.photoPrincipale != null
+                      ? Image.network(produit.photoPrincipale!.url, fit: BoxFit.cover)
+                      : const EmptyImageIllustration(),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Text(
+                  produit.titre,
+                  style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+      orElse: () => const SizedBox.shrink(),
     );
   }
 }

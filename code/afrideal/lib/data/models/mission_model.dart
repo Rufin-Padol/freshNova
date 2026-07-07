@@ -1,5 +1,6 @@
 import '../../domain/entities/mission.dart';
 import '../../domain/enums/mission_status.dart';
+import '../../domain/enums/proof_type.dart';
 
 class MissionModel {
   final String id;
@@ -14,6 +15,9 @@ class MissionModel {
   final String? raisonRefus;
   final double? latitude;
   final double? longitude;
+  final String? proprietaireId;
+  final String? preuveProprieteType;
+  final String? preuveProprieteValeur;
 
   const MissionModel({
     required this.id,
@@ -28,6 +32,9 @@ class MissionModel {
     this.raisonRefus,
     this.latitude,
     this.longitude,
+    this.proprietaireId,
+    this.preuveProprieteType,
+    this.preuveProprieteValeur,
   });
 
   factory MissionModel.fromEntity(Mission e) {
@@ -44,6 +51,9 @@ class MissionModel {
       raisonRefus: e.raisonRefus,
       latitude: e.latitude,
       longitude: e.longitude,
+      proprietaireId: e.proprietaireId,
+      preuveProprieteType: e.preuveProprieteType?.name,
+      preuveProprieteValeur: e.preuveProprieteValeur,
     );
   }
 
@@ -61,6 +71,11 @@ class MissionModel {
       raisonRefus: raisonRefus,
       latitude: latitude,
       longitude: longitude,
+      proprietaireId: proprietaireId,
+      preuveProprieteType: preuveProprieteType == null
+          ? null
+          : ProofType.values.firstWhere((t) => t.name == preuveProprieteType),
+      preuveProprieteValeur: preuveProprieteValeur,
     );
   }
 
@@ -77,6 +92,9 @@ class MissionModel {
         'raisonRefus': raisonRefus,
         'latitude': latitude,
         'longitude': longitude,
+        'proprietaireId': proprietaireId,
+        'preuveProprieteType': preuveProprieteType,
+        'preuveProprieteValeur': preuveProprieteValeur,
       };
 
   factory MissionModel.fromJson(Map<String, dynamic> json) {
@@ -93,6 +111,9 @@ class MissionModel {
       raisonRefus: json['raisonRefus'] as String?,
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
+      proprietaireId: json['proprietaireId'] as String?,
+      preuveProprieteType: json['preuveProprieteType'] as String?,
+      preuveProprieteValeur: json['preuveProprieteValeur'] as String?,
     );
   }
 }

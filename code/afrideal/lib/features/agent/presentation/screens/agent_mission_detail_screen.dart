@@ -12,7 +12,9 @@ import '../../../../shared/widgets/cards/info_row.dart';
 import '../../../../shared/widgets/cards/status_badge.dart';
 import '../../../../shared/widgets/feedback/app_loading_indicator.dart';
 import '../../../../shared/widgets/feedback/app_snackbar.dart';
+import '../../../../shared/widgets/map/mission_map_view.dart';
 import '../../providers/agent_provider.dart';
+import '../widgets/mission_collecte_form.dart';
 
 class AgentMissionDetailScreen extends ConsumerWidget {
   final String missionId;
@@ -61,19 +63,18 @@ class AgentMissionDetailScreen extends ConsumerWidget {
                         label: 'Date et heure prévues',
                         value: Formatters.dateWithTime(mission.dateHeure),
                       ),
-                      if (mission.latitude != null) ...[
-                        const Divider(height: AppSpacing.xl),
-                        InfoRow(
-                          icon: Icons.location_on_outlined,
-                          label: 'Localisation GPS',
-                          value: '${mission.latitude!.toStringAsFixed(4)}, '
-                              '${mission.longitude!.toStringAsFixed(4)}',
-                        ),
-                      ],
                     ],
                   ),
                 ),
                 const SizedBox(height: AppSpacing.xl),
+                if (mission.latitude != null && mission.longitude != null) ...[
+                  MissionMapView(
+                    destinationLat: mission.latitude!,
+                    destinationLng: mission.longitude!,
+                    destinationLabel: 'Adresse de la mission',
+                  ),
+                  const SizedBox(height: AppSpacing.xl),
+                ],
                 if (!estComplete && !estEchec) ...[
                   if (mission.statut == MissionStatus.assignee)
                     AppPrimaryButton(
@@ -96,13 +97,26 @@ class AgentMissionDetailScreen extends ConsumerWidget {
                       },
                     ),
                   if (mission.statut == MissionStatus.surSite) ...[
-                    AppPrimaryButton(
-                      label: 'Valider la collecte',
-                      icon: Icons.check_circle_outline_rounded,
-                      isLoading: notifierState.isLoading,
-                      onPressed: () async {
-                        await ref.read(agentMissionNotifierProvider.notifier).validerCollecte(mission);
-                        if (context.mounted) AppSnackbar.showSuccess(context, 'Collecte validée !');
+                    Consumer(
+                      builder: (context, ref, _) {
+                        final produitAsync =
+                            ref.watch(produitDeMissionProvider(mission.id));
+                        return produitAsync.when(
+                          loading: () => const AppLoadingIndicator(),
+                          error: (_, __) =>
+                              const ErrorView(message: 'Impossible de charger le produit.'),
+                          data: (produit) {
+                            if (produit == null) {
+                              return const ErrorView(
+                                message: 'Produit introuvable pour cette mission.',
+                              );
+                            }
+                            return MissionCollecteForm(
+                              mission: mission,
+                              produitBrouillon: produit,
+                            );
+                          },
+                        );
                       },
                     ),
                     const SizedBox(height: AppSpacing.md),

@@ -1,26 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_dimens.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../auth/providers/session_provider.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Navigation latérale du panel Admin, utilisée à la fois sur le
-/// web (sidebar fixe à gauche) et en repli sur mobile (Drawer).
-class AdminSidebar extends ConsumerWidget {
+/// Navigation latérale du panel Super Admin — contrôle total de la
+/// plateforme, y compris la gestion des comptes Admin.
+class SuperAdminSidebar extends ConsumerWidget {
   final String currentRoute;
-  const AdminSidebar({super.key, required this.currentRoute});
+  const SuperAdminSidebar({super.key, required this.currentRoute});
 
   static const _items = [
-    _NavItem(Icons.dashboard_rounded, 'Tableau de bord', AppRoutes.adminDashboard),
-    _NavItem(Icons.inventory_2_outlined, 'Catalogue', AppRoutes.adminCatalog),
-    _NavItem(Icons.assignment_outlined, 'Demandes vendeurs', AppRoutes.adminSellerRequests),
-    _NavItem(Icons.receipt_long_outlined, 'Commandes', AppRoutes.adminOrders),
-    _NavItem(Icons.people_outline_rounded, 'Utilisateurs', AppRoutes.adminUsers),
-    _NavItem(Icons.gavel_rounded, 'Litiges', AppRoutes.adminDisputes),
-    _NavItem(Icons.route_outlined, 'Agents', AppRoutes.adminAgents),
+    _NavItem(Icons.dashboard_rounded, 'Vue globale', AppRoutes.superAdminDashboard),
+    _NavItem(Icons.admin_panel_settings_outlined, 'Administrateurs', AppRoutes.superAdminAdmins),
+    _NavItem(Icons.percent_rounded, 'Commissions', AppRoutes.superAdminCommissions),
   ];
 
   @override
@@ -42,14 +38,14 @@ class AdminSidebar extends ConsumerWidget {
                 children: [
                   Text('AfriDeal',
                       style: AppTypography.titleLarge.copyWith(color: AppColors.white)),
-                  Text('Administration',
+                  Text('Super Administration',
                       style: AppTypography.caption.copyWith(color: AppColors.gray400)),
                 ],
               ),
             ),
             const Divider(color: AppColors.gray800, height: 1),
             const SizedBox(height: AppSpacing.sm),
-            ...AdminSidebar._items.map((item) {
+            ..._items.map((item) {
               final selected = currentRoute.startsWith(item.route);
               return _SidebarTile(item: item, selected: selected);
             }),

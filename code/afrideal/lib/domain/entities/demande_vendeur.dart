@@ -18,6 +18,7 @@ class DemandeVendeur extends Equatable {
 
   final String vendeurId;
   final String typeProduitSouhaite;
+  final String categorieId;
   final int quantite;
   final String descriptionInitiale;
   final double prixSouhaite;
@@ -27,6 +28,13 @@ class DemandeVendeur extends Equatable {
 
   /// Raison du refus, si applicable.
   final String? raisonRefus;
+
+  /// Position réelle choisie par le vendeur sur la carte à la
+  /// soumission, en complément de l'adresse texte — permet à l'agent
+  /// de s'y rendre avec une navigation précise plutôt qu'une simple
+  /// description.
+  final double? latitude;
+  final double? longitude;
 
   const DemandeVendeur({
     required this.id,
@@ -38,11 +46,14 @@ class DemandeVendeur extends Equatable {
     required this.dateCreation,
     required this.vendeurId,
     required this.typeProduitSouhaite,
+    required this.categorieId,
     required this.quantite,
     required this.descriptionInitiale,
     required this.prixSouhaite,
     this.missionId,
     this.raisonRefus,
+    this.latitude,
+    this.longitude,
   });
 
   DemandeVendeur copyWith({
@@ -55,11 +66,14 @@ class DemandeVendeur extends Equatable {
     DateTime? dateCreation,
     String? vendeurId,
     String? typeProduitSouhaite,
+    String? categorieId,
     int? quantite,
     String? descriptionInitiale,
     double? prixSouhaite,
     String? missionId,
     String? raisonRefus,
+    double? latitude,
+    double? longitude,
   }) {
     return DemandeVendeur(
       id: id ?? this.id,
@@ -71,11 +85,14 @@ class DemandeVendeur extends Equatable {
       dateCreation: dateCreation ?? this.dateCreation,
       vendeurId: vendeurId ?? this.vendeurId,
       typeProduitSouhaite: typeProduitSouhaite ?? this.typeProduitSouhaite,
+      categorieId: categorieId ?? this.categorieId,
       quantite: quantite ?? this.quantite,
       descriptionInitiale: descriptionInitiale ?? this.descriptionInitiale,
       prixSouhaite: prixSouhaite ?? this.prixSouhaite,
       missionId: missionId ?? this.missionId,
       raisonRefus: raisonRefus ?? this.raisonRefus,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
     );
   }
 
@@ -90,10 +107,13 @@ class DemandeVendeur extends Equatable {
         dateCreation,
         vendeurId,
         typeProduitSouhaite,
+        categorieId,
         quantite,
         descriptionInitiale,
         prixSouhaite,
         missionId,
         raisonRefus,
+        latitude,
+        longitude,
       ];
 }

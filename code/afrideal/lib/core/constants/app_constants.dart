@@ -48,6 +48,7 @@ class StorageKeys {
   static const String categoriesBox = 'categories_box';
   static const String conversationsBox = 'conversations_box';
   static const String paymentsBox = 'payments_box';
+  static const String proprietairesBox = 'proprietaires_box';
 
   static const String secureTokenKey = 'auth_token';
   static const String secureCurrentUserIdKey = 'current_user_id';

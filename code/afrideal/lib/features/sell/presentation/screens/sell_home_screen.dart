@@ -92,7 +92,12 @@ class SellHomeScreen extends ConsumerWidget {
                           final d = demandes[i];
                           return Padding(
                             padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                            child: Container(
+                            child: InkWell(
+                              borderRadius: AppRadius.lgRadius,
+                              onTap: () => context.push(
+                                AppRoutes.sellRequestDetail.replaceFirst(':requestId', d.id),
+                              ),
+                              child: Container(
                               padding: const EdgeInsets.all(AppSpacing.lg),
                               decoration: BoxDecoration(
                                 color: AppColors.surface,
@@ -124,6 +129,7 @@ class SellHomeScreen extends ConsumerWidget {
                                     style: AppTypography.bodySmall,
                                   ),
                                 ],
+                              ),
                               ),
                             ),
                           );

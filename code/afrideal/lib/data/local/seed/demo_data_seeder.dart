@@ -450,6 +450,7 @@ class DemoDataSeeder {
       dateCreation: maintenant.subtract(const Duration(hours: 8)),
       vendeurId: DemoIds.vendeurId,
       typeProduitSouhaite: 'Téléviseur Samsung 43"',
+      categorieId: DemoIds.catElectronique,
       quantite: 1,
       descriptionInitiale: 'Téléviseur en bon état, peu utilisé.',
       prixSouhaite: 95000,

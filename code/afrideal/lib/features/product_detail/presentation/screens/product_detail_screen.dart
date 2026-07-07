@@ -10,12 +10,12 @@ import '../../../../core/errors/error_view.dart';
 import '../../../../domain/enums/user_role.dart';
 import '../../../../shared/widgets/buttons/app_primary_button.dart';
 import '../../../../shared/widgets/buttons/app_secondary_button.dart';
-import '../../../../shared/widgets/cards/app_avatar.dart';
 import '../../../../shared/widgets/cards/info_row.dart';
 import '../../../../shared/widgets/feedback/app_loading_indicator.dart';
 import '../../../../shared/widgets/illustrations/empty_image_illustration.dart';
 import '../../../auth/providers/session_provider.dart';
 import '../../../favorites/providers/favorites_provider.dart';
+import '../../../messages/providers/message_provider.dart';
 import '../../../shop/providers/product_list_provider.dart';
 
 /// Fiche détaillée d'un produit, accessible aux acheteurs depuis la
@@ -27,11 +27,20 @@ class ProductDetailScreen extends ConsumerWidget {
 
   const ProductDetailScreen({super.key, required this.productId});
 
+  /// Redirige un visiteur non connecté vers le choix de compte, en
+  /// mémorisant la page courante pour y revenir après connexion —
+  /// la navigation reste libre, seule l'action déclenche la demande
+  /// de connexion (principe "on regarde d'abord").
+  void _demanderConnexion(BuildContext context) {
+    final from = Uri.encodeComponent(GoRouterState.of(context).uri.toString());
+    context.push('${AppRoutes.demoAccounts}?from=$from');
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final produitAsync = ref.watch(productDetailProvider(productId));
     final utilisateur = ref.watch(currentUserProvider);
-    final estAcheteur = utilisateur?.role == UserRole.acheteur;
+    final peutGererFavori = utilisateur == null || utilisateur.role == UserRole.acheteur;
     final favoris = ref.watch(favoritesProvider).valueOrNull ?? [];
     final estFavori = favoris.contains(productId);
 
@@ -62,10 +71,15 @@ class ProductDetailScreen extends ConsumerWidget {
                   ),
                 ),
                 actions: [
-                  if (estAcheteur)
+                  if (peutGererFavori)
                     IconButton(
-                      onPressed: () =>
-                          ref.read(favoritesProvider.notifier).toggle(productId),
+                      onPressed: () {
+                        if (utilisateur == null) {
+                          _demanderConnexion(context);
+                          return;
+                        }
+                        ref.read(favoritesProvider.notifier).toggle(productId);
+                      },
                       icon: Icon(
                         estFavori ? Icons.favorite_rounded : Icons.favorite_border_rounded,
                         color: estFavori ? AppColors.danger : AppColors.black,
@@ -106,7 +120,15 @@ class ProductDetailScreen extends ConsumerWidget {
                         ),
                         child: Row(
                           children: [
-                            const AppAvatar(initiales: 'V', size: 44),
+                            Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: AppColors.violetSurface,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.shield_rounded, color: AppColors.violet),
+                            ),
                             const SizedBox(width: AppSpacing.md),
                             Expanded(
                               child: Column(
@@ -114,14 +136,14 @@ class ProductDetailScreen extends ConsumerWidget {
                                 children: [
                                   Row(
                                     children: [
-                                      Text('Vendeur vérifié', style: AppTypography.titleMedium),
+                                      Text('Vendu par AfriDeal', style: AppTypography.titleMedium),
                                       const SizedBox(width: 4),
                                       const Icon(Icons.verified_rounded,
                                           size: 16, color: AppColors.blue),
                                     ],
                                   ),
                                   Text(
-                                    'Identité et produit vérifiés par AfriDeal',
+                                    'Produit inspecté et garanti par notre équipe',
                                     style: AppTypography.bodySmall,
                                   ),
                                 ],
@@ -199,7 +221,18 @@ class ProductDetailScreen extends ConsumerWidget {
                         child: AppSecondaryButton(
                           label: 'Contacter',
                           icon: Icons.chat_bubble_outline_rounded,
-                          onPressed: () => context.push(AppRoutes.messages),
+                          onPressed: () async {
+                            if (utilisateur == null) {
+                              _demanderConnexion(context);
+                              return;
+                            }
+                            final conversationId =
+                                await ouvrirConversationProduit(ref, produit.id);
+                            if (context.mounted) {
+                              context.push(AppRoutes.conversation
+                                  .replaceFirst(':conversationId', conversationId));
+                            }
+                          },
                         ),
                       ),
                       const SizedBox(width: AppSpacing.md),
@@ -208,7 +241,13 @@ class ProductDetailScreen extends ConsumerWidget {
                         child: AppPrimaryButton(
                           label: 'Acheter en sécurité',
                           icon: Icons.shield_outlined,
-                          onPressed: () => context.push(AppRoutes.checkout, extra: produit),
+                          onPressed: () {
+                            if (utilisateur == null) {
+                              _demanderConnexion(context);
+                              return;
+                            }
+                            context.push(AppRoutes.checkout, extra: produit);
+                          },
                         ),
                       ),
                     ],

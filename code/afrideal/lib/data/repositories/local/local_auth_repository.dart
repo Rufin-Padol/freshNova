@@ -77,6 +77,24 @@ class LocalAuthRepository implements IAuthRepository {
   }
 
   @override
+  Future<Utilisateur> creerCompteSansConnexion(
+    Utilisateur utilisateur,
+    String motDePasse,
+  ) async {
+    final existants = await _store.getAll();
+    final dejaUtilise = existants.any((u) => u.telephone == utilisateur.telephone);
+    if (dejaUtilise) {
+      throw const BusinessRuleException('Ce numéro est déjà utilisé.');
+    }
+
+    final model = UtilisateurModel.fromEntity(
+      utilisateur.copyWith(motDePasseHash: hashPassword(motDePasse)),
+    );
+    await _store.save(model);
+    return model.toEntity();
+  }
+
+  @override
   Future<void> logout() async {
     await _sessionStore.delete(StorageKeys.secureCurrentUserIdKey);
   }

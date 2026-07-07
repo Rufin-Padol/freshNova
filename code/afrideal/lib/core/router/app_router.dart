@@ -17,13 +17,24 @@ import '../../features/sell/presentation/screens/sell_step1_screen.dart';
 import '../../features/sell/presentation/screens/sell_step2_screen.dart';
 import '../../features/sell/presentation/screens/sell_step3_screen.dart';
 import '../../features/sell/presentation/screens/sell_confirmation_screen.dart';
+import '../../features/sell/presentation/screens/sell_request_detail_screen.dart';
 import '../../features/agent/presentation/screens/agent_dashboard_screen.dart';
+import '../../features/agent/presentation/screens/agent_new_collecte_screen.dart';
 import '../../features/messages/presentation/screens/messages_screen.dart';
 import '../../features/messages/presentation/screens/conversation_screen.dart';
 import '../../features/notifications/presentation/screens/notifications_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
+import '../../features/admin/presentation/screens/admin_shell_screen.dart';
 import '../../features/admin/presentation/screens/admin_dashboard_screen.dart';
 import '../../features/admin/presentation/screens/admin_catalog_screen.dart';
+import '../../features/admin/presentation/screens/admin_seller_requests_screen.dart';
+import '../../features/admin/presentation/screens/admin_product_edit_screen.dart';
+import '../../features/admin/presentation/screens/admin_disputes_screen.dart';
+import '../../features/admin/presentation/screens/admin_agents_screen.dart';
+import '../../features/super_admin/presentation/screens/super_admin_shell_screen.dart';
+import '../../features/super_admin/presentation/screens/super_admin_dashboard_screen.dart';
+import '../../features/super_admin/presentation/screens/super_admin_admins_screen.dart';
+import '../../features/super_admin/presentation/screens/super_admin_commissions_screen.dart';
 import '../../features/admin/presentation/screens/admin_orders_screen.dart';
 import '../../features/admin/presentation/screens/admin_users_screen.dart';
 import '../../features/agent/presentation/screens/agent_mission_detail_screen.dart';
@@ -65,20 +76,45 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         return chemin == AppRoutes.splash ? null : AppRoutes.splash;
       }
 
+      // Juste après le splash : un visiteur non connecté part
+      // directement sur la boutique (principe "on regarde d'abord",
+      // à la Alibaba — jamais de connexion forcée pour naviguer).
+      if (chemin == AppRoutes.splash) {
+        return estConnecte ? _accueilPourRole(utilisateur.role) : AppRoutes.shop;
+      }
+
       final estSurEcranAuth = chemin == AppRoutes.onboarding ||
           chemin == AppRoutes.entryChoice ||
           chemin == AppRoutes.login ||
           chemin == AppRoutes.demoAccounts;
 
-      // Personne connecté : seuls les écrans d'authentification sont
-      // accessibles, tout le reste redirige vers l'accueil de bienvenue.
+      // Boutique et fiches produit restent consultables sans compte :
+      // la connexion n'est demandée qu'au moment d'une action précise
+      // (favori, achat, vente, messages...), jamais pour simplement
+      // regarder les produits.
+      final estCheminPublic =
+          estSurEcranAuth || chemin == AppRoutes.shop || chemin.startsWith('/product/');
+
       if (!estConnecte) {
-        return estSurEcranAuth ? null : AppRoutes.entryChoice;
+        if (estCheminPublic) return null;
+        // On mémorise le chemin visé dans "from" pour y revenir une
+        // fois connecté, plutôt que d'atterrir systématiquement sur
+        // l'accueil du rôle après connexion.
+        final retour = Uri.encodeComponent(state.uri.toString());
+        return '${AppRoutes.demoAccounts}?from=$retour';
       }
 
       // Connecté mais encore sur un écran d'authentification : on
-      // redirige automatiquement vers le bon espace selon le rôle.
+      // retourne au chemin d'origine si la connexion a été déclenchée
+      // par une action précise (paramètre "from"), sinon accueil du rôle.
       if (estSurEcranAuth) {
+        final from = state.uri.queryParameters['from'];
+        if (from != null) {
+          final destination = Uri.decodeComponent(from);
+          if (_cheminAutorisePourRole(destination, utilisateur.role)) {
+            return destination;
+          }
+        }
         return _accueilPourRole(utilisateur.role);
       }
 
@@ -191,7 +227,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.sellRequestDetail,
-        builder: (context, state) => const PlaceholderScreen(titre: 'Détail de la demande'),
+        builder: (context, state) {
+          final requestId = state.pathParameters['requestId']!;
+          return SellRequestDetailScreen(requestId: requestId);
+        },
       ),
 
       // ── Agent terrain ──
@@ -203,6 +242,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           transitionsBuilder: AppTransitions.fade,
           transitionDuration: const Duration(milliseconds: 200),
         ),
+      ),
+      GoRoute(
+        path: AppRoutes.agentNewCollecte,
+        builder: (context, state) => const AgentNewCollecteScreen(),
       ),
       GoRoute(
         path: AppRoutes.agentMissionDetail,
@@ -249,43 +292,64 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
 
       // ── Admin (web) ──
+      // Toutes ces routes partagent la sidebar Admin (AdminShellScreen),
+      // sauf l'édition produit qui est un flux plein écran avec son
+      // propre bouton retour (même logique que checkout ou sell-step).
       GoRoute(
         path: AppRoutes.adminDashboard,
-        builder: (context, state) => const AdminDashboardScreen(),
+        builder: (context, state) =>
+            const AdminShellScreen(child: AdminDashboardScreen()),
       ),
       GoRoute(
         path: AppRoutes.adminCatalog,
-        builder: (context, state) => const AdminCatalogScreen(),
+        builder: (context, state) =>
+            const AdminShellScreen(child: AdminCatalogScreen()),
+      ),
+      GoRoute(
+        path: AppRoutes.adminSellerRequests,
+        builder: (context, state) =>
+            const AdminShellScreen(child: AdminSellerRequestsScreen()),
+      ),
+      GoRoute(
+        path: AppRoutes.adminProductEdit,
+        builder: (context, state) => AdminProductEditScreen(produit: state.extra as Produit),
       ),
       GoRoute(
         path: AppRoutes.adminOrders,
-        builder: (context, state) => const AdminOrdersScreen(),
+        builder: (context, state) =>
+            const AdminShellScreen(child: AdminOrdersScreen()),
       ),
       GoRoute(
         path: AppRoutes.adminDisputes,
-        builder: (context, state) => const PlaceholderScreen(titre: 'Litiges'),
+        builder: (context, state) =>
+            const AdminShellScreen(child: AdminDisputesScreen()),
       ),
       GoRoute(
         path: AppRoutes.adminUsers,
-        builder: (context, state) => const AdminUsersScreen(),
+        builder: (context, state) =>
+            const AdminShellScreen(child: AdminUsersScreen()),
       ),
       GoRoute(
         path: AppRoutes.adminAgents,
-        builder: (context, state) => const PlaceholderScreen(titre: 'Agents terrain'),
+        builder: (context, state) =>
+            const AdminShellScreen(child: AdminAgentsScreen()),
       ),
 
       // ── Super Admin (web) ──
       GoRoute(
         path: AppRoutes.superAdminDashboard,
-        builder: (context, state) => const PlaceholderScreen(titre: 'Tableau de bord Super Admin'),
+        builder: (context, state) =>
+            const SuperAdminShellScreen(child: SuperAdminDashboardScreen()),
       ),
       GoRoute(
         path: AppRoutes.superAdminAdmins,
-        builder: (context, state) => const PlaceholderScreen(titre: 'Administrateurs'),
+        builder: (context, state) =>
+            const SuperAdminShellScreen(child: SuperAdminAdminsScreen()),
       ),
       GoRoute(
         path: AppRoutes.superAdminCommissions,
-        builder: (context, state) => const PlaceholderScreen(titre: 'Commissions'),
+        builder: (context, state) =>
+            const SuperAdminShellScreen(child: SuperAdminCommissionsScreen()),
       ),
       GoRoute(
         path: AppRoutes.superAdminReports,

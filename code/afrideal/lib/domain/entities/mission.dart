@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import '../enums/mission_status.dart';
+import '../enums/proof_type.dart';
 
 /// Entité métier Mission, conforme au diagramme UML.
 ///
@@ -30,6 +31,15 @@ class Mission extends Equatable {
   final double? latitude;
   final double? longitude;
 
+  /// Propriétaire identifié/confirmé sur place par l'agent (registre
+  /// [Proprietaire], indépendant du compte vendeur de l'app).
+  final String? proprietaireId;
+
+  /// Preuve de propriété capturée par l'agent (pièce d'identité +
+  /// justificatif), obligatoire avant de valider une collecte.
+  final ProofType? preuveProprieteType;
+  final String? preuveProprieteValeur;
+
   const Mission({
     required this.id,
     required this.type,
@@ -43,6 +53,9 @@ class Mission extends Equatable {
     this.raisonRefus,
     this.latitude,
     this.longitude,
+    this.proprietaireId,
+    this.preuveProprieteType,
+    this.preuveProprieteValeur,
   });
 
   Mission copyWith({
@@ -58,6 +71,9 @@ class Mission extends Equatable {
     String? raisonRefus,
     double? latitude,
     double? longitude,
+    String? proprietaireId,
+    ProofType? preuveProprieteType,
+    String? preuveProprieteValeur,
   }) {
     return Mission(
       id: id ?? this.id,
@@ -72,6 +88,9 @@ class Mission extends Equatable {
       raisonRefus: raisonRefus ?? this.raisonRefus,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
+      proprietaireId: proprietaireId ?? this.proprietaireId,
+      preuveProprieteType: preuveProprieteType ?? this.preuveProprieteType,
+      preuveProprieteValeur: preuveProprieteValeur ?? this.preuveProprieteValeur,
     );
   }
 
@@ -89,5 +108,8 @@ class Mission extends Equatable {
         raisonRefus,
         latitude,
         longitude,
+        proprietaireId,
+        preuveProprieteType,
+        preuveProprieteValeur,
       ];
 }

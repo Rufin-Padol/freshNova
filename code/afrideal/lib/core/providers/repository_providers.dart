@@ -10,6 +10,7 @@ import '../../domain/repositories/i_notification_repository.dart';
 import '../../domain/repositories/i_order_repository.dart';
 import '../../domain/repositories/i_payment_repository.dart';
 import '../../domain/repositories/i_product_repository.dart';
+import '../../domain/repositories/i_proprietaire_repository.dart';
 import '../../domain/repositories/i_seller_request_repository.dart';
 import '../../domain/repositories/i_user_repository.dart';
 import '../../data/repositories/local/local_auth_repository.dart';
@@ -22,6 +23,7 @@ import '../../data/repositories/local/local_notification_repository.dart';
 import '../../data/repositories/local/local_order_repository.dart';
 import '../../data/repositories/local/local_payment_repository.dart';
 import '../../data/repositories/local/local_product_repository.dart';
+import '../../data/repositories/local/local_proprietaire_repository.dart';
 import '../../data/repositories/local/local_seller_request_repository.dart';
 import '../../data/repositories/local/local_user_repository.dart';
 
@@ -127,4 +129,11 @@ final userRepositoryProvider = Provider<IUserRepository>((ref) {
     return LocalUserRepository();
   }
   throw UnimplementedError('ApiUserRepository sera branché au script 09.');
+});
+
+final proprietaireRepositoryProvider = Provider<IProprietaireRepository>((ref) {
+  if (AppConfig.isLocal) {
+    return LocalProprietaireRepository();
+  }
+  throw UnimplementedError('ApiProprietaireRepository sera branché au script 09.');
 });

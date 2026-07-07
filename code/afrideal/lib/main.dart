@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'core/config/app_config.dart';
@@ -12,6 +13,11 @@ Future<void> main() async {
   // appel à du code natif (Hive, plugins...), requis car main() est
   // maintenant asynchrone (à cause de l'initialisation Hive ci-dessous).
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialise les données de locale française (dates, montants) —
+  // requis par tous les usages de Formatters/intl dans l'application,
+  // sans quoi tout écran affichant une date plante au premier appel.
+  await initializeDateFormatting('fr_FR');
 
   // Initialise la base de données locale et ouvre toutes les box
   // nécessaires au fonctionnement de l'application.

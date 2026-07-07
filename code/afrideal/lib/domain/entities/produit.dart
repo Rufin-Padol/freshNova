@@ -37,6 +37,19 @@ class Produit extends Equatable {
   /// Raison du refus ou de l'indisponibilité, si applicable.
   final String? raisonException;
 
+  /// Dimensions/taille du produit, en texte libre (ex. "120x60x75 cm"),
+  /// renseignées par l'agent lors de la collecte.
+  final String? dimensions;
+
+  /// Propriétaire identifié par l'agent lors de la collecte (registre
+  /// [Proprietaire]) — jamais exposé à l'acheteur (anonymat).
+  final String? proprietaireId;
+
+  /// Mission de collecte à l'origine de ce produit — lien direct et
+  /// fiable pour retrouver le produit d'une mission donnée (plutôt que
+  /// de déduire par élimination via agentId + statut).
+  final String? missionId;
+
   const Produit({
     required this.id,
     required this.titre,
@@ -53,6 +66,9 @@ class Produit extends Equatable {
     this.photos = const [],
     this.defautsConnus,
     this.raisonException,
+    this.dimensions,
+    this.proprietaireId,
+    this.missionId,
   });
 
   /// Montant net que le vendeur recevra une fois la commission
@@ -84,6 +100,9 @@ class Produit extends Equatable {
     double? tauxCommission,
     String? defautsConnus,
     String? raisonException,
+    String? dimensions,
+    String? proprietaireId,
+    String? missionId,
   }) {
     return Produit(
       id: id ?? this.id,
@@ -101,6 +120,9 @@ class Produit extends Equatable {
       tauxCommission: tauxCommission ?? this.tauxCommission,
       defautsConnus: defautsConnus ?? this.defautsConnus,
       raisonException: raisonException ?? this.raisonException,
+      dimensions: dimensions ?? this.dimensions,
+      proprietaireId: proprietaireId ?? this.proprietaireId,
+      missionId: missionId ?? this.missionId,
     );
   }
 
@@ -121,5 +143,8 @@ class Produit extends Equatable {
         tauxCommission,
         defautsConnus,
         raisonException,
+        dimensions,
+        proprietaireId,
+        missionId,
       ];
 }

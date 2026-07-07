@@ -11,11 +11,14 @@ class DemandeVendeurModel {
   final String dateCreation;
   final String vendeurId;
   final String typeProduitSouhaite;
+  final String categorieId;
   final int quantite;
   final String descriptionInitiale;
   final double prixSouhaite;
   final String? missionId;
   final String? raisonRefus;
+  final double? latitude;
+  final double? longitude;
 
   const DemandeVendeurModel({
     required this.id,
@@ -27,11 +30,14 @@ class DemandeVendeurModel {
     required this.dateCreation,
     required this.vendeurId,
     required this.typeProduitSouhaite,
+    required this.categorieId,
     required this.quantite,
     required this.descriptionInitiale,
     required this.prixSouhaite,
     this.missionId,
     this.raisonRefus,
+    this.latitude,
+    this.longitude,
   });
 
   factory DemandeVendeurModel.fromEntity(DemandeVendeur e) {
@@ -45,11 +51,14 @@ class DemandeVendeurModel {
       dateCreation: e.dateCreation.toIso8601String(),
       vendeurId: e.vendeurId,
       typeProduitSouhaite: e.typeProduitSouhaite,
+      categorieId: e.categorieId,
       quantite: e.quantite,
       descriptionInitiale: e.descriptionInitiale,
       prixSouhaite: e.prixSouhaite,
       missionId: e.missionId,
       raisonRefus: e.raisonRefus,
+      latitude: e.latitude,
+      longitude: e.longitude,
     );
   }
 
@@ -64,11 +73,14 @@ class DemandeVendeurModel {
       dateCreation: DateTime.parse(dateCreation),
       vendeurId: vendeurId,
       typeProduitSouhaite: typeProduitSouhaite,
+      categorieId: categorieId,
       quantite: quantite,
       descriptionInitiale: descriptionInitiale,
       prixSouhaite: prixSouhaite,
       missionId: missionId,
       raisonRefus: raisonRefus,
+      latitude: latitude,
+      longitude: longitude,
     );
   }
 
@@ -82,11 +94,14 @@ class DemandeVendeurModel {
         'dateCreation': dateCreation,
         'vendeurId': vendeurId,
         'typeProduitSouhaite': typeProduitSouhaite,
+        'categorieId': categorieId,
         'quantite': quantite,
         'descriptionInitiale': descriptionInitiale,
         'prixSouhaite': prixSouhaite,
         'missionId': missionId,
         'raisonRefus': raisonRefus,
+        'latitude': latitude,
+        'longitude': longitude,
       };
 
   factory DemandeVendeurModel.fromJson(Map<String, dynamic> json) {
@@ -100,11 +115,14 @@ class DemandeVendeurModel {
       dateCreation: json['dateCreation'] as String,
       vendeurId: json['vendeurId'] as String,
       typeProduitSouhaite: json['typeProduitSouhaite'] as String,
+      categorieId: json['categorieId'] as String? ?? '',
       quantite: json['quantite'] as int,
       descriptionInitiale: json['descriptionInitiale'] as String,
       prixSouhaite: (json['prixSouhaite'] as num).toDouble(),
       missionId: json['missionId'] as String?,
       raisonRefus: json['raisonRefus'] as String?,
+      latitude: (json['latitude'] as num?)?.toDouble(),
+      longitude: (json['longitude'] as num?)?.toDouble(),
     );
   }
 }

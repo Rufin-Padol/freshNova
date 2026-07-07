@@ -6,6 +6,7 @@ class CategorieModel {
   final String? iconeAsset;
   final String? parentId;
   final int ordreAffichage;
+  final double tauxCommission;
 
   const CategorieModel({
     required this.id,
@@ -13,6 +14,7 @@ class CategorieModel {
     this.iconeAsset,
     this.parentId,
     this.ordreAffichage = 0,
+    this.tauxCommission = 10.0,
   });
 
   factory CategorieModel.fromEntity(Categorie e) {
@@ -22,6 +24,7 @@ class CategorieModel {
       iconeAsset: e.iconeAsset,
       parentId: e.parentId,
       ordreAffichage: e.ordreAffichage,
+      tauxCommission: e.tauxCommission,
     );
   }
 
@@ -32,6 +35,7 @@ class CategorieModel {
       iconeAsset: iconeAsset,
       parentId: parentId,
       ordreAffichage: ordreAffichage,
+      tauxCommission: tauxCommission,
     );
   }
 
@@ -41,6 +45,7 @@ class CategorieModel {
         'iconeAsset': iconeAsset,
         'parentId': parentId,
         'ordreAffichage': ordreAffichage,
+        'tauxCommission': tauxCommission,
       };
 
   factory CategorieModel.fromJson(Map<String, dynamic> json) {
@@ -50,6 +55,7 @@ class CategorieModel {
       iconeAsset: json['iconeAsset'] as String?,
       parentId: json['parentId'] as String?,
       ordreAffichage: json['ordreAffichage'] as int? ?? 0,
+      tauxCommission: (json['tauxCommission'] as num?)?.toDouble() ?? 10.0,
     );
   }
 }

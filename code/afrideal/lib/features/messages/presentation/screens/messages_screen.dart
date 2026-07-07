@@ -9,7 +9,9 @@ import '../../../../core/utils/formatters.dart';
 import '../../../../core/errors/error_view.dart';
 import '../../../../shared/widgets/cards/app_avatar.dart';
 import '../../../../shared/widgets/feedback/app_loading_indicator.dart';
+import '../../../../domain/entities/conversation.dart';
 import '../../../auth/providers/session_provider.dart';
+import '../../../shop/providers/product_list_provider.dart';
 import '../../providers/message_provider.dart';
 
 class MessagesScreen extends ConsumerWidget {
@@ -33,7 +35,7 @@ class MessagesScreen extends ConsumerWidget {
           if (convs.isEmpty) {
             return const EmptyView(
               message: 'Aucun message',
-              subtitle: 'Contactez un vendeur depuis la fiche produit.',
+              subtitle: 'Contactez notre équipe depuis une fiche produit.',
               icon: Icons.chat_bubble_outline_rounded,
             );
           }
@@ -68,12 +70,14 @@ class MessagesScreen extends ConsumerWidget {
                             'AF',
                         size: 48,
                       ),
-                title: Text(
-                  conv.estSupport ? 'Support AfriDeal' : 'Conversation',
-                  style: AppTypography.titleMedium.copyWith(
-                    fontWeight: nonLu ? FontWeight.w700 : FontWeight.w600,
-                  ),
-                ),
+                title: conv.estSupport
+                    ? Text(
+                        'Support AfriDeal',
+                        style: AppTypography.titleMedium.copyWith(
+                          fontWeight: nonLu ? FontWeight.w700 : FontWeight.w600,
+                        ),
+                      )
+                    : _TitreConversation(conv: conv, nonLu: nonLu),
                 subtitle: Text(
                   conv.dernierMessage,
                   style: AppTypography.bodySmall.copyWith(
@@ -119,6 +123,28 @@ class MessagesScreen extends ConsumerWidget {
           );
         },
       ),
+    );
+  }
+}
+
+class _TitreConversation extends ConsumerWidget {
+  final Conversation conv;
+  final bool nonLu;
+  const _TitreConversation({required this.conv, required this.nonLu});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final style = AppTypography.titleMedium.copyWith(
+      fontWeight: nonLu ? FontWeight.w700 : FontWeight.w600,
+    );
+    final produitId = conv.produitId;
+    if (produitId == null) return Text('Conversation', style: style);
+
+    final produitAsync = ref.watch(productDetailProvider(produitId));
+    return produitAsync.maybeWhen(
+      data: (p) => Text(p?.titre ?? 'Conversation', style: style, maxLines: 1,
+          overflow: TextOverflow.ellipsis),
+      orElse: () => Text('Conversation', style: style),
     );
   }
 }

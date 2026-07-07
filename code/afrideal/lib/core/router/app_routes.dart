@@ -38,6 +38,7 @@ class AppRoutes {
 
   // ── Agent terrain ──
   static const String agentDashboard = '/agent';
+  static const String agentNewCollecte = '/agent/new-collecte';
   static const String agentMissionDetail = '/agent/missions/:missionId';
 
   // ── Commun ──
@@ -49,6 +50,8 @@ class AppRoutes {
   // ── Admin (web) ──
   static const String adminDashboard = '/admin';
   static const String adminCatalog = '/admin/catalog';
+  static const String adminProductEdit = '/admin/catalog/:productId/edit';
+  static const String adminSellerRequests = '/admin/seller-requests';
   static const String adminOrders = '/admin/orders';
   static const String adminDisputes = '/admin/disputes';
   static const String adminUsers = '/admin/users';

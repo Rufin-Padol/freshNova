@@ -260,7 +260,7 @@ class _CheckoutSuccessView extends ConsumerWidget {
               const SizedBox(height: AppSpacing.sm),
               Text(
                 'Votre achat de "${produit.titre}" a été sécurisé. '
-                'Le vendeur a été notifié et votre produit sera bientôt en livraison.',
+                'Notre équipe a été notifiée et votre produit sera bientôt en livraison.',
                 style: AppTypography.bodyLarge,
                 textAlign: TextAlign.center,
               ),

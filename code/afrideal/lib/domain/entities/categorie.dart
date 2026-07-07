@@ -16,12 +16,18 @@ class Categorie extends Equatable {
   final String? parentId;
   final int ordreAffichage;
 
+  /// Taux de commission (en pourcentage) appliqué aux produits de
+  /// cette catégorie — configurable par le Super Admin, remplace la
+  /// constante fixe utilisée auparavant pour toutes les catégories.
+  final double tauxCommission;
+
   const Categorie({
     required this.id,
     required this.nom,
     this.iconeAsset,
     this.parentId,
     this.ordreAffichage = 0,
+    this.tauxCommission = 10.0,
   });
 
   bool get estSousCategorie => parentId != null;
@@ -32,6 +38,7 @@ class Categorie extends Equatable {
     String? iconeAsset,
     String? parentId,
     int? ordreAffichage,
+    double? tauxCommission,
   }) {
     return Categorie(
       id: id ?? this.id,
@@ -39,9 +46,11 @@ class Categorie extends Equatable {
       iconeAsset: iconeAsset ?? this.iconeAsset,
       parentId: parentId ?? this.parentId,
       ordreAffichage: ordreAffichage ?? this.ordreAffichage,
+      tauxCommission: tauxCommission ?? this.tauxCommission,
     );
   }
 
   @override
-  List<Object?> get props => [id, nom, iconeAsset, parentId, ordreAffichage];
+  List<Object?> get props =>
+      [id, nom, iconeAsset, parentId, ordreAffichage, tauxCommission];
 }

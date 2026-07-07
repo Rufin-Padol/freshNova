@@ -8,6 +8,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../shared/widgets/buttons/app_primary_button.dart';
 import '../../../../shared/widgets/inputs/app_text_field.dart';
 import '../../../../shared/widgets/layout/progress_steps.dart';
+import '../../../../shared/widgets/map/location_picker_map.dart';
 import '../../providers/sell_provider.dart';
 
 class SellStep2Screen extends ConsumerWidget {
@@ -60,6 +61,12 @@ class SellStep2Screen extends ConsumerWidget {
               maxLines: 2,
               initialValue: form.disponibilite,
               onChanged: ref.read(sellProvider.notifier).setDisponibilite,
+            ),
+            const SizedBox(height: AppSpacing.xl),
+            LocationPickerMap(
+              latitudeInitiale: form.latitude,
+              longitudeInitiale: form.longitude,
+              onPositionChoisie: ref.read(sellProvider.notifier).setPosition,
             ),
             const SizedBox(height: AppSpacing.xl),
             Container(

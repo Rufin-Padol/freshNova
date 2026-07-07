@@ -19,6 +19,9 @@ class ProduitModel {
   final String? defautsConnus;
   final double tauxCommission;
   final String? raisonException;
+  final String? dimensions;
+  final String? proprietaireId;
+  final String? missionId;
 
   const ProduitModel({
     required this.id,
@@ -36,6 +39,9 @@ class ProduitModel {
     this.photos = const [],
     this.defautsConnus,
     this.raisonException,
+    this.dimensions,
+    this.proprietaireId,
+    this.missionId,
   });
 
   factory ProduitModel.fromEntity(Produit e) {
@@ -55,6 +61,9 @@ class ProduitModel {
       tauxCommission: e.tauxCommission,
       defautsConnus: e.defautsConnus,
       raisonException: e.raisonException,
+      dimensions: e.dimensions,
+      proprietaireId: e.proprietaireId,
+      missionId: e.missionId,
     );
   }
 
@@ -75,6 +84,9 @@ class ProduitModel {
       tauxCommission: tauxCommission,
       defautsConnus: defautsConnus,
       raisonException: raisonException,
+      dimensions: dimensions,
+      proprietaireId: proprietaireId,
+      missionId: missionId,
     );
   }
 
@@ -94,6 +106,9 @@ class ProduitModel {
         'defautsConnus': defautsConnus,
         'tauxCommission': tauxCommission,
         'raisonException': raisonException,
+        'dimensions': dimensions,
+        'proprietaireId': proprietaireId,
+        'missionId': missionId,
       };
 
   factory ProduitModel.fromJson(Map<String, dynamic> json) {
@@ -115,6 +130,9 @@ class ProduitModel {
       defautsConnus: json['defautsConnus'] as String?,
       tauxCommission: (json['tauxCommission'] as num).toDouble(),
       raisonException: json['raisonException'] as String?,
+      dimensions: json['dimensions'] as String?,
+      proprietaireId: json['proprietaireId'] as String?,
+      missionId: json['missionId'] as String?,
     );
   }
 }

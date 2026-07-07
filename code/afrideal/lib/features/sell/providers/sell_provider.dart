@@ -20,6 +20,8 @@ class SellFormState {
   final String adresse;
   final String zone;
   final String disponibilite;
+  final double? latitude;
+  final double? longitude;
 
   // Navigation
   final int etapeActuelle;
@@ -36,6 +38,8 @@ class SellFormState {
     this.adresse = '',
     this.zone = '',
     this.disponibilite = '',
+    this.latitude,
+    this.longitude,
     this.etapeActuelle = 0,
     this.estEnvoi = false,
     this.estEnvoye = false,
@@ -51,6 +55,8 @@ class SellFormState {
     String? adresse,
     String? zone,
     String? disponibilite,
+    double? latitude,
+    double? longitude,
     int? etapeActuelle,
     bool? estEnvoi,
     bool? estEnvoye,
@@ -66,6 +72,8 @@ class SellFormState {
       adresse: adresse ?? this.adresse,
       zone: zone ?? this.zone,
       disponibilite: disponibilite ?? this.disponibilite,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
       etapeActuelle: etapeActuelle ?? this.etapeActuelle,
       estEnvoi: estEnvoi ?? this.estEnvoi,
       estEnvoye: estEnvoye ?? this.estEnvoye,
@@ -88,6 +96,8 @@ class SellNotifier extends Notifier<SellFormState> {
   void setAdresse(String v) => state = state.copyWith(adresse: v, clearErreur: true);
   void setZone(String v) => state = state.copyWith(zone: v, clearErreur: true);
   void setDisponibilite(String v) => state = state.copyWith(disponibilite: v, clearErreur: true);
+  void setPosition(double latitude, double longitude) =>
+      state = state.copyWith(latitude: latitude, longitude: longitude, clearErreur: true);
 
   bool validerEtape1() {
     if (state.typeProduit.trim().isEmpty) {
@@ -145,9 +155,12 @@ class SellNotifier extends Notifier<SellFormState> {
         dateCreation: DateTime.now(),
         vendeurId: utilisateur.id,
         typeProduitSouhaite: state.typeProduit,
+        categorieId: state.categorieId,
         quantite: state.quantite,
         descriptionInitiale: state.description,
         prixSouhaite: state.prixSouhaite,
+        latitude: state.latitude,
+        longitude: state.longitude,
       ));
       state = state.copyWith(estEnvoi: false, estEnvoye: true);
     } catch (e) {

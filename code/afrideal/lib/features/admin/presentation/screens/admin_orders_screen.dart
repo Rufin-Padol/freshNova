@@ -1,24 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/providers/repository_providers.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_dimens.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/errors/error_view.dart';
+import '../../../../domain/entities/commande.dart';
+import '../../../../domain/enums/order_status.dart';
+import '../../../../shared/widgets/buttons/app_primary_button.dart';
+import '../../../../shared/widgets/buttons/app_secondary_button.dart';
+import '../../../../shared/widgets/cards/info_row.dart';
 import '../../../../shared/widgets/cards/status_badge.dart';
 import '../../../../shared/widgets/feedback/app_loading_indicator.dart';
-
-/// Toutes les commandes de la plateforme, triées par date décroissante.
-/// Déclaré au niveau global (et non dans build()) pour respecter les
-/// règles de Riverpod : les providers doivent être des variables
-/// top-level ou statiques, jamais créées à l'intérieur de fonctions.
-final allOrdersAdminProvider = FutureProvider((ref) async {
-  final repo = ref.watch(orderRepositoryProvider);
-  final all = await repo.getAll();
-  all.sort((a, b) => b.dateCommande.compareTo(a.dateCommande));
-  return all;
-});
+import '../../../../shared/widgets/feedback/app_snackbar.dart';
+import '../../../shop/providers/product_list_provider.dart';
+import '../../providers/admin_provider.dart';
 
 class AdminOrdersScreen extends ConsumerWidget {
   const AdminOrdersScreen({super.key});
@@ -52,6 +48,7 @@ class AdminOrdersScreen extends ConsumerWidget {
                     final c = commandes[i];
                     return ListTile(
                       contentPadding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                      onTap: () => _ouvrirDetail(context, ref, c),
                       title: Row(
                         children: [
                           Expanded(child: Text('#${c.reference}', style: AppTypography.titleMedium)),
@@ -71,5 +68,97 @@ class AdminOrdersScreen extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  void _ouvrirDetail(BuildContext context, WidgetRef ref, Commande commande) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (sheetContext) => _AdminOrderDetailSheet(commande: commande),
+    );
+  }
+}
+
+class _AdminOrderDetailSheet extends ConsumerWidget {
+  final Commande commande;
+
+  const _AdminOrderDetailSheet({required this.commande});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final produitAsync = ref.watch(productDetailProvider(commande.produitId));
+
+    return Padding(
+      padding: EdgeInsets.only(
+        left: AppSpacing.lg,
+        right: AppSpacing.lg,
+        top: AppSpacing.lg,
+        bottom: MediaQuery.of(context).viewInsets.bottom + AppSpacing.lg,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text('#${commande.reference}', style: AppTypography.titleLarge),
+              ),
+              StatusBadge(label: commande.statut.label, color: commande.statut.color),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          produitAsync.when(
+            loading: () => const SizedBox(height: 24),
+            error: (_, __) => const SizedBox.shrink(),
+            data: (produit) => Text(produit?.titre ?? 'Produit', style: AppTypography.titleMedium),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          InfoRow(
+            icon: Icons.payments_outlined,
+            label: 'Montant',
+            value: Formatters.currency(commande.montantTotal),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          InfoRow(
+            icon: Icons.local_shipping_outlined,
+            label: 'Mode de livraison',
+            value: commande.modeLivraison.label,
+          ),
+          const SizedBox(height: AppSpacing.md),
+          InfoRow(
+            icon: Icons.location_on_outlined,
+            label: 'Adresse',
+            value: commande.adresseLivraison,
+          ),
+          const SizedBox(height: AppSpacing.xl),
+          if (commande.statut == OrderStatus.payee)
+            AppPrimaryButton(
+              label: 'Marquer en livraison',
+              onPressed: () => _changerStatut(context, ref, OrderStatus.enLivraison),
+            )
+          else if (commande.statut == OrderStatus.enLivraison)
+            AppPrimaryButton(
+              label: 'Marquer livrée',
+              onPressed: () => _changerStatut(context, ref, OrderStatus.livree),
+            ),
+          if (commande.statut == OrderStatus.payee || commande.statut == OrderStatus.enLivraison) ...[
+            const SizedBox(height: AppSpacing.sm),
+            AppSecondaryButton(
+              label: 'Annuler la commande',
+              onPressed: () => _changerStatut(context, ref, OrderStatus.annulee),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Future<void> _changerStatut(BuildContext context, WidgetRef ref, OrderStatus statut) async {
+    await ref.read(adminOrderNotifierProvider.notifier).changerStatut(commande.id, statut);
+    if (context.mounted) {
+      Navigator.of(context).pop();
+      AppSnackbar.showSuccess(context, 'Commande mise à jour.');
+    }
   }
 }

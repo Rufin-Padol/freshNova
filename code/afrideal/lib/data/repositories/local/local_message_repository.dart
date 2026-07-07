@@ -31,6 +31,12 @@ class LocalMessageRepository implements IMessageRepository {
   }
 
   @override
+  Future<Conversation?> getConversationById(String id) async {
+    final model = await _conversationStore.getById(id);
+    return model?.toEntity();
+  }
+
+  @override
   Future<List<Message>> getMessages(String conversationId) async {
     final all = await _messageStore.getAll();
     final filtered = all.where((m) => m.conversationId == conversationId).toList();

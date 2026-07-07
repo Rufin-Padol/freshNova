@@ -20,6 +20,7 @@ class AgentDashboardScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final utilisateur = ref.watch(currentUserProvider);
     final missionsAsync = ref.watch(myMissionsProvider);
+    final stats = ref.watch(agentStatsProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -41,6 +42,40 @@ class AgentDashboardScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: AppSpacing.xs),
                       Text('Vos missions du jour', style: AppTypography.bodyMedium),
+                      const SizedBox(height: AppSpacing.lg),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _StatCard(
+                              valeur: '${stats.missionsCompleteesCeMois}',
+                              label: 'Complétées\nce mois',
+                              couleur: AppColors.violet,
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.sm),
+                          Expanded(
+                            child: _StatCard(
+                              valeur: '${stats.tauxReussite.toStringAsFixed(0)}%',
+                              label: 'Taux de\nréussite',
+                              couleur: AppColors.success,
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.sm),
+                          Expanded(
+                            child: _StatCard(
+                              valeur: '${stats.zonesCouvertes}',
+                              label: 'Zones\ncouvertes',
+                              couleur: AppColors.blue,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      OutlinedButton.icon(
+                        onPressed: () => context.push(AppRoutes.agentNewCollecte),
+                        icon: const Icon(Icons.add_location_alt_outlined),
+                        label: const Text('Nouvelle collecte terrain (non assignée)'),
+                      ),
                       const SizedBox(height: AppSpacing.xl),
                     ],
                   ),
@@ -145,6 +180,40 @@ class AgentDashboardScreen extends ConsumerWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _StatCard extends StatelessWidget {
+  final String valeur;
+  final String label;
+  final Color couleur;
+
+  const _StatCard({required this.valeur, required this.label, required this.couleur});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.md, horizontal: AppSpacing.sm),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: AppRadius.mdRadius,
+        border: Border.all(color: AppColors.gray200),
+      ),
+      child: Column(
+        children: [
+          Text(
+            valeur,
+            style: AppTypography.displayMedium.copyWith(color: couleur),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: AppTypography.caption,
+          ),
+        ],
       ),
     );
   }

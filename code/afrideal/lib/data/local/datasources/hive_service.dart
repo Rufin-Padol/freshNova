@@ -36,6 +36,7 @@ class HiveService {
       Hive.openBox<String>('categories_box'),
       Hive.openBox<String>('conversations_box'),
       Hive.openBox<String>('payments_box'),
+      Hive.openBox<String>(StorageKeys.proprietairesBox),
     ]);
 
     _initialized = true;
@@ -59,6 +60,7 @@ class HiveService {
       'categories_box',
       'conversations_box',
       'payments_box',
+      StorageKeys.proprietairesBox,
     ]) {
       if (Hive.isBoxOpen(boxName)) {
         await Hive.box<String>(boxName).clear();

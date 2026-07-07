@@ -60,15 +60,21 @@ class ShopScreen extends ConsumerWidget {
                             children: [
                               Text('Bonjour', style: AppTypography.bodyMedium),
                               Text(
-                                utilisateur?.prenom ?? 'Acheteur',
+                                utilisateur?.prenom ?? 'Bienvenue',
                                 style: AppTypography.headline,
                               ),
                             ],
                           ),
-                          IconButton(
-                            onPressed: () => context.push(AppRoutes.notifications),
-                            icon: const Icon(Icons.notifications_outlined),
-                          ),
+                          if (utilisateur == null)
+                            TextButton(
+                              onPressed: () => context.push(AppRoutes.demoAccounts),
+                              child: const Text('Se connecter'),
+                            )
+                          else
+                            IconButton(
+                              onPressed: () => context.push(AppRoutes.notifications),
+                              icon: const Icon(Icons.notifications_outlined),
+                            ),
                         ],
                       ),
                       const SizedBox(height: AppSpacing.lg),
@@ -141,8 +147,15 @@ class ShopScreen extends ConsumerWidget {
                             localisation: produit.localisation,
                             photoUrl: produit.photoPrincipale?.url,
                             estFavori: favoris.contains(produit.id),
-                            onFavoriteTap: () =>
-                                ref.read(favoritesProvider.notifier).toggle(produit.id),
+                            onFavoriteTap: () {
+                              if (utilisateur == null) {
+                                context.push(
+                                  '${AppRoutes.demoAccounts}?from=${Uri.encodeComponent(AppRoutes.shop)}',
+                                );
+                                return;
+                              }
+                              ref.read(favoritesProvider.notifier).toggle(produit.id);
+                            },
                             onTap: () => context.push(
                               AppRoutes.productDetail.replaceFirst(':productId', produit.id),
                             ),

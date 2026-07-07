@@ -20,6 +20,43 @@ final conversationMessagesProvider =
   return repo.getMessages(conversationId);
 });
 
+/// Détail d'une conversation (utilisé pour afficher le bandeau de
+/// contexte produit dans le fil de discussion).
+final conversationByIdProvider =
+    FutureProvider.family<Conversation?, String>((ref, id) async {
+  final repo = ref.watch(messageRepositoryProvider);
+  return repo.getConversationById(id);
+});
+
+/// Ouvre la conversation liée à un produit pour l'utilisateur connecté
+/// — la réutilise si elle existe déjà, sinon en crée une nouvelle.
+/// La plupart des échanges doivent porter sur un bien précis plutôt
+/// que d'être génériques (le support reste une conversation séparée,
+/// voir `estSupport`).
+Future<String> ouvrirConversationProduit(WidgetRef ref, String produitId) async {
+  final utilisateur = ref.read(currentUserProvider);
+  if (utilisateur == null) {
+    throw StateError('Connexion requise pour contacter à propos d\'un produit.');
+  }
+
+  final repo = ref.read(messageRepositoryProvider);
+  final existantes = await repo.getConversations(utilisateur.id);
+  for (final c in existantes) {
+    if (c.produitId == produitId && !c.estSupport) return c.id;
+  }
+
+  final nouvelle = Conversation(
+    id: _uuid.v4(),
+    participantIds: [utilisateur.id],
+    produitId: produitId,
+    dernierMessage: '',
+    dateDernierMessage: DateTime.now(),
+  );
+  await repo.saveConversation(nouvelle);
+  ref.invalidate(myConversationsProvider);
+  return nouvelle.id;
+}
+
 class ConversationNotifier extends FamilyNotifier<AsyncValue<List<Message>>, String> {
   @override
   AsyncValue<List<Message>> build(String conversationId) {

@@ -13,6 +13,12 @@ abstract class IAuthRepository {
 
   Future<Utilisateur> register(Utilisateur utilisateur, String motDePasse);
 
+  /// Crée un compte SANS connecter la session sur ce nouveau compte —
+  /// utilisé par le Super Admin pour créer un compte Admin sans se
+  /// retrouver lui-même déconnecté et reconnecté sur ce nouveau compte
+  /// (contrairement à [register], pensé pour l'auto-inscription).
+  Future<Utilisateur> creerCompteSansConnexion(Utilisateur utilisateur, String motDePasse);
+
   Future<void> logout();
 
   /// Retourne l'utilisateur actuellement connecté, ou null si personne
