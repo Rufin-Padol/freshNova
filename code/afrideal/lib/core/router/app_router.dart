@@ -85,8 +85,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         return estConnecte ? _accueilPourRole(utilisateur.role) : AppRoutes.shop;
       }
 
-      final estSurEcranAuth = chemin == AppRoutes.onboarding ||
-          chemin == AppRoutes.entryChoice ||
+      final estSurEcranAuth = chemin == AppRoutes.entryChoice ||
           chemin == AppRoutes.login ||
           chemin == AppRoutes.demoAccounts;
 
@@ -132,10 +131,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.splash,
         builder: (context, state) => const _SplashScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.onboarding,
-        builder: (context, state) => const PlaceholderScreen(titre: 'Bienvenue sur TrustNova'),
       ),
       GoRoute(
         path: AppRoutes.entryChoice,
