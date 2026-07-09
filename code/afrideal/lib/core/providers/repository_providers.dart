@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/app_config.dart';
 import '../../domain/repositories/i_auth_repository.dart';
+import '../../domain/repositories/i_cart_repository.dart';
 import '../../domain/repositories/i_category_repository.dart';
 import '../../domain/repositories/i_dispute_repository.dart';
 import '../../domain/repositories/i_favorite_repository.dart';
@@ -14,6 +15,7 @@ import '../../domain/repositories/i_proprietaire_repository.dart';
 import '../../domain/repositories/i_seller_request_repository.dart';
 import '../../domain/repositories/i_user_repository.dart';
 import '../../data/repositories/local/local_auth_repository.dart';
+import '../../data/repositories/local/local_cart_repository.dart';
 import '../../data/repositories/local/local_category_repository.dart';
 import '../../data/repositories/local/local_dispute_repository.dart';
 import '../../data/repositories/local/local_favorite_repository.dart';
@@ -122,6 +124,13 @@ final favoriteRepositoryProvider = Provider<IFavoriteRepository>((ref) {
     return LocalFavoriteRepository();
   }
   throw UnimplementedError('ApiFavoriteRepository sera branché au script 09.');
+});
+
+final cartRepositoryProvider = Provider<ICartRepository>((ref) {
+  if (AppConfig.isLocal) {
+    return LocalCartRepository();
+  }
+  throw UnimplementedError('ApiCartRepository sera branché au script 09.');
 });
 
 final userRepositoryProvider = Provider<IUserRepository>((ref) {

@@ -11,6 +11,7 @@ import '../../../../shared/widgets/feedback/app_loading_indicator.dart';
 import '../../../../shared/widgets/inputs/app_search_field.dart';
 import '../../../../shared/widgets/layout/section_header.dart';
 import '../../../auth/providers/session_provider.dart';
+import '../../../cart_checkout/providers/cart_provider.dart';
 import '../../../favorites/providers/favorites_provider.dart';
 import '../../providers/category_provider.dart';
 import '../../providers/product_list_provider.dart';
@@ -32,6 +33,7 @@ class ShopScreen extends ConsumerWidget {
     final produitsAsync = ref.watch(shopProductsProvider);
     final filtres = ref.watch(shopFiltersProvider);
     final favoris = ref.watch(favoritesProvider).valueOrNull ?? [];
+    final panier = ref.watch(cartProvider).valueOrNull ?? [];
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -71,9 +73,47 @@ class ShopScreen extends ConsumerWidget {
                               child: const Text('Se connecter'),
                             )
                           else
-                            IconButton(
-                              onPressed: () => context.push(AppRoutes.notifications),
-                              icon: const Icon(Icons.notifications_outlined),
+                            Row(
+                              children: [
+                                Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    IconButton(
+                                      onPressed: () => context.push(AppRoutes.cart),
+                                      icon: const Icon(Icons.shopping_cart_outlined),
+                                    ),
+                                    if (panier.isNotEmpty)
+                                      Positioned(
+                                        right: 6,
+                                        top: 6,
+                                        child: Container(
+                                          padding: const EdgeInsets.all(4),
+                                          decoration: const BoxDecoration(
+                                            color: AppColors.violet,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          constraints: const BoxConstraints(
+                                            minWidth: 16,
+                                            minHeight: 16,
+                                          ),
+                                          child: Text(
+                                            '${panier.length}',
+                                            textAlign: TextAlign.center,
+                                            style: const TextStyle(
+                                              color: AppColors.white,
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                IconButton(
+                                  onPressed: () => context.push(AppRoutes.notifications),
+                                  icon: const Icon(Icons.notifications_outlined),
+                                ),
+                              ],
                             ),
                         ],
                       ),

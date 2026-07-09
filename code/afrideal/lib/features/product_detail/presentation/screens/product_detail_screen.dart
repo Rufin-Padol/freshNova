@@ -14,6 +14,7 @@ import '../../../../shared/widgets/cards/info_row.dart';
 import '../../../../shared/widgets/feedback/app_loading_indicator.dart';
 import '../../../../shared/widgets/illustrations/empty_image_illustration.dart';
 import '../../../auth/providers/session_provider.dart';
+import '../../../cart_checkout/providers/cart_provider.dart';
 import '../../../favorites/providers/favorites_provider.dart';
 import '../../../messages/providers/message_provider.dart';
 import '../../../shop/providers/product_list_provider.dart';
@@ -43,6 +44,8 @@ class ProductDetailScreen extends ConsumerWidget {
     final peutGererFavori = utilisateur == null || utilisateur.role == UserRole.acheteur;
     final favoris = ref.watch(favoritesProvider).valueOrNull ?? [];
     final estFavori = favoris.contains(productId);
+    final panier = ref.watch(cartProvider).valueOrNull ?? [];
+    final estDansPanier = panier.contains(productId);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -71,6 +74,24 @@ class ProductDetailScreen extends ConsumerWidget {
                   ),
                 ),
                 actions: [
+                  if (peutGererFavori)
+                    IconButton(
+                      onPressed: () {
+                        if (utilisateur == null) {
+                          _demanderConnexion(context);
+                          return;
+                        }
+                        ref.read(cartProvider.notifier).toggle(productId);
+                      },
+                      icon: Icon(
+                        estDansPanier
+                            ? Icons.shopping_cart_rounded
+                            : Icons.add_shopping_cart_rounded,
+                        color: estDansPanier ? AppColors.violet : AppColors.black,
+                      ),
+                      style: IconButton.styleFrom(backgroundColor: AppColors.white),
+                    ),
+                  const SizedBox(width: AppSpacing.sm),
                   if (peutGererFavori)
                     IconButton(
                       onPressed: () {

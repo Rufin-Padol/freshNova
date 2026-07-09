@@ -43,6 +43,7 @@ class StorageKeys {
   static const String notificationsBox = 'notifications_box';
   static const String messagesBox = 'messages_box';
   static const String favoritesBox = 'favorites_box';
+  static const String cartBox = 'cart_box';
   static const String sessionBox = 'session_box';
   static const String settingsBox = 'settings_box';
   static const String categoriesBox = 'categories_box';

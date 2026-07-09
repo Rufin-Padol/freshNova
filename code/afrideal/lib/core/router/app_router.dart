@@ -40,6 +40,7 @@ import '../../features/admin/presentation/screens/admin_users_screen.dart';
 import '../../features/agent/presentation/screens/agent_mission_detail_screen.dart';
 import '../../features/orders/presentation/screens/order_detail_screen.dart';
 import '../../features/favorites/presentation/screens/favorites_screen.dart';
+import '../../features/cart_checkout/presentation/screens/cart_screen.dart';
 import '../../features/cart_checkout/presentation/screens/checkout_screen.dart';
 import '../../domain/entities/produit.dart';
 
@@ -167,7 +168,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.cart,
-        builder: (context, state) => const PlaceholderScreen(titre: 'Panier'),
+        pageBuilder: (context, state) => CustomTransitionPage(
+          key: state.pageKey,
+          child: const RoleShellScreen(child: CartScreen()),
+          transitionsBuilder: AppTransitions.fade,
+          transitionDuration: const Duration(milliseconds: 200),
+        ),
       ),
       GoRoute(
         path: AppRoutes.checkout,
