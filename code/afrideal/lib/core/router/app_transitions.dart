@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Transitions de navigation personnalisées pour AfriDeal.
+/// Transitions de navigation personnalisées pour TrustNova.
 ///
 /// Deux variantes selon le contexte :
 ///   - [fadeSlide] : transition principale (fondu + glissement léger

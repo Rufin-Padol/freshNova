@@ -81,7 +81,7 @@ class SellStep2Screen extends ConsumerWidget {
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: Text(
-                      'L\'agent se présentera avec son badge AfriDeal. '
+                      'L\'agent se présentera avec son badge TrustNova. '
                       'Votre identité et la propriété du produit seront vérifiées.',
                       style: AppTypography.bodySmall.copyWith(color: AppColors.violetDark),
                     ),

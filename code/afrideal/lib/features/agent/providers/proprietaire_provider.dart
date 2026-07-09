@@ -7,7 +7,7 @@ const _uuid = Uuid();
 
 /// Tous les propriétaires connus de la plateforme — registre partagé
 /// entre agents, indépendant des comptes vendeurs de l'app (un
-/// propriétaire n'a pas besoin d'installer AfriDeal pour vendre).
+/// propriétaire n'a pas besoin d'installer TrustNova pour vendre).
 final allProprietairesProvider = FutureProvider<List<Proprietaire>>((ref) async {
   final repo = ref.watch(proprietaireRepositoryProvider);
   final all = await repo.getAll();

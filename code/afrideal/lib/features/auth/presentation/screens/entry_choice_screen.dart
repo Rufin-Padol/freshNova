@@ -9,7 +9,7 @@ import '../../../../shared/widgets/illustrations/onboarding_illustrations.dart';
 
 /// Écran de bienvenue, premier écran vu par tout nouvel utilisateur.
 ///
-/// Reprend l'identité visuelle AfriDeal validée : dégradé violet-bleu,
+/// Reprend l'identité visuelle TrustNova validée : dégradé violet-bleu,
 /// message de confiance et sécurité, illustration vectorielle de
 /// bouclier — fidèle à la maquette fournie.
 class EntryChoiceScreen extends StatelessWidget {
@@ -29,7 +29,7 @@ class EntryChoiceScreen extends StatelessWidget {
                 const TrustShieldIllustration(size: 140),
                 const SizedBox(height: AppSpacing.xxxl),
                 Text(
-                  'AfriDeal',
+                  'TrustNova',
                   style: AppTypography.displayLarge.copyWith(
                     color: AppColors.white,
                     fontSize: 36,
@@ -60,7 +60,7 @@ class EntryChoiceScreen extends StatelessWidget {
                     borderRadius: AppRadius.mdRadius,
                   ),
                   child: AppPrimaryButton(
-                    label: 'Découvrir AfriDeal',
+                    label: 'Découvrir TrustNova',
                     icon: Icons.arrow_forward_rounded,
                     onPressed: () => context.go(AppRoutes.demoAccounts),
                   ),

@@ -8,7 +8,7 @@ import 'app_typography.dart';
 /// Centraliser ici le style de chaque composant (boutons, champs de
 /// texte, app bar...) garantit que les widgets Material par défaut
 /// (TextButton, ElevatedButton, etc.) respectent automatiquement
-/// l'identité visuelle AfriDeal sans configuration répétée écran par écran.
+/// l'identité visuelle TrustNova sans configuration répétée écran par écran.
 class AppTheme {
   AppTheme._();
 

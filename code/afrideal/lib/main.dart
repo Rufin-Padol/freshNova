@@ -30,16 +30,16 @@ Future<void> main() async {
     await DemoDataSeeder.seedIfNeeded();
   }
 
-  runApp(const ProviderScope(child: AfriDealApp()));
+  runApp(const ProviderScope(child: TrustNovaApp()));
 }
 
-/// Widget racine de l'application AfriDeal.
+/// Widget racine de l'application TrustNova.
 ///
 /// Utilise ConsumerWidget pour pouvoir lire le routeur depuis
 /// Riverpod (lui-même réactif à l'état de session, voir
 /// lib/core/router/app_router.dart).
-class AfriDealApp extends ConsumerWidget {
-  const AfriDealApp({super.key});
+class TrustNovaApp extends ConsumerWidget {
+  const TrustNovaApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

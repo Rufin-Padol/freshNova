@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 /// Conversation entre deux utilisateurs (ou un utilisateur et le
-/// support AfriDeal). Entité ajoutée pour couvrir l'écran "Messages"
+/// support TrustNova). Entité ajoutée pour couvrir l'écran "Messages"
 /// présent dans les scénarios UX, absent du diagramme de classes
 /// d'origine qui se concentrait sur le processus d'achat/vente.
 class Conversation extends Equatable {

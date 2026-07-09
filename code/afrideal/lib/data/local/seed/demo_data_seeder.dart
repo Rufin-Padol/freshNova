@@ -137,7 +137,7 @@ class DemoDataSeeder {
       ),
       Utilisateur(
         id: DemoIds.supportId,
-        nom: 'AfriDeal',
+        nom: 'TrustNova',
         prenom: 'Support',
         telephone: '670000000',
         motDePasseHash: hash,
@@ -155,7 +155,7 @@ class DemoDataSeeder {
   }
 
   // ──────────────────────────────────────────────────────────────
-  // Catégories (identiques aux maquettes AfriDeal)
+  // Catégories (identiques aux maquettes TrustNova)
   // ──────────────────────────────────────────────────────────────
   static Future<void> _seedCategories() async {
     final repo = LocalCategoryRepository();
@@ -518,7 +518,7 @@ class DemoDataSeeder {
       id: 'demo-msg-1',
       conversationId: 'demo-conv-support',
       expediteurId: DemoIds.supportId,
-      contenu: 'Bonjour Marie, bienvenue sur AfriDeal !',
+      contenu: 'Bonjour Marie, bienvenue sur TrustNova !',
       dateEnvoi: maintenant.subtract(const Duration(days: 6, hours: 1)),
       estLu: true,
     ));

@@ -43,7 +43,7 @@ import '../../features/favorites/presentation/screens/favorites_screen.dart';
 import '../../features/cart_checkout/presentation/screens/checkout_screen.dart';
 import '../../domain/entities/produit.dart';
 
-/// Le routeur complet de l'application AfriDeal.
+/// Le routeur complet de l'application TrustNova.
 ///
 /// Toutes les routes sont déclarées ici, avec leur écran associé.
 /// Au fur et à mesure que les scripts suivants créent les écrans
@@ -133,7 +133,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.onboarding,
-        builder: (context, state) => const PlaceholderScreen(titre: 'Bienvenue sur AfriDeal'),
+        builder: (context, state) => const PlaceholderScreen(titre: 'Bienvenue sur TrustNova'),
       ),
       GoRoute(
         path: AppRoutes.entryChoice,

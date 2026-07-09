@@ -46,5 +46,5 @@ class AppConfig {
   static const bool enableDebugLogs = true;
 
   /// Nom de l'application affiché dans l'UI.
-  static const String appName = 'AfriDeal';
+  static const String appName = 'TrustNova';
 }

@@ -44,7 +44,7 @@ class DemoAccountsScreen extends ConsumerWidget {
             ),
             const SizedBox(height: AppSpacing.xs),
             Text(
-              'Sélectionnez un profil pour explorer AfriDeal. '
+              'Sélectionnez un profil pour explorer TrustNova. '
               'Chaque profil donne accès à un espace différent de la plateforme.',
               style: AppTypography.bodyMedium,
             ),

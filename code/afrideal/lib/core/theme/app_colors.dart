@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Palette de couleurs officielle AfriDeal.
+/// Palette de couleurs officielle TrustNova.
 ///
 /// Ces couleurs sont la SEULE source de vérité pour les couleurs de
 /// l'application. Aucun écran ne doit écrire une couleur en dur

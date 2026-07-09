@@ -174,7 +174,7 @@ class _AdminProductEditScreenState extends ConsumerState<AdminProductEditScreen>
         defautsConnus = null;
         break;
       case _ModeDefauts.nonGaranti:
-        defautsConnus = 'Défauts internes non garantis par AfriDeal.';
+        defautsConnus = 'Défauts internes non garantis par TrustNova.';
         break;
     }
 

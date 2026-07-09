@@ -72,7 +72,7 @@ class MessagesScreen extends ConsumerWidget {
                       ),
                 title: conv.estSupport
                     ? Text(
-                        'Support AfriDeal',
+                        'Support TrustNova',
                         style: AppTypography.titleMedium.copyWith(
                           fontWeight: nonLu ? FontWeight.w700 : FontWeight.w600,
                         ),

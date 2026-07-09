@@ -40,7 +40,7 @@ class AdminSidebar extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('AfriDeal',
+                  Text('TrustNova',
                       style: AppTypography.titleLarge.copyWith(color: AppColors.white)),
                   Text('Administration',
                       style: AppTypography.caption.copyWith(color: AppColors.gray400)),

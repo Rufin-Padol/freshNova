@@ -1,4 +1,4 @@
-# afrideal
+# TrustNova
 
 A new Flutter project.
 

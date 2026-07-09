@@ -35,7 +35,7 @@ class AppRadius {
   static BorderRadius get fullRadius => BorderRadius.circular(full);
 }
 
-/// Ombres standardisées. Volontairement discrètes : le design AfriDeal
+/// Ombres standardisées. Volontairement discrètes : le design TrustNova
 /// privilégie les bordures fines et les surfaces claires plutôt que des
 /// ombres marquées, pour rester sobre et rapide à dessiner (important
 /// pour la fluidité sur des appareils d'entrée de gamme).

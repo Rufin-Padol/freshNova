@@ -136,7 +136,7 @@ class ProductDetailScreen extends ConsumerWidget {
                                 children: [
                                   Row(
                                     children: [
-                                      Text('Vendu par AfriDeal', style: AppTypography.titleMedium),
+                                      Text('Vendu par TrustNova', style: AppTypography.titleMedium),
                                       const SizedBox(width: 4),
                                       const Icon(Icons.verified_rounded,
                                           size: 16, color: AppColors.blue),

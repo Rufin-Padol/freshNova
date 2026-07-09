@@ -1,7 +1,7 @@
 import 'svg_illustration_base.dart';
 
 /// Illustration "confiance et sécurité" : bouclier avec coche,
-/// thème central de l'identité AfriDeal, utilisée sur l'écran
+/// thème central de l'identité TrustNova, utilisée sur l'écran
 /// d'accueil et l'onboarding.
 class TrustShieldIllustration extends SvgIllustrationBase {
   const TrustShieldIllustration({super.key, super.size});
