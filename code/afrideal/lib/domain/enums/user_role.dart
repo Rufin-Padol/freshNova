@@ -1,9 +1,11 @@
-/// Les 5 rôles distincts de la plateforme, conformes au cahier des
-/// charges. Chaque rôle a son propre espace applicatif et ses propres
-/// permissions : un Acheteur ne voit jamais les écrans Agent, etc.
+/// Les rôles distincts de la plateforme. Il n'existe pas de rôle
+/// "vendeur" séparé : un Acheteur peut aussi bien acheter que
+/// soumettre un bien à la vente depuis son profil — c'est TrustNova
+/// qui met le produit en vente après vérification par un agent, pas
+/// l'utilisateur lui-même. Seuls les rôles internes (agent terrain,
+/// admin, super admin) ont leur propre espace applicatif dédié.
 enum UserRole {
   acheteur,
-  vendeur,
   agentTerrain,
   admin,
   superAdmin;
@@ -11,9 +13,7 @@ enum UserRole {
   String get label {
     switch (this) {
       case UserRole.acheteur:
-        return 'Acheteur';
-      case UserRole.vendeur:
-        return 'Vendeur';
+        return 'Membre';
       case UserRole.agentTerrain:
         return 'Agent terrain';
       case UserRole.admin:
@@ -24,6 +24,6 @@ enum UserRole {
   }
 
   /// Indique si ce rôle a accès au panneau web (Admin / Super Admin),
-  /// par opposition aux rôles mobiles (Acheteur, Vendeur, Agent).
+  /// par opposition aux rôles mobiles (Acheteur, Agent).
   bool get isWebRole => this == UserRole.admin || this == UserRole.superAdmin;
 }

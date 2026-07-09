@@ -98,7 +98,7 @@ class DemoDataSeeder {
         prenom: 'Michel',
         telephone: '670000002',
         motDePasseHash: hash,
-        role: UserRole.vendeur,
+        role: UserRole.acheteur,
         ville: 'Douala',
         noteVendeur: 4.8,
         dateInscription: maintenant.subtract(const Duration(days: 120)),

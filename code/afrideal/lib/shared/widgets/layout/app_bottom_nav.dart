@@ -19,12 +19,11 @@ class _NavTab {
 }
 
 /// Onglets de navigation pour chaque rôle mobile.
-/// Acheteur et vendeur partagent la même barre : n'importe quel
-/// utilisateur connecté peut aussi bien acheter que vendre (l'accès à
-/// "Vendre" se fait depuis le profil, pas depuis un onglet dédié).
+/// Aucun onglet "Vendre" dédié : n'importe quel utilisateur connecté
+/// peut aussi bien acheter que soumettre un bien, depuis son profil.
 /// L'Admin et le Super Admin n'ont pas de barre inférieure —
 /// ils naviguent via la sidebar (AdminSidebar, script 13).
-const List<_NavTab> _tabsAcheteurVendeur = [
+const List<_NavTab> _tabsAcheteur = [
   _NavTab(
     label: 'Boutique',
     icon: Icons.storefront_outlined,
@@ -58,8 +57,7 @@ const List<_NavTab> _tabsAcheteurVendeur = [
 ];
 
 const Map<UserRole, List<_NavTab>> _tabsParRole = {
-  UserRole.acheteur: _tabsAcheteurVendeur,
-  UserRole.vendeur: _tabsAcheteurVendeur,
+  UserRole.acheteur: _tabsAcheteur,
   UserRole.agentTerrain: [
     _NavTab(
       label: 'Missions',

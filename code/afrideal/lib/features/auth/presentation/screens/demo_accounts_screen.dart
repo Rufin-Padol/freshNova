@@ -112,9 +112,7 @@ class _DemoAccountTile extends StatelessWidget {
   String _descriptionRole(UserRole role) {
     switch (role) {
       case UserRole.acheteur:
-        return 'Parcourir et acheter des produits';
-      case UserRole.vendeur:
-        return 'Vendre des produits d\'occasion';
+        return 'Acheter et vendre des produits';
       case UserRole.agentTerrain:
         return 'Vérifier et collecter les produits';
       case UserRole.admin:

@@ -366,7 +366,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 String _accueilPourRole(UserRole role) {
   switch (role) {
     case UserRole.acheteur:
-    case UserRole.vendeur:
       return AppRoutes.shop;
     case UserRole.agentTerrain:
       return AppRoutes.agentDashboard;
@@ -380,7 +379,7 @@ String _accueilPourRole(UserRole role) {
 /// Vérifie qu'un chemin donné appartient bien à l'espace applicatif
 /// autorisé pour le rôle de l'utilisateur connecté. Les routes
 /// "communes" (messages, notifications, profil) sont accessibles à
-/// tous les rôles mobiles (Acheteur, Vendeur, Agent).
+/// tous les rôles mobiles (Acheteur, Agent).
 bool _cheminAutorisePourRole(String chemin, UserRole role) {
   const cheminsCommuns = [
     AppRoutes.messages,
@@ -394,12 +393,11 @@ bool _cheminAutorisePourRole(String chemin, UserRole role) {
   if (cheminsCommuns.any(correspond)) return true;
 
   switch (role) {
-    // Acheteur et vendeur partagent le même espace applicatif : tout
-    // utilisateur connecté peut aussi bien acheter que soumettre un
-    // bien à la vente depuis son profil (pas de rôle exclusif requis
-    // pour vendre, à la différence des rôles agent/admin ci-dessous).
+    // Aucun rôle "vendeur" séparé : soumettre un bien (/sell) fait
+    // partie de l'espace acheteur au même titre qu'acheter, puisque
+    // c'est TrustNova qui met le produit en vente après vérification,
+    // pas l'utilisateur lui-même.
     case UserRole.acheteur:
-    case UserRole.vendeur:
       return correspond(AppRoutes.shop) ||
           correspond('/product') ||
           correspond(AppRoutes.cart) ||

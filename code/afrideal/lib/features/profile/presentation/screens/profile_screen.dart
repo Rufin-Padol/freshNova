@@ -52,7 +52,7 @@ class ProfileScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.xxl),
-          if (utilisateur.role == UserRole.acheteur || utilisateur.role == UserRole.vendeur) ...[
+          if (utilisateur.role == UserRole.acheteur) ...[
             _SectionTitre('Vendre'),
             _MesAnnoncesCard(),
             const SizedBox(height: AppSpacing.xl),
