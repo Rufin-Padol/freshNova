@@ -61,7 +61,7 @@ class AdminUsersScreen extends ConsumerWidget {
                       ),
                       trailing: Switch(
                         value: u.estActif,
-                        activeColor: AppColors.violet,
+                        activeThumbColor: AppColors.violet,
                         onChanged: (val) async {
                           await ref.read(adminUserNotifierProvider.notifier).toggleActif(u.id, val);
                           if (context.mounted) {

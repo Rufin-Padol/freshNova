@@ -1,4 +1,3 @@
-import '../../../core/constants/app_constants.dart';
 import '../../../domain/entities/categorie.dart';
 import '../../../domain/entities/commande.dart';
 import '../../../domain/entities/conversation.dart';
@@ -10,7 +9,6 @@ import '../../../domain/entities/paiement.dart';
 import '../../../domain/entities/photo.dart';
 import '../../../domain/entities/produit.dart';
 import '../../../domain/entities/utilisateur.dart';
-import '../../../domain/enums/dispute_status.dart';
 import '../../../domain/enums/mission_status.dart';
 import '../../../domain/enums/notification_type.dart';
 import '../../../domain/enums/order_status.dart';

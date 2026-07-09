@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
-import '../../../core/constants/app_constants.dart';
 import '../../../core/providers/repository_providers.dart';
 import '../../../domain/entities/commande.dart';
 import '../../../domain/entities/paiement.dart';

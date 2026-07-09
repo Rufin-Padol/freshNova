@@ -1,5 +1,4 @@
 import '../../domain/entities/produit.dart';
-import '../../domain/entities/photo.dart';
 import '../../domain/enums/product_status.dart';
 import 'photo_model.dart';
 

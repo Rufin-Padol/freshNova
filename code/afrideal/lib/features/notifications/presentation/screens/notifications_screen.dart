@@ -8,7 +8,6 @@ import '../../../../core/errors/error_view.dart';
 import '../../../../core/providers/repository_providers.dart';
 import '../../../../domain/enums/notification_type.dart';
 import '../../../../shared/widgets/feedback/app_loading_indicator.dart';
-import '../../../auth/providers/session_provider.dart';
 import '../../providers/notification_provider.dart';
 
 class NotificationsScreen extends ConsumerWidget {

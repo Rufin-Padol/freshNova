@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_dimens.dart';
 
 /// Bouton circulaire avec icône, utilisé dans les barres d'application
 /// et les actions flottantes secondaires (favoris, partage...).

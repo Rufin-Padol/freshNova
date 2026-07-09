@@ -66,6 +66,14 @@ class EntryChoiceScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: AppSpacing.lg),
+                TextButton(
+                  onPressed: () => context.push(AppRoutes.login),
+                  child: Text(
+                    'J\'ai déjà un compte — Se connecter',
+                    style: AppTypography.bodyMedium.copyWith(color: AppColors.white),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
               ],
             ),
           ),
