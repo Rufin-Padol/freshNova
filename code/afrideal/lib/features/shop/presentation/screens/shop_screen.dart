@@ -184,7 +184,6 @@ class ShopScreen extends ConsumerWidget {
                           return ProductCard(
                             titre: produit.titre,
                             prix: produit.prix,
-                            localisation: produit.localisation,
                             photoUrl: produit.photoPrincipale?.url,
                             estFavori: favoris.contains(produit.id),
                             onFavoriteTap: () {

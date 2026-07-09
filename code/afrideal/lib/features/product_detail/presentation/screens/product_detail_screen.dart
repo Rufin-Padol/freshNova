@@ -12,6 +12,7 @@ import '../../../../shared/widgets/buttons/app_primary_button.dart';
 import '../../../../shared/widgets/buttons/app_secondary_button.dart';
 import '../../../../shared/widgets/cards/info_row.dart';
 import '../../../../shared/widgets/feedback/app_loading_indicator.dart';
+import '../../../../shared/widgets/feedback/app_snackbar.dart';
 import '../../../../shared/widgets/illustrations/empty_image_illustration.dart';
 import '../../../auth/providers/session_provider.dart';
 import '../../../cart_checkout/providers/cart_provider.dart';
@@ -19,10 +20,12 @@ import '../../../favorites/providers/favorites_provider.dart';
 import '../../../messages/providers/message_provider.dart';
 import '../../../shop/providers/product_list_provider.dart';
 
-/// Fiche détaillée d'un produit, accessible aux acheteurs depuis la
-/// boutique. Affiche la photo officielle, le vendeur, l'état, la
-/// localisation, et la description — y compris les défauts connus
-/// affichés de façon transparente, conformément au cahier des charges.
+/// Fiche détaillée d'un produit, accessible depuis la boutique.
+/// Affiche la photo officielle, l'état, et la description — y compris
+/// les défauts connus affichés de façon transparente. Ni la
+/// localisation ni l'identité du vendeur ne sont exposées à
+/// l'acheteur : TrustNova est le seul interlocuteur visible, c'est
+/// notre boutique qui vend.
 class ProductDetailScreen extends ConsumerWidget {
   final String productId;
 
@@ -76,12 +79,19 @@ class ProductDetailScreen extends ConsumerWidget {
                 actions: [
                   if (peutGererFavori)
                     IconButton(
-                      onPressed: () {
+                      onPressed: () async {
                         if (utilisateur == null) {
                           _demanderConnexion(context);
                           return;
                         }
-                        ref.read(cartProvider.notifier).toggle(productId);
+                        final ajoute = !estDansPanier;
+                        await ref.read(cartProvider.notifier).toggle(productId);
+                        if (context.mounted) {
+                          AppSnackbar.showSuccess(
+                            context,
+                            ajoute ? 'Ajouté au panier' : 'Retiré du panier',
+                          );
+                        }
                       },
                       icon: Icon(
                         estDansPanier
@@ -203,23 +213,10 @@ class ProductDetailScreen extends ConsumerWidget {
                         ),
                       ],
                       const SizedBox(height: AppSpacing.xl),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: InfoRow(
-                              icon: Icons.checkroom_outlined,
-                              label: 'État',
-                              value: produit.etat.label,
-                            ),
-                          ),
-                          Expanded(
-                            child: InfoRow(
-                              icon: Icons.location_on_outlined,
-                              label: 'Localisation',
-                              value: produit.localisation,
-                            ),
-                          ),
-                        ],
+                      InfoRow(
+                        icon: Icons.checkroom_outlined,
+                        label: 'État',
+                        value: produit.etat.label,
                       ),
                       const SizedBox(height: AppSpacing.huge),
                     ],

@@ -9,13 +9,14 @@ import '../illustrations/empty_image_illustration.dart';
 /// favoris, et des listes vendeur/agent.
 ///
 /// Volontairement compacte : seules les informations essentielles à
-/// la décision d'achat sont visibles (photo, titre, prix, localisation).
-/// Le détail complet n'apparaît que sur la fiche produit.
+/// la décision d'achat sont visibles (photo, titre, prix). Ni la
+/// localisation ni le vendeur ne sont affichés — TrustNova est
+/// l'unique interlocuteur visible de l'acheteur, sur la carte comme
+/// sur la fiche produit.
 class ProductCard extends StatelessWidget {
   final String titre;
   final double prix;
   final String? photoUrl;
-  final String localisation;
   final VoidCallback onTap;
   final VoidCallback? onFavoriteTap;
   final bool estFavori;
@@ -24,7 +25,6 @@ class ProductCard extends StatelessWidget {
     super.key,
     required this.titre,
     required this.prix,
-    required this.localisation,
     required this.onTap,
     this.photoUrl,
     this.onFavoriteTap,
@@ -95,21 +95,6 @@ class ProductCard extends StatelessWidget {
                   Text(
                     Formatters.currency(prix),
                     style: AppTypography.titleMedium.copyWith(color: AppColors.violet),
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      const Icon(Icons.location_on_outlined, size: 13, color: AppColors.gray400),
-                      const SizedBox(width: 2),
-                      Expanded(
-                        child: Text(
-                          localisation,
-                          style: AppTypography.caption,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
                   ),
                 ],
               ),

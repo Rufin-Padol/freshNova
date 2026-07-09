@@ -84,7 +84,6 @@ class _FavoritesGrid extends ConsumerWidget {
             return ProductCard(
               titre: produit.titre,
               prix: produit.prix,
-              localisation: produit.localisation,
               photoUrl: produit.photoPrincipale?.url,
               estFavori: true,
               onFavoriteTap: () => ref.read(favoritesProvider.notifier).toggle(produit.id),

@@ -366,9 +366,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 String _accueilPourRole(UserRole role) {
   switch (role) {
     case UserRole.acheteur:
-      return AppRoutes.shop;
     case UserRole.vendeur:
-      return AppRoutes.sellHome;
+      return AppRoutes.shop;
     case UserRole.agentTerrain:
       return AppRoutes.agentDashboard;
     case UserRole.admin:
@@ -395,15 +394,19 @@ bool _cheminAutorisePourRole(String chemin, UserRole role) {
   if (cheminsCommuns.any(correspond)) return true;
 
   switch (role) {
+    // Acheteur et vendeur partagent le même espace applicatif : tout
+    // utilisateur connecté peut aussi bien acheter que soumettre un
+    // bien à la vente depuis son profil (pas de rôle exclusif requis
+    // pour vendre, à la différence des rôles agent/admin ci-dessous).
     case UserRole.acheteur:
+    case UserRole.vendeur:
       return correspond(AppRoutes.shop) ||
           correspond('/product') ||
           correspond(AppRoutes.cart) ||
           correspond(AppRoutes.checkout) ||
           correspond(AppRoutes.orders) ||
-          correspond(AppRoutes.favorites);
-    case UserRole.vendeur:
-      return correspond(AppRoutes.sellHome) || correspond('/sell');
+          correspond(AppRoutes.favorites) ||
+          correspond('/sell');
     case UserRole.agentTerrain:
       return correspond(AppRoutes.agentDashboard) || correspond('/agent');
     case UserRole.admin:
