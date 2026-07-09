@@ -8,7 +8,9 @@ import '../../../../core/errors/error_view.dart';
 import '../../../../domain/entities/produit.dart';
 import '../../../../shared/widgets/cards/product_card.dart';
 import '../../../../shared/widgets/feedback/app_loading_indicator.dart';
+import '../../../../shared/widgets/feedback/app_snackbar.dart';
 import '../../../../core/providers/repository_providers.dart';
+import '../../../cart_checkout/providers/cart_provider.dart';
 import '../../providers/favorites_provider.dart';
 
 /// Grille des produits favoris de l'acheteur. Charge les identifiants
@@ -54,6 +56,7 @@ class _FavoritesGrid extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final productRepo = ref.watch(productRepositoryProvider);
+    final panier = ref.watch(cartProvider).valueOrNull ?? [];
 
     return FutureBuilder<List<Produit>>(
       future: Future.wait(favoriteIds.map((id) => productRepo.getById(id)))
@@ -87,6 +90,17 @@ class _FavoritesGrid extends ConsumerWidget {
               photoUrl: produit.photoPrincipale?.url,
               estFavori: true,
               onFavoriteTap: () => ref.read(favoritesProvider.notifier).toggle(produit.id),
+              estDansPanier: panier.contains(produit.id),
+              onCartTap: () async {
+                final ajoute = !panier.contains(produit.id);
+                await ref.read(cartProvider.notifier).toggle(produit.id);
+                if (context.mounted) {
+                  AppSnackbar.showSuccess(
+                    context,
+                    ajoute ? 'Ajouté au panier' : 'Retiré du panier',
+                  );
+                }
+              },
               onTap: () => context.push(
                 AppRoutes.productDetail.replaceFirst(':productId', produit.id),
               ),

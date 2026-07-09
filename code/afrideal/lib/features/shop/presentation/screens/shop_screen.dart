@@ -8,6 +8,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/errors/error_view.dart';
 import '../../../../shared/widgets/cards/product_card.dart';
 import '../../../../shared/widgets/feedback/app_loading_indicator.dart';
+import '../../../../shared/widgets/feedback/app_snackbar.dart';
 import '../../../../shared/widgets/inputs/app_search_field.dart';
 import '../../../../shared/widgets/layout/section_header.dart';
 import '../../../auth/providers/session_provider.dart';
@@ -194,6 +195,23 @@ class ShopScreen extends ConsumerWidget {
                                 return;
                               }
                               ref.read(favoritesProvider.notifier).toggle(produit.id);
+                            },
+                            estDansPanier: panier.contains(produit.id),
+                            onCartTap: () async {
+                              if (utilisateur == null) {
+                                context.push(
+                                  '${AppRoutes.demoAccounts}?from=${Uri.encodeComponent(AppRoutes.shop)}',
+                                );
+                                return;
+                              }
+                              final ajoute = !panier.contains(produit.id);
+                              await ref.read(cartProvider.notifier).toggle(produit.id);
+                              if (context.mounted) {
+                                AppSnackbar.showSuccess(
+                                  context,
+                                  ajoute ? 'Ajouté au panier' : 'Retiré du panier',
+                                );
+                              }
                             },
                             onTap: () => context.push(
                               AppRoutes.productDetail.replaceFirst(':productId', produit.id),

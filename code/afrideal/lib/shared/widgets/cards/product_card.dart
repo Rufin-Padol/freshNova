@@ -20,6 +20,8 @@ class ProductCard extends StatelessWidget {
   final VoidCallback onTap;
   final VoidCallback? onFavoriteTap;
   final bool estFavori;
+  final VoidCallback? onCartTap;
+  final bool estDansPanier;
 
   const ProductCard({
     super.key,
@@ -29,6 +31,8 @@ class ProductCard extends StatelessWidget {
     this.photoUrl,
     this.onFavoriteTap,
     this.estFavori = false,
+    this.onCartTap,
+    this.estDansPanier = false,
   });
 
   @override
@@ -74,6 +78,28 @@ class ProductCard extends StatelessWidget {
                           estFavori ? Icons.favorite_rounded : Icons.favorite_border_rounded,
                           size: 16,
                           color: estFavori ? AppColors.danger : AppColors.gray400,
+                        ),
+                      ),
+                    ),
+                  ),
+                if (onCartTap != null)
+                  Positioned(
+                    bottom: AppSpacing.sm,
+                    right: AppSpacing.sm,
+                    child: GestureDetector(
+                      onTap: onCartTap,
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: estDansPanier ? AppColors.violet : AppColors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          estDansPanier
+                              ? Icons.shopping_cart_rounded
+                              : Icons.add_shopping_cart_outlined,
+                          size: 16,
+                          color: estDansPanier ? AppColors.white : AppColors.gray700,
                         ),
                       ),
                     ),
