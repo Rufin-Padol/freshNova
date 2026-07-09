@@ -116,8 +116,16 @@ class _AdminOrderDetailSheet extends ConsumerWidget {
           const SizedBox(height: AppSpacing.md),
           InfoRow(
             icon: Icons.payments_outlined,
-            label: 'Montant',
+            label: 'Montant à collecter à la livraison',
             value: Formatters.currency(commande.montantTotal),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          InfoRow(
+            icon: Icons.account_balance_wallet_outlined,
+            label: 'Paiement',
+            value: commande.numeroPaieur != null && commande.numeroPaieur!.isNotEmpty
+                ? '${commande.methodePaiement.label} (${commande.numeroPaieur})'
+                : commande.methodePaiement.label,
           ),
           const SizedBox(height: AppSpacing.md),
           InfoRow(
@@ -132,17 +140,18 @@ class _AdminOrderDetailSheet extends ConsumerWidget {
             value: commande.adresseLivraison,
           ),
           const SizedBox(height: AppSpacing.xl),
-          if (commande.statut == OrderStatus.payee)
+          if (commande.statut == OrderStatus.pendante)
             AppPrimaryButton(
               label: 'Marquer en livraison',
               onPressed: () => _changerStatut(context, ref, OrderStatus.enLivraison),
             )
           else if (commande.statut == OrderStatus.enLivraison)
             AppPrimaryButton(
-              label: 'Marquer livrée',
+              label: 'Marquer livrée et encaissée',
               onPressed: () => _changerStatut(context, ref, OrderStatus.livree),
             ),
-          if (commande.statut == OrderStatus.payee || commande.statut == OrderStatus.enLivraison) ...[
+          if (commande.statut == OrderStatus.pendante ||
+              commande.statut == OrderStatus.enLivraison) ...[
             const SizedBox(height: AppSpacing.sm),
             AppSecondaryButton(
               label: 'Annuler la commande',

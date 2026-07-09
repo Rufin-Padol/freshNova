@@ -66,6 +66,10 @@ class _MissionCollecteFormState extends ConsumerState<MissionCollecteForm> {
   ProductCondition? _etat;
   bool _enCours = false;
 
+  /// null = pas encore répondu, true = "aucun défaut", false =
+  /// "défauts constatés" (voir _defautsCtrl pour le détail).
+  bool? _aucunDefaut;
+
   @override
   void initState() {
     super.initState();
@@ -166,6 +170,13 @@ class _MissionCollecteFormState extends ConsumerState<MissionCollecteForm> {
     if (_photos.length < _photosMinimum) return false;
     if (_titreCtrl.text.trim().isEmpty) return false;
     if (_etat == null) return false;
+    // Le constat de défauts n'est pas optionnel : l'agent doit
+    // explicitement confirmer qu'il n'y a rien à signaler, plutôt que
+    // de simplement laisser le champ vide. C'est nous qui garantissons
+    // le produit à l'acheteur, un défaut non mentionné ici ne sera
+    // jamais découvert ailleurs.
+    if (_aucunDefaut == null) return false;
+    if (_aucunDefaut == false && _defautsCtrl.text.trim().isEmpty) return false;
     final prix = double.tryParse(_prixCtrl.text.replaceAll(' ', ''));
     if (prix == null || prix <= 0) return false;
     return true;
@@ -176,7 +187,7 @@ class _MissionCollecteFormState extends ConsumerState<MissionCollecteForm> {
       AppSnackbar.showError(
         context,
         'Complétez tous les champs obligatoires (propriétaire, preuve, '
-        'au moins $_photosMinimum photos, état, prix).',
+        'au moins $_photosMinimum photos, état, constat de défauts, prix).',
       );
       return;
     }
@@ -197,7 +208,7 @@ class _MissionCollecteFormState extends ConsumerState<MissionCollecteForm> {
           categorieId: _categorieId,
           dimensions: _dimensionsCtrl.text.trim().isEmpty ? null : _dimensionsCtrl.text.trim(),
           etat: _etat!,
-          defautsConnus: _defautsCtrl.text.trim().isEmpty ? null : _defautsCtrl.text.trim(),
+          defautsConnus: _aucunDefaut == true ? null : _defautsCtrl.text.trim(),
           prixConfirme: prix,
         );
 
@@ -388,12 +399,37 @@ class _MissionCollecteFormState extends ConsumerState<MissionCollecteForm> {
           }).toList(),
         ),
         const SizedBox(height: AppSpacing.md),
-        AppTextField(
-          label: 'Défauts constatés (optionnel)',
-          hint: 'Ex : petite rayure sur le côté gauche',
-          controller: _defautsCtrl,
-          maxLines: 2,
+        Text('Défauts constatés *', style: AppTypography.titleMedium),
+        const SizedBox(height: 4),
+        Text(
+          'Obligatoire : un défaut non mentionné ici ne sera jamais repéré ailleurs.',
+          style: AppTypography.bodySmall,
         ),
+        const SizedBox(height: AppSpacing.sm),
+        Wrap(
+          spacing: AppSpacing.sm,
+          children: [
+            ChoiceChip(
+              label: const Text('Aucun défaut constaté'),
+              selected: _aucunDefaut == true,
+              onSelected: (_) => setState(() => _aucunDefaut = true),
+            ),
+            ChoiceChip(
+              label: const Text('Défauts constatés'),
+              selected: _aucunDefaut == false,
+              onSelected: (_) => setState(() => _aucunDefaut = false),
+            ),
+          ],
+        ),
+        if (_aucunDefaut == false) ...[
+          const SizedBox(height: AppSpacing.md),
+          AppTextField(
+            label: 'Description des défauts',
+            hint: 'Ex : petite rayure sur le côté gauche',
+            controller: _defautsCtrl,
+            maxLines: 2,
+          ),
+        ],
         const SizedBox(height: AppSpacing.md),
         AppTextField(
           label: 'Prix confirmé (FCFA)',

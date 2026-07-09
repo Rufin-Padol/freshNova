@@ -12,7 +12,7 @@ enum OrderStatus {
   String get label {
     switch (this) {
       case OrderStatus.pendante:
-        return 'En attente de paiement';
+        return 'Commande confirmée';
       case OrderStatus.payee:
         return 'Payée';
       case OrderStatus.enLivraison:

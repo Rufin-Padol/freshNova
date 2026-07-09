@@ -387,6 +387,8 @@ class DemoDataSeeder {
       dateCommande: maintenant.subtract(const Duration(hours: 5)),
       modeLivraison: DeliveryMode.livraison,
       adresseLivraison: 'Rue de la Joie, Bonamoussadi, Douala',
+      methodePaiement: PaymentMethod.orangeMoney,
+      numeroPaieur: '670000001',
       acheteurId: DemoIds.acheteurId,
       produitId: 'demo-prod-reserve',
     );
@@ -399,6 +401,8 @@ class DemoDataSeeder {
       dateCommande: maintenant.subtract(const Duration(days: 14)),
       modeLivraison: DeliveryMode.livraison,
       adresseLivraison: 'Rue de la Joie, Bonamoussadi, Douala',
+      methodePaiement: PaymentMethod.mtnMomo,
+      numeroPaieur: '670000001',
       acheteurId: DemoIds.acheteurId,
       produitId: 'demo-prod-livre',
     );
@@ -406,17 +410,9 @@ class DemoDataSeeder {
     await orderRepo.save(commandeEnLivraison);
     await orderRepo.save(commandeLivree);
 
-    await paymentRepo.save(Paiement(
-      id: 'demo-pay-1',
-      montant: 60000,
-      methode: PaymentMethod.orangeMoney,
-      reference: 'OM-2026-0001',
-      statut: PaymentStatus.valide,
-      dateHeure: maintenant.subtract(const Duration(hours: 5)),
-      numeroPaieur: '670000001',
-      commandeId: 'demo-cmd-1',
-    ));
-
+    // Aucun paiement pour commandeEnLivraison : elle n'est pas encore
+    // livrée, donc pas encore payée (paiement à la livraison). Seule
+    // commandeLivree, déjà livrée, a un paiement validé.
     await paymentRepo.save(Paiement(
       id: 'demo-pay-2',
       montant: 22000,

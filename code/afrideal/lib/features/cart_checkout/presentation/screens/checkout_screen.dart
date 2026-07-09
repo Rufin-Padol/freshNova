@@ -36,7 +36,7 @@ class CheckoutScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text('Paiement sécurisé')),
+      appBar: AppBar(title: const Text('Confirmer la commande')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
@@ -81,19 +81,26 @@ class CheckoutScreen extends ConsumerWidget {
               onChanged: (v) => ref.read(checkoutProvider.notifier).setAdresse(v),
             ),
             const SizedBox(height: AppSpacing.xl),
-            Text('Méthode de paiement', style: AppTypography.titleLarge),
+            Text('Paiement à la livraison', style: AppTypography.titleLarge),
+            const SizedBox(height: 2),
+            Text(
+              'Vous payez uniquement à la réception du produit — rien n\'est débité maintenant.',
+              style: AppTypography.bodySmall,
+            ),
             const SizedBox(height: AppSpacing.sm),
             _PaymentMethodSelector(
               selected: state.methode,
               onChanged: (methode) => ref.read(checkoutProvider.notifier).setMethode(methode),
             ),
-            const SizedBox(height: AppSpacing.lg),
-            AppTextField(
-              label: 'Numéro Mobile Money',
-              hint: '6XX XXX XXX',
-              keyboardType: TextInputType.phone,
-              onChanged: (v) => ref.read(checkoutProvider.notifier).setNumeroPaieur(v),
-            ),
+            if (state.methode != PaymentMethod.especes) ...[
+              const SizedBox(height: AppSpacing.lg),
+              AppTextField(
+                label: 'Numéro Mobile Money',
+                hint: '6XX XXX XXX',
+                keyboardType: TextInputType.phone,
+                onChanged: (v) => ref.read(checkoutProvider.notifier).setNumeroPaieur(v),
+              ),
+            ],
             if (state.messageErreur != null) ...[
               const SizedBox(height: AppSpacing.md),
               Text(
@@ -111,7 +118,7 @@ class CheckoutScreen extends ConsumerWidget {
           child: AppPrimaryButton(
             label: state.step == CheckoutStep.traitement
                 ? 'Confirmation en cours...'
-                : 'Payer ${Formatters.currency(produit.prix)}',
+                : 'Confirmer — ${Formatters.currency(produit.prix)} à la livraison',
             isLoading: state.step == CheckoutStep.traitement,
             onPressed: state.step == CheckoutStep.traitement
                 ? null
@@ -185,52 +192,60 @@ class _PaymentMethodSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final methodes = PaymentMethod.values;
     return Row(
-      children: PaymentMethod.values.map((methode) {
-        final estSelectionne = methode == selected;
-        final couleur = methode == PaymentMethod.orangeMoney
-            ? const Color(0xFFFF6600)
-            : const Color(0xFFFFCC00);
-        return Expanded(
-          child: Padding(
-            padding: EdgeInsets.only(
-              right: methode == PaymentMethod.orangeMoney ? AppSpacing.sm : 0,
-            ),
-            child: GestureDetector(
-              onTap: () => onChanged(methode),
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-                decoration: BoxDecoration(
-                  color: estSelectionne ? AppColors.violetSurface : AppColors.surface,
-                  borderRadius: AppRadius.mdRadius,
-                  border: Border.all(
-                    color: estSelectionne ? AppColors.violet : AppColors.gray200,
-                    width: estSelectionne ? 1.5 : 1,
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      width: 28,
-                      height: 28,
-                      decoration: BoxDecoration(color: couleur, shape: BoxShape.circle),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      methode.label,
-                      style: AppTypography.bodySmall.copyWith(
-                        color: estSelectionne ? AppColors.violet : AppColors.gray600,
-                        fontWeight: estSelectionne ? FontWeight.w600 : FontWeight.w400,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-            ),
+      children: [
+        for (var i = 0; i < methodes.length; i++) ...[
+          if (i > 0) const SizedBox(width: AppSpacing.sm),
+          Expanded(child: _buildOption(methodes[i])),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildOption(PaymentMethod methode) {
+    final estSelectionne = methode == selected;
+    return GestureDetector(
+      onTap: () => onChanged(methode),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+        decoration: BoxDecoration(
+          color: estSelectionne ? AppColors.violetSurface : AppColors.surface,
+          borderRadius: AppRadius.mdRadius,
+          border: Border.all(
+            color: estSelectionne ? AppColors.violet : AppColors.gray200,
+            width: estSelectionne ? 1.5 : 1,
           ),
-        );
-      }).toList(),
+        ),
+        child: Column(
+          children: [
+            _buildIcone(methode),
+            const SizedBox(height: 6),
+            Text(
+              methode.label,
+              style: AppTypography.bodySmall.copyWith(
+                color: estSelectionne ? AppColors.violet : AppColors.gray600,
+                fontWeight: estSelectionne ? FontWeight.w600 : FontWeight.w400,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildIcone(PaymentMethod methode) {
+    if (methode == PaymentMethod.especes) {
+      return const Icon(Icons.payments_outlined, size: 28, color: AppColors.gray700);
+    }
+    final couleur = methode == PaymentMethod.orangeMoney
+        ? const Color(0xFFFF6600)
+        : const Color(0xFFFFCC00);
+    return Container(
+      width: 28,
+      height: 28,
+      decoration: BoxDecoration(color: couleur, shape: BoxShape.circle),
     );
   }
 }
@@ -253,14 +268,14 @@ class _CheckoutSuccessView extends ConsumerWidget {
               const SuccessIllustration(size: 140),
               const SizedBox(height: AppSpacing.xl),
               Text(
-                'Paiement confirmé !',
+                'Commande confirmée !',
                 style: AppTypography.displayMedium,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
-                'Votre achat de "${produit.titre}" a été sécurisé. '
-                'Notre équipe a été notifiée et votre produit sera bientôt en livraison.',
+                'Votre achat de "${produit.titre}" est enregistré. '
+                'Notre équipe s\'occupe de la livraison — vous payez à la réception.',
                 style: AppTypography.bodyLarge,
                 textAlign: TextAlign.center,
               ),

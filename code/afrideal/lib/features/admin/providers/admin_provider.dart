@@ -7,12 +7,14 @@ import '../../../domain/entities/commande.dart';
 import '../../../domain/entities/demande_vendeur.dart';
 import '../../../domain/entities/litige.dart';
 import '../../../domain/entities/mission.dart';
+import '../../../domain/entities/paiement.dart';
 import '../../../domain/entities/produit.dart';
 import '../../../domain/entities/proprietaire.dart';
 import '../../../domain/entities/utilisateur.dart';
 import '../../../domain/enums/dispute_status.dart';
 import '../../../domain/enums/mission_status.dart';
 import '../../../domain/enums/order_status.dart';
+import '../../../domain/enums/payment_status.dart';
 import '../../../domain/enums/product_status.dart';
 import '../../../domain/enums/seller_request_status.dart';
 import '../../../domain/enums/user_role.dart';
@@ -236,9 +238,31 @@ class AdminOrderNotifier extends Notifier<void> {
   @override
   void build() {}
 
+  /// Change le statut d'une commande. Lorsque la commande passe à
+  /// "livrée", c'est précisément à ce moment que le paiement est
+  /// collecté (espèces ou Mobile Money remis à la personne qui
+  /// livre) — on enregistre donc le [Paiement] ici, jamais avant.
   Future<void> changerStatut(String commandeId, OrderStatus statut) async {
-    final repo = ref.read(orderRepositoryProvider);
-    await repo.updateStatut(commandeId, statut);
+    final orderRepo = ref.read(orderRepositoryProvider);
+
+    if (statut == OrderStatus.livree) {
+      final commande = await orderRepo.getById(commandeId);
+      if (commande != null) {
+        final paymentRepo = ref.read(paymentRepositoryProvider);
+        await paymentRepo.save(Paiement(
+          id: _uuid.v4(),
+          montant: commande.montantTotal,
+          methode: commande.methodePaiement,
+          reference: 'PAY-${_uuid.v4().substring(0, 8).toUpperCase()}',
+          statut: PaymentStatus.valide,
+          dateHeure: DateTime.now(),
+          numeroPaieur: commande.numeroPaieur ?? '',
+          commandeId: commandeId,
+        ));
+      }
+    }
+
+    await orderRepo.updateStatut(commandeId, statut);
     ref.invalidate(allOrdersAdminProvider);
   }
 }

@@ -35,12 +35,22 @@ enum PaymentStatus {
   }
 }
 
-/// Méthodes de paiement disponibles, conformes au cahier des charges
-/// (Mobile Money uniquement pour le marché camerounais).
+/// Méthodes de paiement disponibles. Le paiement se fait toujours à
+/// la livraison — espèces ou Mobile Money remis à la personne qui
+/// livre, jamais en ligne au moment de la commande.
 enum PaymentMethod {
+  especes,
   orangeMoney,
   mtnMomo;
 
-  String get label =>
-      this == PaymentMethod.orangeMoney ? 'Orange Money' : 'MTN Mobile Money';
+  String get label {
+    switch (this) {
+      case PaymentMethod.especes:
+        return 'Espèces';
+      case PaymentMethod.orangeMoney:
+        return 'Orange Money';
+      case PaymentMethod.mtnMomo:
+        return 'MTN Mobile Money';
+    }
+  }
 }

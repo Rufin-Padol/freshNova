@@ -1,5 +1,6 @@
 import '../../domain/entities/commande.dart';
 import '../../domain/enums/order_status.dart';
+import '../../domain/enums/payment_status.dart';
 
 class CommandeModel {
   final String id;
@@ -9,6 +10,8 @@ class CommandeModel {
   final String dateCommande;
   final String modeLivraison;
   final String adresseLivraison;
+  final String methodePaiement;
+  final String? numeroPaieur;
   final String acheteurId;
   final String produitId;
   final String? missionLivraisonId;
@@ -21,8 +24,10 @@ class CommandeModel {
     required this.dateCommande,
     required this.modeLivraison,
     required this.adresseLivraison,
+    required this.methodePaiement,
     required this.acheteurId,
     required this.produitId,
+    this.numeroPaieur,
     this.missionLivraisonId,
   });
 
@@ -35,6 +40,8 @@ class CommandeModel {
       dateCommande: e.dateCommande.toIso8601String(),
       modeLivraison: e.modeLivraison.name,
       adresseLivraison: e.adresseLivraison,
+      methodePaiement: e.methodePaiement.name,
+      numeroPaieur: e.numeroPaieur,
       acheteurId: e.acheteurId,
       produitId: e.produitId,
       missionLivraisonId: e.missionLivraisonId,
@@ -50,6 +57,8 @@ class CommandeModel {
       dateCommande: DateTime.parse(dateCommande),
       modeLivraison: DeliveryMode.values.firstWhere((m) => m.name == modeLivraison),
       adresseLivraison: adresseLivraison,
+      methodePaiement: PaymentMethod.values.firstWhere((m) => m.name == methodePaiement),
+      numeroPaieur: numeroPaieur,
       acheteurId: acheteurId,
       produitId: produitId,
       missionLivraisonId: missionLivraisonId,
@@ -64,6 +73,8 @@ class CommandeModel {
         'dateCommande': dateCommande,
         'modeLivraison': modeLivraison,
         'adresseLivraison': adresseLivraison,
+        'methodePaiement': methodePaiement,
+        'numeroPaieur': numeroPaieur,
         'acheteurId': acheteurId,
         'produitId': produitId,
         'missionLivraisonId': missionLivraisonId,
@@ -78,6 +89,10 @@ class CommandeModel {
       dateCommande: json['dateCommande'] as String,
       modeLivraison: json['modeLivraison'] as String,
       adresseLivraison: json['adresseLivraison'] as String,
+      // Repli sur "espèces" pour les commandes créées avant l'ajout du
+      // paiement à la livraison, qui n'ont pas ce champ en local.
+      methodePaiement: json['methodePaiement'] as String? ?? PaymentMethod.especes.name,
+      numeroPaieur: json['numeroPaieur'] as String?,
       acheteurId: json['acheteurId'] as String,
       produitId: json['produitId'] as String,
       missionLivraisonId: json['missionLivraisonId'] as String?,

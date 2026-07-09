@@ -1,7 +1,13 @@
 import 'package:equatable/equatable.dart';
 import '../enums/order_status.dart';
+import '../enums/payment_status.dart';
 
 /// Entité métier Commande, conforme au diagramme UML.
+///
+/// Le paiement se fait à la livraison (espèces ou Mobile Money) : la
+/// commande retient donc la méthode choisie par l'acheteur pour que
+/// la personne qui livre sache quoi collecter, mais aucun [Paiement]
+/// n'est créé avant la livraison effective (voir AdminOrderNotifier).
 class Commande extends Equatable {
   final String id;
   final String reference;
@@ -10,6 +16,8 @@ class Commande extends Equatable {
   final DateTime dateCommande;
   final DeliveryMode modeLivraison;
   final String adresseLivraison;
+  final PaymentMethod methodePaiement;
+  final String? numeroPaieur;
 
   final String acheteurId;
   final String produitId;
@@ -26,8 +34,10 @@ class Commande extends Equatable {
     required this.dateCommande,
     required this.modeLivraison,
     required this.adresseLivraison,
+    required this.methodePaiement,
     required this.acheteurId,
     required this.produitId,
+    this.numeroPaieur,
     this.missionLivraisonId,
   });
 
@@ -39,6 +49,8 @@ class Commande extends Equatable {
     DateTime? dateCommande,
     DeliveryMode? modeLivraison,
     String? adresseLivraison,
+    PaymentMethod? methodePaiement,
+    String? numeroPaieur,
     String? acheteurId,
     String? produitId,
     String? missionLivraisonId,
@@ -51,6 +63,8 @@ class Commande extends Equatable {
       dateCommande: dateCommande ?? this.dateCommande,
       modeLivraison: modeLivraison ?? this.modeLivraison,
       adresseLivraison: adresseLivraison ?? this.adresseLivraison,
+      methodePaiement: methodePaiement ?? this.methodePaiement,
+      numeroPaieur: numeroPaieur ?? this.numeroPaieur,
       acheteurId: acheteurId ?? this.acheteurId,
       produitId: produitId ?? this.produitId,
       missionLivraisonId: missionLivraisonId ?? this.missionLivraisonId,
@@ -73,6 +87,8 @@ class Commande extends Equatable {
         dateCommande,
         modeLivraison,
         adresseLivraison,
+        methodePaiement,
+        numeroPaieur,
         acheteurId,
         produitId,
         missionLivraisonId,

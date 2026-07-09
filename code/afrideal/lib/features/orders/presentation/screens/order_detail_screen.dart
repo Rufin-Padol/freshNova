@@ -13,7 +13,10 @@ import '../../../shop/providers/product_list_provider.dart';
 import '../../providers/order_list_provider.dart';
 
 /// Suivi détaillé d'une commande, avec barre de progression visuelle
-/// de l'avancement (Payée → En livraison → Livrée).
+/// de l'avancement (Confirmée → En livraison → Livrée). Le paiement
+/// (espèces ou Mobile Money) n'a lieu qu'à la livraison — jamais
+/// avant, d'où le libellé "à régler à la livraison" tant que la
+/// commande n'est pas encore livrée.
 class OrderDetailScreen extends ConsumerWidget {
   final String orderId;
 
@@ -53,7 +56,7 @@ class OrderDetailScreen extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.xxl),
                 if (commande.statut != OrderStatus.annulee)
                   ProgressSteps(
-                    steps: const ['Payée', 'Livraison', 'Livrée'],
+                    steps: const ['Confirmée', 'Livraison', 'Livrée'],
                     currentIndex: etapeIndex,
                   ),
                 const SizedBox(height: AppSpacing.xxl),
@@ -78,8 +81,16 @@ class OrderDetailScreen extends ConsumerWidget {
                       const SizedBox(height: AppSpacing.md),
                       InfoRow(
                         icon: Icons.payments_outlined,
-                        label: 'Montant payé',
+                        label: commande.statut == OrderStatus.livree
+                            ? 'Montant payé'
+                            : 'Montant à régler à la livraison',
                         value: Formatters.currency(commande.montantTotal),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      InfoRow(
+                        icon: Icons.account_balance_wallet_outlined,
+                        label: 'Mode de paiement',
+                        value: commande.methodePaiement.label,
                       ),
                       const SizedBox(height: AppSpacing.md),
                       InfoRow(
