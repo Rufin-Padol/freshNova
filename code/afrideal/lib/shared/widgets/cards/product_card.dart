@@ -90,6 +90,34 @@ class ProductCard extends StatelessWidget {
                       ),
                     ),
                   ),
+                if (estDansPanier)
+                  Positioned(
+                    top: AppSpacing.sm,
+                    left: AppSpacing.sm,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: AppColors.violet,
+                        borderRadius: AppRadius.fullRadius,
+                        boxShadow: AppShadows.card,
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.check_rounded, size: 13, color: AppColors.white),
+                          SizedBox(width: 3),
+                          Text(
+                            'Au panier',
+                            style: TextStyle(
+                              color: AppColors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
               ],
             ),
             Padding(
