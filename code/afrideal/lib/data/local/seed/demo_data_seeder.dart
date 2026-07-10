@@ -232,7 +232,7 @@ class DemoDataSeeder {
         tauxCommission: 12,
         photos: [
           photoOfficielle('photo-iphone12-1',
-              'https://images.unsplash.com/photo-1611472173362-3f53dbd65d80'),
+              'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/IPhone_13.jpg/500px-IPhone_13.jpg'),
         ],
       ),
 
@@ -254,7 +254,7 @@ class DemoDataSeeder {
         tauxCommission: 10,
         photos: [
           photoOfficielle('photo-chaise-1',
-              'https://images.unsplash.com/photo-1503602642458-232111445657'),
+              'https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Aalto_chair_front.JPG/500px-Aalto_chair_front.JPG'),
         ],
       ),
 
@@ -279,7 +279,7 @@ class DemoDataSeeder {
         quantiteDisponible: 3,
         photos: [
           photoOfficielle('photo-casque-1',
-              'https://images.unsplash.com/photo-1505740420928-5e560c06d30e'),
+              'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Bose_NC_700.jpg/330px-Bose_NC_700.jpg'),
         ],
       ),
 
@@ -346,7 +346,7 @@ class DemoDataSeeder {
         tauxCommission: 10,
         photos: [
           photoOfficielle('photo-velo-1',
-              'https://images.unsplash.com/photo-1485965120184-e220f721d03e'),
+              'https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Mountain_bike.JPG/330px-Mountain_bike.JPG'),
         ],
       ),
 
@@ -366,7 +366,7 @@ class DemoDataSeeder {
         tauxCommission: 12,
         photos: [
           photoOfficielle('photo-jbl-1',
-              'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1'),
+              'https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/JBL_Flip_3_bluetooth_speaker_%28DSCF2653%29.jpg/330px-JBL_Flip_3_bluetooth_speaker_%28DSCF2653%29.jpg'),
         ],
       ),
     ];
