@@ -67,10 +67,16 @@ flutter:
 
   # Logos officiels des moyens de paiement Mobile Money (Orange Money,
   # MTN MoMo), affichés tels quels sur l'écran de paiement pour que
-  # l'acheteur identifie immédiatement les options disponibles — seuls
-  # fichiers d'assets utilisés dans l'app pour l'instant, tout le
-  # reste des illustrations étant des widgets Dart (voir
+  # l'acheteur identifie immédiatement les options disponibles. Le
+  # reste des illustrations est fait de widgets Dart (voir
   # shared/widgets/illustrations). Toujours pas de "fonts:"
   # (assets/fonts/ vide).
+  #
+  # assets/seed/ : photos de démonstration pour les demandes vendeur
+  # seedées au premier lancement (encodées en data URL par
+  # DemoDataSeeder au moment du seed, jamais chargées telles quelles
+  # par l'UI) — sans elles, le profil de démo affichait des annonces
+  # sans aucune photo.
   assets:
     - assets/icons/payment/
+    - assets/seed/

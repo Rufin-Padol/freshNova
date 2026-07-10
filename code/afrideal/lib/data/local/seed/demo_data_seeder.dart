@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:flutter/services.dart' show rootBundle;
+
 import '../../../domain/entities/categorie.dart';
 import '../../../domain/entities/commande.dart';
 import '../../../domain/entities/conversation.dart';
@@ -432,10 +436,27 @@ class DemoDataSeeder {
   // Demande vendeur en attente + mission de collecte assignée
   // (pour démontrer le parcours Agent terrain dès le premier lancement)
   // ──────────────────────────────────────────────────────────────
+  /// Charge une image d'assets/seed/ et la convertit en data URL —
+  /// même format que les photos ajoutées par un vrai vendeur (voir
+  /// SellStep1Screen), pour que l'affichage soit strictement identique.
+  static Future<String> _photoDataUrl(String assetPath) async {
+    final bytes = await rootBundle.load(assetPath);
+    return 'data:image/jpeg;base64,${base64Encode(bytes.buffer.asUint8List())}';
+  }
+
   static Future<void> _seedSellerRequestAndMission() async {
     final requestRepo = LocalSellerRequestRepository();
     final missionRepo = LocalMissionRepository();
     final maintenant = DateTime.now();
+
+    final photosTv = [
+      await _photoDataUrl('assets/seed/demo_req_1_tv.jpg'),
+      await _photoDataUrl('assets/seed/demo_req_1_tv_2.jpg'),
+    ];
+    final photosMoto = [
+      await _photoDataUrl('assets/seed/demo_req_2_moto.jpg'),
+      await _photoDataUrl('assets/seed/demo_req_2_moto_2.jpg'),
+    ];
 
     await requestRepo.save(DemandeVendeur(
       id: 'demo-req-1',
@@ -452,6 +473,7 @@ class DemoDataSeeder {
       descriptionInitiale: 'Téléviseur d\'occasion en bon état, peu utilisé.',
       prixSouhaite: 95000,
       missionId: 'demo-mission-1',
+      photos: photosTv,
     ));
 
     await requestRepo.save(DemandeVendeur(
@@ -466,6 +488,7 @@ class DemoDataSeeder {
       typeProduitSouhaite: 'Moto Boxer 100 occasion',
       categorieId: DemoIds.catVehicules,
       quantite: 1,
+      photos: photosMoto,
       descriptionInitiale:
           'Moto d\'occasion, moteur révisé récemment, quelques rayures sur le réservoir.',
       prixSouhaite: 350000,

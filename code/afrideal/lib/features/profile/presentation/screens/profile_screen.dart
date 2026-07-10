@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -21,6 +24,8 @@ import '../../../../shared/widgets/feedback/app_snackbar.dart';
 import '../../../../shared/widgets/inputs/app_text_field.dart';
 import '../../../auth/providers/session_provider.dart';
 import '../../../sell/providers/sell_provider.dart';
+
+Uint8List _decodeDataUrl(String dataUrl) => base64Decode(dataUrl.split(',').last);
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -66,7 +71,6 @@ class ProfileScreen extends ConsumerWidget {
           ),
           _InfoTile(Icons.phone_outlined, 'Téléphone', utilisateur.telephone),
           _InfoTile(Icons.location_city_outlined, 'Ville', utilisateur.ville ?? 'Non renseignée'),
-          _InfoTile(Icons.badge_outlined, 'Rôle', utilisateur.role.label),
           if (utilisateur.noteVendeur != null)
             _InfoTile(Icons.star_outline_rounded, 'Note vendeur',
                 '${utilisateur.noteVendeur!.toStringAsFixed(1)} / 5.0'),
@@ -310,31 +314,59 @@ class _AnnonceTile extends StatelessWidget {
           borderRadius: AppRadius.lgRadius,
           border: Border.all(color: AppColors.gray200),
         ),
-        child: Column(
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    demande.typeProduitSouhaite,
-                    style: AppTypography.titleMedium,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+            if (demande.photos.isNotEmpty) ...[
+              ClipRRect(
+                borderRadius: AppRadius.smRadius,
+                child: Image.memory(
+                  _decodeDataUrl(demande.photos.first),
+                  height: 64,
+                  width: 64,
+                  fit: BoxFit.cover,
                 ),
-                StatusBadge(label: demande.statut.label, color: demande.statut.color),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            Text(
-              '${Formatters.currency(demande.prixSouhaite)} souhaité · '
-              '${Formatters.shortDate(demande.dateCreation)}',
-              style: AppTypography.bodySmall,
-            ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+            ],
+            Expanded(child: _AnnonceDetails(demande: demande)),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _AnnonceDetails extends StatelessWidget {
+  final DemandeVendeur demande;
+
+  const _AnnonceDetails({required this.demande});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                demande.typeProduitSouhaite,
+                style: AppTypography.titleMedium,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            StatusBadge(label: demande.statut.label, color: demande.statut.color),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        Text(
+          '${Formatters.currency(demande.prixSouhaite)} souhaité · '
+          '${Formatters.shortDate(demande.dateCreation)}',
+          style: AppTypography.bodySmall,
+        ),
+      ],
     );
   }
 }
