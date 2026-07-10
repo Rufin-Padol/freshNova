@@ -22,9 +22,9 @@ class AppSearchField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.gray50,
-        borderRadius: AppRadius.mdRadius,
-        border: Border.all(color: AppColors.gray200),
+        color: AppColors.surface,
+        borderRadius: AppRadius.fullRadius,
+        boxShadow: AppShadows.card,
       ),
       child: Row(
         children: [

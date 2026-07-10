@@ -36,6 +36,12 @@ class ShopScreen extends ConsumerWidget {
     final favoris = ref.watch(favoritesProvider).valueOrNull ?? [];
     final panier = ref.watch(cartProvider).valueOrNull ?? [];
 
+    void demanderConnexion() {
+      context.push(
+        '${AppRoutes.demoAccounts}?from=${Uri.encodeComponent(AppRoutes.shop)}',
+      );
+    }
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -76,53 +82,39 @@ class ShopScreen extends ConsumerWidget {
                           else
                             Row(
                               children: [
-                                Stack(
-                                  clipBehavior: Clip.none,
-                                  children: [
-                                    IconButton(
-                                      onPressed: () => context.push(AppRoutes.cart),
-                                      icon: const Icon(Icons.shopping_cart_outlined),
-                                    ),
-                                    if (panier.isNotEmpty)
-                                      Positioned(
-                                        right: 6,
-                                        top: 6,
-                                        child: Container(
-                                          padding: const EdgeInsets.all(4),
-                                          decoration: const BoxDecoration(
-                                            color: AppColors.violet,
-                                            shape: BoxShape.circle,
-                                          ),
-                                          constraints: const BoxConstraints(
-                                            minWidth: 16,
-                                            minHeight: 16,
-                                          ),
-                                          child: Text(
-                                            '${panier.length}',
-                                            textAlign: TextAlign.center,
-                                            style: const TextStyle(
-                                              color: AppColors.white,
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                  ],
+                                _TopIconButton(
+                                  icon: Icons.shopping_cart_outlined,
+                                  badgeCount: panier.length,
+                                  onTap: () => context.push(AppRoutes.cart),
                                 ),
-                                IconButton(
-                                  onPressed: () => context.push(AppRoutes.notifications),
-                                  icon: const Icon(Icons.notifications_outlined),
+                                const SizedBox(width: AppSpacing.sm),
+                                _TopIconButton(
+                                  icon: Icons.notifications_outlined,
+                                  onTap: () => context.push(AppRoutes.notifications),
                                 ),
                               ],
                             ),
                         ],
                       ),
-                      const SizedBox(height: AppSpacing.lg),
-                      AppSearchField(
-                        onChanged: (texte) =>
-                            ref.read(shopFiltersProvider.notifier).setRecherche(texte),
+                      const SizedBox(height: AppSpacing.xl),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: AppSearchField(
+                              onChanged: (texte) =>
+                                  ref.read(shopFiltersProvider.notifier).setRecherche(texte),
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.sm),
+                          _FilterButton(
+                            tri: filtres.tri,
+                            onSelect: (tri) =>
+                                ref.read(shopFiltersProvider.notifier).setTri(tri),
+                          ),
+                        ],
                       ),
+                      const SizedBox(height: AppSpacing.xl),
+                      const _PromoBanner(),
                       const SizedBox(height: AppSpacing.xl),
                       categoriesAsync.when(
                         loading: () => const SizedBox(
@@ -177,7 +169,7 @@ class ShopScreen extends ConsumerWidget {
                         crossAxisCount: 2,
                         crossAxisSpacing: AppSpacing.md,
                         mainAxisSpacing: AppSpacing.md,
-                        childAspectRatio: 0.68,
+                        childAspectRatio: 0.56,
                       ),
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
@@ -189,9 +181,7 @@ class ShopScreen extends ConsumerWidget {
                             estFavori: favoris.contains(produit.id),
                             onFavoriteTap: () {
                               if (utilisateur == null) {
-                                context.push(
-                                  '${AppRoutes.demoAccounts}?from=${Uri.encodeComponent(AppRoutes.shop)}',
-                                );
+                                demanderConnexion();
                                 return;
                               }
                               ref.read(favoritesProvider.notifier).toggle(produit.id);
@@ -199,9 +189,7 @@ class ShopScreen extends ConsumerWidget {
                             estDansPanier: panier.contains(produit.id),
                             onCartTap: () async {
                               if (utilisateur == null) {
-                                context.push(
-                                  '${AppRoutes.demoAccounts}?from=${Uri.encodeComponent(AppRoutes.shop)}',
-                                );
+                                demanderConnexion();
                                 return;
                               }
                               final ajoute = !panier.contains(produit.id);
@@ -228,6 +216,266 @@ class ShopScreen extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Bouton d'action du bandeau supérieur (panier, notifications) —
+/// carré arrondi avec ombre douce, badge de compteur optionnel.
+class _TopIconButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+  final int badgeCount;
+
+  const _TopIconButton({required this.icon, required this.onTap, this.badgeCount = 0});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: AppRadius.mdRadius,
+              boxShadow: AppShadows.card,
+            ),
+            child: Icon(icon, color: AppColors.gray700, size: 22),
+          ),
+          if (badgeCount > 0)
+            Positioned(
+              right: -4,
+              top: -4,
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: const BoxDecoration(color: AppColors.violet, shape: BoxShape.circle),
+                constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+                child: Text(
+                  '$badgeCount',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: AppColors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Bouton de tri, à côté de la barre de recherche. Ouvre une feuille
+/// de choix plutôt qu'un vrai système de filtres multi-critères : la
+/// boutique n'a qu'un seul axe de tri pertinent pour l'instant (le
+/// prix), pas de note ni de disponibilité par article puisque chaque
+/// annonce est un bien unique.
+class _FilterButton extends StatelessWidget {
+  final ShopTri tri;
+  final void Function(ShopTri) onSelect;
+
+  const _FilterButton({required this.tri, required this.onSelect});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _ouvrirTri(context),
+      child: Container(
+        width: 48,
+        height: 48,
+        decoration: BoxDecoration(
+          color: tri == ShopTri.recent ? AppColors.surface : AppColors.violet,
+          borderRadius: AppRadius.mdRadius,
+          boxShadow: AppShadows.card,
+        ),
+        child: Icon(
+          Icons.tune_rounded,
+          color: tri == ShopTri.recent ? AppColors.gray700 : AppColors.white,
+          size: 22,
+        ),
+      ),
+    );
+  }
+
+  void _ouvrirTri(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: AppRadius.xlRadius.topLeft),
+      ),
+      builder: (sheetContext) => Padding(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Trier par', style: AppTypography.titleLarge),
+            const SizedBox(height: AppSpacing.md),
+            _OptionTri(
+              label: 'Plus récents',
+              selected: tri == ShopTri.recent,
+              onTap: () => _choisir(sheetContext, ShopTri.recent),
+            ),
+            _OptionTri(
+              label: 'Prix croissant',
+              selected: tri == ShopTri.prixCroissant,
+              onTap: () => _choisir(sheetContext, ShopTri.prixCroissant),
+            ),
+            _OptionTri(
+              label: 'Prix décroissant',
+              selected: tri == ShopTri.prixDecroissant,
+              onTap: () => _choisir(sheetContext, ShopTri.prixDecroissant),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _choisir(BuildContext sheetContext, ShopTri choix) {
+    onSelect(choix);
+    Navigator.of(sheetContext).pop();
+  }
+}
+
+class _OptionTri extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _OptionTri({required this.label, required this.selected, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      title: Text(label, style: AppTypography.bodyLarge),
+      trailing: selected ? const Icon(Icons.check_rounded, color: AppColors.violet) : null,
+      onTap: onTap,
+    );
+  }
+}
+
+/// Bandeau promotionnel défilant, en haut de la boutique. Met en
+/// avant nos vrais atouts (vérification par agent, paiement à la
+/// livraison, couverture nationale) plutôt que des promotions
+/// fictives — TrustNova ne fixe pas les prix des annonces, il n'y a
+/// donc pas de "réduction" à afficher de façon honnête.
+class _PromoBanner extends StatefulWidget {
+  const _PromoBanner();
+
+  @override
+  State<_PromoBanner> createState() => _PromoBannerState();
+}
+
+class _PromoBannerState extends State<_PromoBanner> {
+  static const _slides = [
+    (
+      icone: Icons.shield_rounded,
+      titre: 'Achetez en toute confiance',
+      sousTitre: 'Chaque produit est vérifié par un agent TrustNova avant la vente.',
+    ),
+    (
+      icone: Icons.payments_rounded,
+      titre: 'Payez à la livraison',
+      sousTitre: 'Espèces, Orange Money ou MTN Mobile Money — réglez à la réception.',
+    ),
+    (
+      icone: Icons.map_rounded,
+      titre: 'Partout au Cameroun',
+      sousTitre: 'Douala, Yaoundé et au-delà : nous livrons où que vous soyez.',
+    ),
+  ];
+
+  final _controller = PageController();
+  int _page = 0;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(
+          height: 128,
+          child: PageView.builder(
+            controller: _controller,
+            itemCount: _slides.length,
+            onPageChanged: (index) => setState(() => _page = index),
+            itemBuilder: (context, index) {
+              final slide = _slides[index];
+              return Container(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                decoration: BoxDecoration(
+                  gradient: AppColors.primaryGradient,
+                  borderRadius: AppRadius.lgRadius,
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: AppColors.white.withValues(alpha: 0.18),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(slide.icone, color: AppColors.white, size: 24),
+                    ),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            slide.titre,
+                            style: AppTypography.titleLarge.copyWith(color: AppColors.white),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            slide.sousTitre,
+                            style: AppTypography.bodyMedium.copyWith(
+                              color: AppColors.white.withValues(alpha: 0.85),
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(_slides.length, (index) {
+            final estActif = index == _page;
+            return AnimatedContainer(
+              duration: AppDurations.fast,
+              margin: const EdgeInsets.symmetric(horizontal: 3),
+              width: estActif ? 18 : 6,
+              height: 6,
+              decoration: BoxDecoration(
+                color: estActif ? AppColors.violet : AppColors.gray300,
+                borderRadius: AppRadius.fullRadius,
+              ),
+            );
+          }),
+        ),
+      ],
     );
   }
 }

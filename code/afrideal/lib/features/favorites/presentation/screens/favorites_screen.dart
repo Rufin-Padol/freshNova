@@ -79,7 +79,7 @@ class _FavoritesGrid extends ConsumerWidget {
             crossAxisCount: 2,
             crossAxisSpacing: AppSpacing.md,
             mainAxisSpacing: AppSpacing.md,
-            childAspectRatio: 0.68,
+            childAspectRatio: 0.56,
           ),
           itemCount: produits.length,
           itemBuilder: (context, index) {

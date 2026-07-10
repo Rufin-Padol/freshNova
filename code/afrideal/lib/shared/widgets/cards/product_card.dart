@@ -12,7 +12,9 @@ import '../illustrations/empty_image_illustration.dart';
 /// la décision d'achat sont visibles (photo, titre, prix). Ni la
 /// localisation ni le vendeur ne sont affichés — TrustNova est
 /// l'unique interlocuteur visible de l'acheteur, sur la carte comme
-/// sur la fiche produit.
+/// sur la fiche produit. Pas de note ni de "stock restant" : chaque
+/// annonce est un bien de seconde main unique, pas un article en
+/// stock avec avis clients.
 class ProductCard extends StatelessWidget {
   final String titre;
   final double prix;
@@ -44,7 +46,7 @@ class ProductCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: AppRadius.lgRadius,
-          border: Border.all(color: AppColors.gray200),
+          boxShadow: AppShadows.card,
         ),
         clipBehavior: Clip.antiAlias,
         child: Column(
@@ -53,7 +55,7 @@ class ProductCard extends StatelessWidget {
             Stack(
               children: [
                 AspectRatio(
-                  aspectRatio: 1.1,
+                  aspectRatio: 1.15,
                   child: photoUrl != null && photoUrl!.isNotEmpty
                       ? Image.network(
                           photoUrl!,
@@ -70,9 +72,10 @@ class ProductCard extends StatelessWidget {
                       onTap: onFavoriteTap,
                       child: Container(
                         padding: const EdgeInsets.all(6),
-                        decoration: const BoxDecoration(
+                        decoration: BoxDecoration(
                           color: AppColors.white,
                           shape: BoxShape.circle,
+                          boxShadow: AppShadows.card,
                         ),
                         child: Icon(
                           estFavori ? Icons.favorite_rounded : Icons.favorite_border_rounded,
@@ -82,32 +85,12 @@ class ProductCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                if (onCartTap != null)
-                  Positioned(
-                    bottom: AppSpacing.sm,
-                    right: AppSpacing.sm,
-                    child: GestureDetector(
-                      onTap: onCartTap,
-                      child: Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: estDansPanier ? AppColors.violet : AppColors.white,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          estDansPanier
-                              ? Icons.shopping_cart_rounded
-                              : Icons.add_shopping_cart_outlined,
-                          size: 16,
-                          color: estDansPanier ? AppColors.white : AppColors.gray700,
-                        ),
-                      ),
-                    ),
-                  ),
               ],
             ),
             Padding(
-              padding: const EdgeInsets.all(AppSpacing.md),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.md, AppSpacing.md, AppSpacing.md, AppSpacing.sm,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -123,6 +106,56 @@ class ProductCard extends StatelessWidget {
                     style: AppTypography.titleMedium.copyWith(color: AppColors.violet),
                   ),
                 ],
+              ),
+            ),
+            if (onCartTap != null)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.md, 0, AppSpacing.md, AppSpacing.md,
+                ),
+                child: _AddToCartButton(
+                  dansLePanier: estDansPanier,
+                  onTap: onCartTap!,
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AddToCartButton extends StatelessWidget {
+  final bool dansLePanier;
+  final VoidCallback onTap;
+
+  const _AddToCartButton({required this.dansLePanier, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        height: 34,
+        decoration: BoxDecoration(
+          color: dansLePanier ? AppColors.violetSurface : AppColors.violet,
+          borderRadius: AppRadius.smRadius,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              dansLePanier ? Icons.check_rounded : Icons.add_shopping_cart_rounded,
+              size: 15,
+              color: dansLePanier ? AppColors.violet : AppColors.white,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              dansLePanier ? 'Dans le panier' : 'Ajouter au panier',
+              style: AppTypography.bodySmall.copyWith(
+                color: dansLePanier ? AppColors.violet : AppColors.white,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ],
