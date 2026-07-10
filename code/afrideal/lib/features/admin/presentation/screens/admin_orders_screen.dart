@@ -110,7 +110,7 @@ class _AdminOrderDetailSheet extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.lg),
           FutureBuilder<List<Produit>>(
-            future: Future.wait(commande.produitIds.map((id) => productRepo.getById(id)))
+            future: Future.wait(commande.lignes.keys.map((id) => productRepo.getById(id)))
                 .then((liste) => liste.whereType<Produit>().toList()),
             builder: (context, snapshot) {
               final produits = snapshot.data;
@@ -122,7 +122,12 @@ class _AdminOrderDetailSheet extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   for (final produit in produits)
-                    Text(produit.titre, style: AppTypography.titleMedium),
+                    Text(
+                      (commande.lignes[produit.id] ?? 1) > 1
+                          ? '${produit.titre} × ${commande.lignes[produit.id]}'
+                          : produit.titre,
+                      style: AppTypography.titleMedium,
+                    ),
                 ],
               );
             },

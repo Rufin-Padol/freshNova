@@ -13,7 +13,7 @@ class CommandeModel {
   final String methodePaiement;
   final String? numeroPaieur;
   final String acheteurId;
-  final List<String> produitIds;
+  final Map<String, int> lignes;
   final String? missionLivraisonId;
 
   const CommandeModel({
@@ -26,7 +26,7 @@ class CommandeModel {
     required this.adresseLivraison,
     required this.methodePaiement,
     required this.acheteurId,
-    required this.produitIds,
+    required this.lignes,
     this.numeroPaieur,
     this.missionLivraisonId,
   });
@@ -43,7 +43,7 @@ class CommandeModel {
       methodePaiement: e.methodePaiement.name,
       numeroPaieur: e.numeroPaieur,
       acheteurId: e.acheteurId,
-      produitIds: e.produitIds,
+      lignes: e.lignes,
       missionLivraisonId: e.missionLivraisonId,
     );
   }
@@ -60,7 +60,7 @@ class CommandeModel {
       methodePaiement: PaymentMethod.values.firstWhere((m) => m.name == methodePaiement),
       numeroPaieur: numeroPaieur,
       acheteurId: acheteurId,
-      produitIds: produitIds,
+      lignes: lignes,
       missionLivraisonId: missionLivraisonId,
     );
   }
@@ -76,7 +76,7 @@ class CommandeModel {
         'methodePaiement': methodePaiement,
         'numeroPaieur': numeroPaieur,
         'acheteurId': acheteurId,
-        'produitIds': produitIds,
+        'lignes': lignes,
         'missionLivraisonId': missionLivraisonId,
       };
 
@@ -94,11 +94,16 @@ class CommandeModel {
       methodePaiement: json['methodePaiement'] as String? ?? PaymentMethod.especes.name,
       numeroPaieur: json['numeroPaieur'] as String?,
       acheteurId: json['acheteurId'] as String,
-      // Repli sur l'ancien champ "produitId" (singulier) pour les
-      // commandes créées avant le passage au panier multi-articles.
-      produitIds: json['produitIds'] != null
-          ? List<String>.from(json['produitIds'] as List)
-          : [json['produitId'] as String],
+      // Reconstruit "lignes" à partir des anciens formats : d'abord
+      // "produitIds" (liste, quantité 1 chacun), sinon l'ancien champ
+      // "produitId" (singulier, avant le passage au panier).
+      lignes: json['lignes'] != null
+          ? Map<String, int>.from(
+              (json['lignes'] as Map).map((k, v) => MapEntry(k as String, (v as num).toInt())),
+            )
+          : json['produitIds'] != null
+              ? {for (final id in (json['produitIds'] as List).cast<String>()) id: 1}
+              : {json['produitId'] as String: 1},
       missionLivraisonId: json['missionLivraisonId'] as String?,
     );
   }

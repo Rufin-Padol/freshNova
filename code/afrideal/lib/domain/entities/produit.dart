@@ -25,6 +25,14 @@ class Produit extends Equatable {
   final List<Photo> photos;
   final String localisation;
 
+  /// Nombre d'unités identiques encore disponibles pour cette annonce
+  /// — un propriétaire peut avoir plusieurs exemplaires du même bien,
+  /// une annonce n'est donc pas toujours un article unique. Une
+  /// commande ne peut jamais porter sur plus que cette quantité, et
+  /// elle est décrémentée à chaque vente (voir
+  /// IProductRepository.decrementerQuantite).
+  final int quantiteDisponible;
+
   /// Défauts connus, affichés de façon transparente à l'acheteur,
   /// conformément à l'exigence du cahier des charges ("Affichage
   /// transparent des défauts connus" / mention "défaut inconnu").
@@ -62,6 +70,7 @@ class Produit extends Equatable {
     required this.vendeurId,
     required this.localisation,
     required this.tauxCommission,
+    this.quantiteDisponible = 1,
     this.agentId,
     this.photos = const [],
     this.defautsConnus,
@@ -98,6 +107,7 @@ class Produit extends Equatable {
     List<Photo>? photos,
     String? localisation,
     double? tauxCommission,
+    int? quantiteDisponible,
     String? defautsConnus,
     String? raisonException,
     String? dimensions,
@@ -118,6 +128,7 @@ class Produit extends Equatable {
       photos: photos ?? this.photos,
       localisation: localisation ?? this.localisation,
       tauxCommission: tauxCommission ?? this.tauxCommission,
+      quantiteDisponible: quantiteDisponible ?? this.quantiteDisponible,
       defautsConnus: defautsConnus ?? this.defautsConnus,
       raisonException: raisonException ?? this.raisonException,
       dimensions: dimensions ?? this.dimensions,
@@ -141,6 +152,7 @@ class Produit extends Equatable {
         photos,
         localisation,
         tauxCommission,
+        quantiteDisponible,
         defautsConnus,
         raisonException,
         dimensions,

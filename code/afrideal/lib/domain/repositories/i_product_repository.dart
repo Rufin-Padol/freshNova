@@ -16,5 +16,12 @@ abstract class IProductRepository {
 
   Future<void> save(Produit produit);
   Future<void> updateStatut(String produitId, ProductStatus nouveauStatut);
+
+  /// Retire [quantite] unités du stock disponible d'un produit après
+  /// une vente (jamais en dessous de zéro). Si le stock tombe à zéro,
+  /// le produit passe automatiquement au statut "Réservé" — il reste
+  /// possible d'en racheter d'autres unités tant qu'il en reste.
+  Future<void> decrementerQuantite(String produitId, int quantite);
+
   Future<void> delete(String id);
 }

@@ -15,6 +15,7 @@ class ProduitModel {
   final String? agentId;
   final List<PhotoModel> photos;
   final String localisation;
+  final int quantiteDisponible;
   final String? defautsConnus;
   final double tauxCommission;
   final String? raisonException;
@@ -34,6 +35,7 @@ class ProduitModel {
     required this.vendeurId,
     required this.localisation,
     required this.tauxCommission,
+    this.quantiteDisponible = 1,
     this.agentId,
     this.photos = const [],
     this.defautsConnus,
@@ -58,6 +60,7 @@ class ProduitModel {
       photos: e.photos.map(PhotoModel.fromEntity).toList(),
       localisation: e.localisation,
       tauxCommission: e.tauxCommission,
+      quantiteDisponible: e.quantiteDisponible,
       defautsConnus: e.defautsConnus,
       raisonException: e.raisonException,
       dimensions: e.dimensions,
@@ -81,6 +84,7 @@ class ProduitModel {
       photos: photos.map((p) => p.toEntity()).toList(),
       localisation: localisation,
       tauxCommission: tauxCommission,
+      quantiteDisponible: quantiteDisponible,
       defautsConnus: defautsConnus,
       raisonException: raisonException,
       dimensions: dimensions,
@@ -104,6 +108,7 @@ class ProduitModel {
         'localisation': localisation,
         'defautsConnus': defautsConnus,
         'tauxCommission': tauxCommission,
+        'quantiteDisponible': quantiteDisponible,
         'raisonException': raisonException,
         'dimensions': dimensions,
         'proprietaireId': proprietaireId,
@@ -128,6 +133,9 @@ class ProduitModel {
       localisation: json['localisation'] as String,
       defautsConnus: json['defautsConnus'] as String?,
       tauxCommission: (json['tauxCommission'] as num).toDouble(),
+      // Repli sur 1 pour les produits créés avant l'ajout de la
+      // quantité disponible.
+      quantiteDisponible: (json['quantiteDisponible'] as num?)?.toInt() ?? 1,
       raisonException: json['raisonException'] as String?,
       dimensions: json['dimensions'] as String?,
       proprietaireId: json['proprietaireId'] as String?,

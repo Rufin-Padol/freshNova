@@ -162,6 +162,10 @@ class AdminSellerRequestNotifier extends Notifier<void> {
       agentId: agentId,
       localisation: demande.zone,
       tauxCommission: tauxCommission,
+      // Reprend la quantité demandée par le vendeur à la soumission —
+      // un propriétaire peut soumettre plusieurs exemplaires
+      // identiques en une seule demande.
+      quantiteDisponible: demande.quantite,
       missionId: missionId,
       proprietaireId: proprietaireId,
     );

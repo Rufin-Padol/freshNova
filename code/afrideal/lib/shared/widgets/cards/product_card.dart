@@ -16,13 +16,15 @@ import '../illustrations/empty_image_illustration.dart';
 /// Affiche la localisation générale du produit (ville/quartier) —
 /// utile pour évaluer la faisabilité d'une livraison — mais jamais
 /// l'identité du vendeur : TrustNova reste l'unique interlocuteur
-/// visible de l'acheteur. Pas de note ni de "stock restant" non plus,
-/// chaque annonce étant un bien de seconde main unique.
+/// visible de l'acheteur. Affiche aussi la quantité disponible : un
+/// propriétaire peut avoir plusieurs exemplaires identiques d'un même
+/// bien, une annonce n'est donc pas toujours un article unique.
 class ProductCard extends StatelessWidget {
   final String titre;
   final double prix;
   final String? photoUrl;
   final String? localisation;
+  final int quantiteDisponible;
   final VoidCallback onTap;
   final VoidCallback? onFavoriteTap;
   final bool estFavori;
@@ -36,6 +38,7 @@ class ProductCard extends StatelessWidget {
     required this.onTap,
     this.photoUrl,
     this.localisation,
+    this.quantiteDisponible = 1,
     this.onFavoriteTap,
     this.estFavori = false,
     this.onCartTap,
@@ -136,6 +139,16 @@ class ProductCard extends StatelessWidget {
                     Formatters.currency(prix),
                     style: AppTypography.titleMedium.copyWith(color: AppColors.violet),
                   ),
+                  const SizedBox(height: 4),
+                  Text(
+                    quantiteDisponible > 0
+                        ? '$quantiteDisponible disponible${quantiteDisponible > 1 ? 's' : ''}'
+                        : 'Épuisé',
+                    style: AppTypography.caption.copyWith(
+                      color: quantiteDisponible > 0 ? AppColors.gray500 : AppColors.danger,
+                      fontWeight: quantiteDisponible > 0 ? FontWeight.w400 : FontWeight.w600,
+                    ),
+                  ),
                   if (localisation != null && localisation!.isNotEmpty) ...[
                     const SizedBox(height: 4),
                     Row(
@@ -153,7 +166,7 @@ class ProductCard extends StatelessWidget {
                       ],
                     ),
                   ],
-                  if (onCartTap != null) ...[
+                  if (onCartTap != null && (quantiteDisponible > 0 || estDansPanier)) ...[
                     const SizedBox(height: AppSpacing.md),
                     _AddToCartButton(dansLePanier: estDansPanier, onTap: onCartTap!),
                   ],

@@ -55,6 +55,7 @@ class _MissionCollecteFormState extends ConsumerState<MissionCollecteForm> {
   late final TextEditingController _dimensionsCtrl;
   late final TextEditingController _defautsCtrl;
   late final TextEditingController _prixCtrl;
+  late final TextEditingController _quantiteCtrl;
   final _preuveTexteCtrl = TextEditingController();
 
   Proprietaire? _proprietaire;
@@ -78,6 +79,7 @@ class _MissionCollecteFormState extends ConsumerState<MissionCollecteForm> {
     _dimensionsCtrl = TextEditingController();
     _defautsCtrl = TextEditingController();
     _prixCtrl = TextEditingController(text: p.prix.toStringAsFixed(0));
+    _quantiteCtrl = TextEditingController(text: '${p.quantiteDisponible}');
     _categorieId = p.categorieId;
   }
 
@@ -87,6 +89,7 @@ class _MissionCollecteFormState extends ConsumerState<MissionCollecteForm> {
     _dimensionsCtrl.dispose();
     _defautsCtrl.dispose();
     _prixCtrl.dispose();
+    _quantiteCtrl.dispose();
     _preuveTexteCtrl.dispose();
     super.dispose();
   }
@@ -179,6 +182,8 @@ class _MissionCollecteFormState extends ConsumerState<MissionCollecteForm> {
     if (_aucunDefaut == false && _defautsCtrl.text.trim().isEmpty) return false;
     final prix = double.tryParse(_prixCtrl.text.replaceAll(' ', ''));
     if (prix == null || prix <= 0) return false;
+    final quantite = int.tryParse(_quantiteCtrl.text.trim());
+    if (quantite == null || quantite <= 0) return false;
     return true;
   }
 
@@ -197,6 +202,7 @@ class _MissionCollecteFormState extends ConsumerState<MissionCollecteForm> {
     final preuveValeur =
         _preuveType == ProofType.image ? _preuveImageDataUrl! : _preuveTexteCtrl.text.trim();
     final prix = double.parse(_prixCtrl.text.replaceAll(' ', ''));
+    final quantite = int.parse(_quantiteCtrl.text.trim());
 
     await ref.read(agentMissionNotifierProvider.notifier).validerCollecteComplete(
           widget.mission,
@@ -210,6 +216,7 @@ class _MissionCollecteFormState extends ConsumerState<MissionCollecteForm> {
           etat: _etat!,
           defautsConnus: _aucunDefaut == true ? null : _defautsCtrl.text.trim(),
           prixConfirme: prix,
+          quantiteConfirmee: quantite,
         );
 
     if (mounted) {
@@ -434,6 +441,13 @@ class _MissionCollecteFormState extends ConsumerState<MissionCollecteForm> {
         AppTextField(
           label: 'Prix confirmé (FCFA)',
           controller: _prixCtrl,
+          keyboardType: TextInputType.number,
+        ),
+        const SizedBox(height: AppSpacing.md),
+        AppTextField(
+          label: 'Quantité disponible',
+          hint: 'Nombre d\'exemplaires identiques chez le propriétaire',
+          controller: _quantiteCtrl,
           keyboardType: TextInputType.number,
         ),
         const SizedBox(height: AppSpacing.xl),

@@ -69,6 +69,17 @@ class LocalProductRepository implements IProductRepository {
   }
 
   @override
+  Future<void> decrementerQuantite(String produitId, int quantite) async {
+    final existant = await getById(produitId);
+    if (existant == null) return;
+    final restant = (existant.quantiteDisponible - quantite).clamp(0, existant.quantiteDisponible);
+    await save(existant.copyWith(
+      quantiteDisponible: restant,
+      statut: restant <= 0 ? ProductStatus.reserve : existant.statut,
+    ));
+  }
+
+  @override
   Future<void> delete(String id) async {
     await _store.delete(id);
   }

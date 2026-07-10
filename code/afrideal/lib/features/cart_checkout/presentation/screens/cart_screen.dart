@@ -14,15 +14,14 @@ import '../../../../shared/widgets/feedback/app_loading_indicator.dart';
 import '../../../../shared/widgets/illustrations/empty_image_illustration.dart';
 import '../../../auth/providers/session_provider.dart';
 import '../../providers/cart_provider.dart';
+import '../../providers/checkout_provider.dart';
 
-/// Panier de l'acheteur : liste des produits mis de côté avant achat.
-///
-/// Chaque article de la marketplace étant un bien de seconde main
-/// unique, le panier ne gère pas de quantité — juste un ensemble de
-/// produits, résolus depuis leurs identifiants comme pour les
-/// favoris. La commande se passe pour tout le panier en une fois
-/// (un seul bouton "Commander" en bas, une seule commande à la fin) —
-/// pas une commande séparée par article.
+/// Panier de l'acheteur : liste des produits mis de côté avant achat,
+/// avec une quantité par article (un propriétaire peut avoir
+/// plusieurs exemplaires identiques d'un même bien, jamais plus que
+/// [Produit.quantiteDisponible]). La commande se passe pour tout le
+/// panier en une fois (un seul bouton "Commander" en bas, une seule
+/// commande à la fin) — pas une commande séparée par article.
 class CartScreen extends ConsumerWidget {
   const CartScreen({super.key});
 
@@ -39,15 +38,15 @@ class CartScreen extends ConsumerWidget {
           message: 'Impossible de charger votre panier.',
           onRetry: () => ref.invalidate(cartProvider),
         ),
-        data: (produitIds) {
-          if (produitIds.isEmpty) {
+        data: (panier) {
+          if (panier.isEmpty) {
             return const EmptyView(
               message: 'Votre panier est vide',
               subtitle: 'Ajoutez un produit depuis sa fiche pour le retrouver ici.',
               icon: Icons.shopping_cart_outlined,
             );
           }
-          return _CartList(produitIds: produitIds);
+          return _CartList(panier: panier);
         },
       ),
     );
@@ -55,16 +54,16 @@ class CartScreen extends ConsumerWidget {
 }
 
 class _CartList extends ConsumerWidget {
-  final List<String> produitIds;
+  final Map<String, int> panier;
 
-  const _CartList({required this.produitIds});
+  const _CartList({required this.panier});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final productRepo = ref.watch(productRepositoryProvider);
 
     return FutureBuilder<List<Produit>>(
-      future: Future.wait(produitIds.map((id) => productRepo.getById(id)))
+      future: Future.wait(panier.keys.map((id) => productRepo.getById(id)))
           .then((liste) => liste.whereType<Produit>().toList()),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
@@ -78,19 +77,29 @@ class _CartList extends ConsumerWidget {
             icon: Icons.shopping_cart_outlined,
           );
         }
-        final total = produits.fold<num>(0, (somme, produit) => somme + produit.prix);
+        final lignes = [
+          for (final produit in produits)
+            LignePanier(produit: produit, quantite: panier[produit.id] ?? 1),
+        ];
+        final total = lignes.fold<double>(0, (somme, l) => somme + l.sousTotal);
+        final nombreArticles = lignes.fold<int>(0, (somme, l) => somme + l.quantite);
         return Column(
           children: [
             Expanded(
               child: ListView.separated(
                 padding: const EdgeInsets.all(AppSpacing.lg),
-                itemCount: produits.length,
+                itemCount: lignes.length,
                 separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.md),
                 itemBuilder: (context, index) {
-                  final produit = produits[index];
+                  final ligne = lignes[index];
                   return _CartTile(
-                    produit: produit,
-                    onRemove: () => ref.read(cartProvider.notifier).remove(produit.id),
+                    ligne: ligne,
+                    onRemove: () => ref.read(cartProvider.notifier).remove(ligne.produit.id),
+                    onQuantiteChangee: (nouvelle) => ref.read(cartProvider.notifier).setQuantite(
+                          ligne.produit.id,
+                          nouvelle,
+                          max: ligne.produit.quantiteDisponible,
+                        ),
                   );
                 },
               ),
@@ -113,7 +122,7 @@ class _CartList extends ConsumerWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Total (${produits.length} article${produits.length > 1 ? 's' : ''})',
+                                'Total ($nombreArticles article${nombreArticles > 1 ? 's' : ''})',
                                 style: AppTypography.bodySmall,
                               ),
                               Text(Formatters.currency(total), style: AppTypography.titleLarge),
@@ -125,7 +134,7 @@ class _CartList extends ConsumerWidget {
                     const SizedBox(height: AppSpacing.md),
                     AppPrimaryButton(
                       label: 'Commander',
-                      onPressed: () => _commander(context, ref, produits),
+                      onPressed: () => _commander(context, ref, lignes),
                     ),
                   ],
                 ),
@@ -137,33 +146,35 @@ class _CartList extends ConsumerWidget {
     );
   }
 
-  Future<void> _commander(BuildContext context, WidgetRef ref, List<Produit> produits) async {
+  void _commander(BuildContext context, WidgetRef ref, List<LignePanier> lignes) {
     if (ref.read(currentUserProvider) == null) {
       context.push(
         '${AppRoutes.demoAccounts}?from=${Uri.encodeComponent(AppRoutes.cart)}',
       );
       return;
     }
-    for (final produit in produits) {
-      await ref.read(cartProvider.notifier).remove(produit.id);
-    }
-    if (context.mounted) {
-      context.push(AppRoutes.checkout, extra: produits);
-    }
+    // Le panier n'est vidé qu'après confirmation réelle de la
+    // commande (voir CheckoutNotifier.confirmerAchat) — reculer
+    // depuis l'écran de paiement ne doit pas faire perdre la
+    // sélection.
+    context.push(AppRoutes.checkout, extra: lignes);
   }
 }
 
 class _CartTile extends StatelessWidget {
-  final Produit produit;
+  final LignePanier ligne;
   final VoidCallback onRemove;
+  final void Function(int) onQuantiteChangee;
 
   const _CartTile({
-    required this.produit,
+    required this.ligne,
     required this.onRemove,
+    required this.onQuantiteChangee,
   });
 
   @override
   Widget build(BuildContext context) {
+    final produit = ligne.produit;
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
@@ -193,11 +204,22 @@ class _CartTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(produit.titre, style: AppTypography.titleMedium, maxLines: 1, overflow: TextOverflow.ellipsis),
+                Text(
+                  produit.titre,
+                  style: AppTypography.titleMedium,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
                 const SizedBox(height: 4),
                 Text(
-                  Formatters.currency(produit.prix),
+                  Formatters.currency(ligne.sousTotal),
                   style: AppTypography.titleMedium.copyWith(color: AppColors.violet),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                _QuantiteStepper(
+                  quantite: ligne.quantite,
+                  max: produit.quantiteDisponible,
+                  onChanged: onQuantiteChangee,
                 ),
               ],
             ),
@@ -208,6 +230,63 @@ class _CartTile extends StatelessWidget {
             tooltip: 'Retirer du panier',
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _QuantiteStepper extends StatelessWidget {
+  final int quantite;
+  final int max;
+  final void Function(int) onChanged;
+
+  const _QuantiteStepper({required this.quantite, required this.max, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _StepperButton(
+          icon: Icons.remove_rounded,
+          onTap: quantite > 1 ? () => onChanged(quantite - 1) : null,
+        ),
+        SizedBox(
+          width: 32,
+          child: Text(
+            '$quantite',
+            textAlign: TextAlign.center,
+            style: AppTypography.titleMedium,
+          ),
+        ),
+        _StepperButton(
+          icon: Icons.add_rounded,
+          onTap: quantite < max ? () => onChanged(quantite + 1) : null,
+        ),
+      ],
+    );
+  }
+}
+
+class _StepperButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback? onTap;
+
+  const _StepperButton({required this.icon, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final actif = onTap != null;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 28,
+        height: 28,
+        decoration: BoxDecoration(
+          color: actif ? AppColors.violetSurface : AppColors.gray100,
+          borderRadius: AppRadius.smRadius,
+        ),
+        child: Icon(icon, size: 16, color: actif ? AppColors.violet : AppColors.gray400),
       ),
     );
   }

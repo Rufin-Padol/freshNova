@@ -270,6 +270,9 @@ class DemoDataSeeder {
         agentId: DemoIds.agentId,
         localisation: 'Douala, Bonanjo',
         tauxCommission: 12,
+        // Exemple de propriétaire ayant plusieurs exemplaires
+        // identiques du même bien, pour démontrer la quantité.
+        quantiteDisponible: 3,
         photos: [
           photoOfficielle('photo-casque-1',
               'https://images.unsplash.com/photo-1505740420928-5e560c06d30e'),
@@ -390,7 +393,7 @@ class DemoDataSeeder {
       methodePaiement: PaymentMethod.orangeMoney,
       numeroPaieur: '670000001',
       acheteurId: DemoIds.acheteurId,
-      produitIds: const ['demo-prod-reserve'],
+      lignes: const {'demo-prod-reserve': 1},
     );
 
     final commandeLivree = Commande(
@@ -404,7 +407,7 @@ class DemoDataSeeder {
       methodePaiement: PaymentMethod.mtnMomo,
       numeroPaieur: '670000001',
       acheteurId: DemoIds.acheteurId,
-      produitIds: const ['demo-prod-livre'],
+      lignes: const {'demo-prod-livre': 1},
     );
 
     await orderRepo.save(commandeEnLivraison);

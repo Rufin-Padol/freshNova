@@ -34,7 +34,7 @@ class ShopScreen extends ConsumerWidget {
     final produitsAsync = ref.watch(shopProductsProvider);
     final filtres = ref.watch(shopFiltersProvider);
     final favoris = ref.watch(favoritesProvider).valueOrNull ?? [];
-    final panier = ref.watch(cartProvider).valueOrNull ?? [];
+    final panier = ref.watch(cartProvider).valueOrNull ?? {};
 
     void demanderConnexion() {
       context.push(
@@ -82,7 +82,7 @@ class ShopScreen extends ConsumerWidget {
                               // panier sans être connecté.
                               _TopIconButton(
                                 icon: Icons.shopping_cart_outlined,
-                                badgeCount: panier.length,
+                                badgeCount: panier.values.fold(0, (a, b) => a + b),
                                 onTap: () => context.push(AppRoutes.cart),
                               ),
                               const SizedBox(width: AppSpacing.sm),
@@ -178,6 +178,7 @@ class ShopScreen extends ConsumerWidget {
                           prix: produit.prix,
                           photoUrl: produit.photoPrincipale?.url,
                           localisation: produit.localisation,
+                          quantiteDisponible: produit.quantiteDisponible,
                           estFavori: favoris.contains(produit.id),
                           onFavoriteTap: () {
                             if (utilisateur == null) {
@@ -186,10 +187,12 @@ class ShopScreen extends ConsumerWidget {
                             }
                             ref.read(favoritesProvider.notifier).toggle(produit.id);
                           },
-                          estDansPanier: panier.contains(produit.id),
+                          estDansPanier: panier.containsKey(produit.id),
                           onCartTap: () async {
-                            final ajoute = !panier.contains(produit.id);
-                            await ref.read(cartProvider.notifier).toggle(produit.id);
+                            final ajoute = !panier.containsKey(produit.id);
+                            await ref
+                                .read(cartProvider.notifier)
+                                .toggle(produit.id, max: produit.quantiteDisponible);
                             if (context.mounted) {
                               AppSnackbar.showSuccess(
                                 context,

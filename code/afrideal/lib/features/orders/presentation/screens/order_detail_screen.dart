@@ -73,7 +73,7 @@ class OrderDetailScreen extends ConsumerWidget {
                     children: [
                       FutureBuilder<List<Produit>>(
                         future: Future.wait(
-                          commande.produitIds.map((id) => productRepo.getById(id)),
+                          commande.lignes.keys.map((id) => productRepo.getById(id)),
                         ).then((liste) => liste.whereType<Produit>().toList()),
                         builder: (context, snapshot) {
                           final produits = snapshot.data;
@@ -90,10 +90,17 @@ class OrderDetailScreen extends ConsumerWidget {
                                   child: Row(
                                     children: [
                                       Expanded(
-                                        child: Text(produit.titre, style: AppTypography.titleLarge),
+                                        child: Text(
+                                          (commande.lignes[produit.id] ?? 1) > 1
+                                              ? '${produit.titre} × ${commande.lignes[produit.id]}'
+                                              : produit.titre,
+                                          style: AppTypography.titleLarge,
+                                        ),
                                       ),
                                       Text(
-                                        Formatters.currency(produit.prix),
+                                        Formatters.currency(
+                                          produit.prix * (commande.lignes[produit.id] ?? 1),
+                                        ),
                                         style: AppTypography.bodyMedium,
                                       ),
                                     ],

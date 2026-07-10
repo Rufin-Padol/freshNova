@@ -24,7 +24,12 @@ class Commande extends Equatable {
   final String? numeroPaieur;
 
   final String acheteurId;
-  final List<String> produitIds;
+
+  /// Articles de la commande : identifiant de produit -> quantité
+  /// achetée. Un propriétaire pouvant avoir plusieurs exemplaires
+  /// d'un même bien, une commande peut porter sur plusieurs unités
+  /// d'un même produit, pas seulement sur des produits distincts.
+  final Map<String, int> lignes;
 
   /// Identifiant de la mission de livraison associée, renseigné une
   /// fois qu'un agent a été assigné pour livrer la commande.
@@ -40,7 +45,7 @@ class Commande extends Equatable {
     required this.adresseLivraison,
     required this.methodePaiement,
     required this.acheteurId,
-    required this.produitIds,
+    required this.lignes,
     this.numeroPaieur,
     this.missionLivraisonId,
   });
@@ -56,7 +61,7 @@ class Commande extends Equatable {
     PaymentMethod? methodePaiement,
     String? numeroPaieur,
     String? acheteurId,
-    List<String>? produitIds,
+    Map<String, int>? lignes,
     String? missionLivraisonId,
   }) {
     return Commande(
@@ -70,7 +75,7 @@ class Commande extends Equatable {
       methodePaiement: methodePaiement ?? this.methodePaiement,
       numeroPaieur: numeroPaieur ?? this.numeroPaieur,
       acheteurId: acheteurId ?? this.acheteurId,
-      produitIds: produitIds ?? this.produitIds,
+      lignes: lignes ?? this.lignes,
       missionLivraisonId: missionLivraisonId ?? this.missionLivraisonId,
     );
   }
@@ -94,7 +99,7 @@ class Commande extends Equatable {
         methodePaiement,
         numeroPaieur,
         acheteurId,
-        produitIds,
+        lignes,
         missionLivraisonId,
       ];
 }

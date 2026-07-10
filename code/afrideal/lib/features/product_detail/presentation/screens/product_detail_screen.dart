@@ -16,6 +16,7 @@ import '../../../../shared/widgets/feedback/app_snackbar.dart';
 import '../../../../shared/widgets/illustrations/empty_image_illustration.dart';
 import '../../../auth/providers/session_provider.dart';
 import '../../../cart_checkout/providers/cart_provider.dart';
+import '../../../cart_checkout/providers/checkout_provider.dart';
 import '../../../favorites/providers/favorites_provider.dart';
 import '../../../messages/providers/message_provider.dart';
 import '../../../shop/providers/product_list_provider.dart';
@@ -49,8 +50,8 @@ class ProductDetailScreen extends ConsumerWidget {
     final peutGererFavori = utilisateur == null || utilisateur.role == UserRole.acheteur;
     final favoris = ref.watch(favoritesProvider).valueOrNull ?? [];
     final estFavori = favoris.contains(productId);
-    final panier = ref.watch(cartProvider).valueOrNull ?? [];
-    final estDansPanier = panier.contains(productId);
+    final panier = ref.watch(cartProvider).valueOrNull ?? {};
+    final estDansPanier = panier.containsKey(productId);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -83,7 +84,9 @@ class ProductDetailScreen extends ConsumerWidget {
                     IconButton(
                       onPressed: () async {
                         final ajoute = !estDansPanier;
-                        await ref.read(cartProvider.notifier).toggle(productId);
+                        await ref
+                            .read(cartProvider.notifier)
+                            .toggle(productId, max: produit.quantiteDisponible);
                         if (context.mounted) {
                           AppSnackbar.showSuccess(
                             context,
@@ -275,7 +278,10 @@ class ProductDetailScreen extends ConsumerWidget {
                               _demanderConnexion(context);
                               return;
                             }
-                            context.push(AppRoutes.checkout, extra: [produit]);
+                            context.push(
+                              AppRoutes.checkout,
+                              extra: [LignePanier(produit: produit, quantite: 1)],
+                            );
                           },
                         ),
                       ),

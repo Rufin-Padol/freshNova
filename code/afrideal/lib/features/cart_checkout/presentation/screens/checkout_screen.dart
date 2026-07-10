@@ -6,7 +6,6 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_dimens.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/formatters.dart';
-import '../../../../domain/entities/produit.dart';
 import '../../../../domain/enums/order_status.dart';
 import '../../../../domain/enums/payment_status.dart';
 import '../../../../shared/widgets/buttons/app_primary_button.dart';
@@ -24,19 +23,19 @@ import '../../providers/checkout_provider.dart';
 /// l'écran précédent — évite un aller-retour réseau inutile, important
 /// pour la fluidité sur connexion lente.
 class CheckoutScreen extends ConsumerWidget {
-  final List<Produit> produits;
+  final List<LignePanier> lignes;
 
-  const CheckoutScreen({super.key, required this.produits});
+  const CheckoutScreen({super.key, required this.lignes});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(checkoutProvider);
 
     if (state.step == CheckoutStep.succes) {
-      return _CheckoutSuccessView(produits: produits);
+      return _CheckoutSuccessView(lignes: lignes);
     }
 
-    final montantTotal = produits.fold<double>(0, (somme, p) => somme + p.prix);
+    final montantTotal = lignes.fold<double>(0, (somme, l) => somme + l.sousTotal);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -56,21 +55,26 @@ class CheckoutScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  for (final produit in produits) ...[
+                  for (final ligne in lignes) ...[
                     Row(
                       children: [
                         Expanded(
-                          child: Text(produit.titre, style: AppTypography.titleMedium),
+                          child: Text(
+                            ligne.quantite > 1
+                                ? '${ligne.produit.titre} × ${ligne.quantite}'
+                                : ligne.produit.titre,
+                            style: AppTypography.titleMedium,
+                          ),
                         ),
                         Text(
-                          Formatters.currency(produit.prix),
+                          Formatters.currency(ligne.sousTotal),
                           style: AppTypography.bodyLarge.copyWith(color: AppColors.gray700),
                         ),
                       ],
                     ),
-                    if (produit != produits.last) const SizedBox(height: AppSpacing.sm),
+                    if (ligne != lignes.last) const SizedBox(height: AppSpacing.sm),
                   ],
-                  if (produits.length > 1) ...[
+                  if (lignes.length > 1) ...[
                     const SizedBox(height: AppSpacing.md),
                     const Divider(height: 1),
                     const SizedBox(height: AppSpacing.md),
@@ -143,7 +147,7 @@ class CheckoutScreen extends ConsumerWidget {
             isLoading: state.step == CheckoutStep.traitement,
             onPressed: state.step == CheckoutStep.traitement
                 ? null
-                : () => ref.read(checkoutProvider.notifier).confirmerAchat(produits),
+                : () => ref.read(checkoutProvider.notifier).confirmerAchat(lignes),
           ),
         ),
       ),
@@ -272,15 +276,16 @@ class _PaymentMethodSelector extends StatelessWidget {
 }
 
 class _CheckoutSuccessView extends ConsumerWidget {
-  final List<Produit> produits;
+  final List<LignePanier> lignes;
 
-  const _CheckoutSuccessView({required this.produits});
+  const _CheckoutSuccessView({required this.lignes});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final description = produits.length == 1
-        ? 'Votre achat de "${produits.first.titre}" est enregistré.'
-        : 'Vos ${produits.length} articles sont enregistrés.';
+    final nombreArticles = lignes.fold<int>(0, (somme, l) => somme + l.quantite);
+    final description = lignes.length == 1 && lignes.first.quantite == 1
+        ? 'Votre achat de "${lignes.first.produit.titre}" est enregistré.'
+        : 'Vos $nombreArticles articles sont enregistrés.';
 
     return Scaffold(
       backgroundColor: AppColors.background,

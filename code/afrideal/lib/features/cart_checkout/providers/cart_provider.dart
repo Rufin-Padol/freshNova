@@ -8,65 +8,81 @@ import '../../auth/providers/session_provider.dart';
 /// sans utilisateur identifié.
 const _cleInvite = 'guest';
 
-/// Liste des identifiants de produits présents dans le panier de
-/// l'utilisateur courant (connecté, ou invité via [_cleInvite]). Même
-/// logique que FavoritesNotifier : mise à jour optimiste de
-/// l'interface, persistée ensuite via Hive.
-class CartNotifier extends AsyncNotifier<List<String>> {
+/// Contenu du panier de l'utilisateur courant (connecté, ou invité via
+/// [_cleInvite]) : identifiant de produit -> quantité voulue. Un
+/// propriétaire pouvant avoir plusieurs exemplaires d'un même bien, le
+/// panier retient une quantité par produit plutôt qu'une simple
+/// présence/absence. Mise à jour optimiste de l'interface, persistée
+/// ensuite via Hive (même principe que FavoritesNotifier).
+class CartNotifier extends AsyncNotifier<Map<String, int>> {
   @override
-  Future<List<String>> build() async {
+  Future<Map<String, int>> build() async {
     final utilisateur = ref.watch(currentUserProvider);
     final repo = ref.watch(cartRepositoryProvider);
-    return repo.getCartProductIds(utilisateur?.id ?? _cleInvite);
+    return repo.getCartItems(utilisateur?.id ?? _cleInvite);
   }
 
-  Future<void> add(String produitId) async {
+  Future<void> _setQuantite(String produitId, int quantite) async {
     final cle = ref.read(currentUserProvider)?.id ?? _cleInvite;
     final repo = ref.read(cartRepositoryProvider);
-    final actuel = state.valueOrNull ?? [];
-    if (!actuel.contains(produitId)) {
-      state = AsyncData([...actuel, produitId]);
-      await repo.addToCart(cle, produitId);
+    final actuel = Map<String, int>.from(state.valueOrNull ?? {});
+    if (quantite <= 0) {
+      actuel.remove(produitId);
+    } else {
+      actuel[produitId] = quantite;
     }
+    state = AsyncData(actuel);
+    await repo.setQuantite(cle, produitId, quantite);
   }
 
-  Future<void> remove(String produitId) async {
-    final cle = ref.read(currentUserProvider)?.id ?? _cleInvite;
-    final repo = ref.read(cartRepositoryProvider);
-    final actuel = state.valueOrNull ?? [];
-    state = AsyncData(actuel.where((id) => id != produitId).toList());
-    await repo.removeFromCart(cle, produitId);
+  /// Ajoute une unité du produit (jusqu'à [max] s'il est déjà dans le
+  /// panier). Utilisé par le bouton "Ajouter au panier" simple des
+  /// cartes produit — le réglage fin de quantité se fait dans l'écran
+  /// du panier.
+  Future<void> add(String produitId, {int max = 1}) async {
+    final actuelle = (state.valueOrNull ?? {})[produitId] ?? 0;
+    if (actuelle >= max) return;
+    await _setQuantite(produitId, actuelle + 1);
   }
 
-  Future<void> toggle(String produitId) async {
-    final actuel = state.valueOrNull ?? [];
-    if (actuel.contains(produitId)) {
+  Future<void> remove(String produitId) => _setQuantite(produitId, 0);
+
+  Future<void> setQuantite(String produitId, int quantite, {required int max}) {
+    return _setQuantite(produitId, quantite.clamp(0, max));
+  }
+
+  Future<void> toggle(String produitId, {int max = 1}) async {
+    final actuel = state.valueOrNull ?? {};
+    if (actuel.containsKey(produitId)) {
       await remove(produitId);
     } else {
-      await add(produitId);
+      await add(produitId, max: max);
     }
   }
 
   bool isInCart(String produitId) {
-    return (state.valueOrNull ?? []).contains(produitId);
+    return (state.valueOrNull ?? {}).containsKey(produitId);
   }
 
   /// Transfère le panier "invité" vers le compte qui vient de se
   /// connecter ou de s'inscrire, pour qu'un visiteur ne perde pas sa
   /// sélection au moment où la connexion devient obligatoire (à la
-  /// commande). Appelé par SessionNotifier après une connexion réussie.
+  /// commande). Les quantités s'additionnent en cas de doublon.
+  /// Appelé par SessionNotifier après une connexion réussie.
   Future<void> migrerVersUtilisateur(String utilisateurId) async {
     final repo = ref.read(cartRepositoryProvider);
-    final idsInvite = await repo.getCartProductIds(_cleInvite);
-    if (idsInvite.isEmpty) return;
-    for (final id in idsInvite) {
-      await repo.addToCart(utilisateurId, id);
-      await repo.removeFromCart(_cleInvite, id);
+    final panierInvite = await repo.getCartItems(_cleInvite);
+    if (panierInvite.isEmpty) return;
+    final panierUtilisateur = await repo.getCartItems(utilisateurId);
+    for (final entry in panierInvite.entries) {
+      final total = (panierUtilisateur[entry.key] ?? 0) + entry.value;
+      await repo.setQuantite(utilisateurId, entry.key, total);
+      await repo.setQuantite(_cleInvite, entry.key, 0);
     }
-    state = AsyncData(await repo.getCartProductIds(utilisateurId));
+    state = AsyncData(await repo.getCartItems(utilisateurId));
   }
 }
 
-final cartProvider = AsyncNotifierProvider<CartNotifier, List<String>>(
+final cartProvider = AsyncNotifierProvider<CartNotifier, Map<String, int>>(
   CartNotifier.new,
 );

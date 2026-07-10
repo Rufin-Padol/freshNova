@@ -56,7 +56,7 @@ class _FavoritesGrid extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final productRepo = ref.watch(productRepositoryProvider);
-    final panier = ref.watch(cartProvider).valueOrNull ?? [];
+    final panier = ref.watch(cartProvider).valueOrNull ?? {};
 
     return FutureBuilder<List<Produit>>(
       future: Future.wait(favoriteIds.map((id) => productRepo.getById(id)))
@@ -84,12 +84,15 @@ class _FavoritesGrid extends ConsumerWidget {
               prix: produit.prix,
               photoUrl: produit.photoPrincipale?.url,
               localisation: produit.localisation,
+              quantiteDisponible: produit.quantiteDisponible,
               estFavori: true,
               onFavoriteTap: () => ref.read(favoritesProvider.notifier).toggle(produit.id),
-              estDansPanier: panier.contains(produit.id),
+              estDansPanier: panier.containsKey(produit.id),
               onCartTap: () async {
-                final ajoute = !panier.contains(produit.id);
-                await ref.read(cartProvider.notifier).toggle(produit.id);
+                final ajoute = !panier.containsKey(produit.id);
+                await ref
+                    .read(cartProvider.notifier)
+                    .toggle(produit.id, max: produit.quantiteDisponible);
                 if (context.mounted) {
                   AppSnackbar.showSuccess(
                     context,

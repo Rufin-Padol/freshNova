@@ -35,6 +35,7 @@ class _AdminProductEditScreenState extends ConsumerState<AdminProductEditScreen>
   late final TextEditingController _titreCtrl;
   late final TextEditingController _descriptionCtrl;
   late final TextEditingController _defautsCtrl;
+  late final TextEditingController _quantiteCtrl;
   _ModeDefauts? _mode;
   bool _enCours = false;
 
@@ -45,6 +46,7 @@ class _AdminProductEditScreenState extends ConsumerState<AdminProductEditScreen>
     _titreCtrl = TextEditingController(text: p.titre);
     _descriptionCtrl = TextEditingController(text: p.description);
     _defautsCtrl = TextEditingController(text: p.defautsConnus ?? '');
+    _quantiteCtrl = TextEditingController(text: '${p.quantiteDisponible}');
   }
 
   @override
@@ -52,6 +54,7 @@ class _AdminProductEditScreenState extends ConsumerState<AdminProductEditScreen>
     _titreCtrl.dispose();
     _descriptionCtrl.dispose();
     _defautsCtrl.dispose();
+    _quantiteCtrl.dispose();
     super.dispose();
   }
 
@@ -74,6 +77,13 @@ class _AdminProductEditScreenState extends ConsumerState<AdminProductEditScreen>
               label: 'Description',
               controller: _descriptionCtrl,
               maxLines: 4,
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            AppTextField(
+              label: 'Quantité disponible',
+              hint: 'Nombre d\'exemplaires identiques',
+              controller: _quantiteCtrl,
+              keyboardType: TextInputType.number,
             ),
             const SizedBox(height: AppSpacing.xl),
             Text('Défauts', style: AppTypography.titleLarge),
@@ -162,6 +172,11 @@ class _AdminProductEditScreenState extends ConsumerState<AdminProductEditScreen>
       AppSnackbar.showError(context, 'Le titre et la description sont obligatoires.');
       return;
     }
+    final quantite = int.tryParse(_quantiteCtrl.text.trim());
+    if (quantite == null || quantite <= 0) {
+      AppSnackbar.showError(context, 'La quantité disponible doit être un nombre positif.');
+      return;
+    }
 
     setState(() => _enCours = true);
 
@@ -182,6 +197,7 @@ class _AdminProductEditScreenState extends ConsumerState<AdminProductEditScreen>
       titre: _titreCtrl.text.trim(),
       description: _descriptionCtrl.text.trim(),
       defautsConnus: defautsConnus,
+      quantiteDisponible: quantite,
     );
 
     await ref.read(productRepositoryProvider).save(produitMisAJour);

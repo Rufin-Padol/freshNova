@@ -183,6 +183,7 @@ class AgentMissionNotifier extends Notifier<AsyncValue<void>> {
     required ProductCondition etat,
     required String? defautsConnus,
     required double prixConfirme,
+    required int quantiteConfirmee,
   }) async {
     state = const AsyncLoading();
     try {
@@ -220,6 +221,7 @@ class AgentMissionNotifier extends Notifier<AsyncValue<void>> {
           etat: etat,
           defautsConnus: defautsConnus,
           prix: prixConfirme,
+          quantiteDisponible: quantiteConfirmee,
           proprietaireId: proprietaireId,
           photos: photosOfficielles,
           statut: ProductStatus.enTraitement,

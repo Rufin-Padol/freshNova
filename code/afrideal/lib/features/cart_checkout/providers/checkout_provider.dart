@@ -5,10 +5,22 @@ import '../../../domain/entities/commande.dart';
 import '../../../domain/entities/produit.dart';
 import '../../../domain/enums/order_status.dart';
 import '../../../domain/enums/payment_status.dart';
-import '../../../domain/enums/product_status.dart';
 import '../../auth/providers/session_provider.dart';
+import 'cart_provider.dart';
 
 const _uuid = Uuid();
+
+/// Une ligne du panier au moment du checkout : le produit et la
+/// quantité choisie (jamais plus que produit.quantiteDisponible, déjà
+/// vérifié au moment de l'ajout au panier).
+class LignePanier {
+  final Produit produit;
+  final int quantite;
+
+  const LignePanier({required this.produit, required this.quantite});
+
+  double get sousTotal => produit.prix * quantite;
+}
 
 /// Représente l'avancement de la confirmation de commande, pour
 /// piloter l'interface (bouton désactivé pendant l'enregistrement,
@@ -56,7 +68,7 @@ class CheckoutState {
 }
 
 /// Pilote la confirmation de commande : création de la commande,
-/// mise à jour du statut du produit (En vente → Réservé).
+/// décrément du stock de chaque produit acheté.
 ///
 /// Le paiement (espèces ou Mobile Money) n'a jamais lieu ici : il est
 /// collecté au moment de la livraison, par la personne qui livre.
@@ -87,12 +99,13 @@ class CheckoutNotifier extends Notifier<CheckoutState> {
     state = const CheckoutState();
   }
 
-  /// Confirme la commande pour l'ensemble des produits passés — un
-  /// panier de plusieurs articles donne UNE seule commande, avec un
-  /// montant total unique et un paiement unique à la livraison, pas
-  /// une commande par article.
-  Future<void> confirmerAchat(List<Produit> produits) async {
-    if (produits.isEmpty) return;
+  /// Confirme la commande pour l'ensemble des lignes passées — un
+  /// panier de plusieurs articles (voire plusieurs unités d'un même
+  /// article) donne UNE seule commande, avec un montant total unique
+  /// et un paiement unique à la livraison, pas une commande par
+  /// article.
+  Future<void> confirmerAchat(List<LignePanier> lignes) async {
+    if (lignes.isEmpty) return;
     final utilisateur = ref.read(currentUserProvider);
     if (utilisateur == null) {
       state = state.copyWith(
@@ -121,7 +134,7 @@ class CheckoutNotifier extends Notifier<CheckoutState> {
       final reference = Commande.genererReference(
         DateTime.now().millisecondsSinceEpoch.remainder(10000),
       );
-      final montantTotal = produits.fold<double>(0, (somme, p) => somme + p.prix);
+      final montantTotal = lignes.fold<double>(0, (somme, l) => somme + l.sousTotal);
 
       final commande = Commande(
         id: commandeId,
@@ -134,11 +147,14 @@ class CheckoutNotifier extends Notifier<CheckoutState> {
         methodePaiement: state.methode,
         numeroPaieur: paiementMobile ? state.numeroPaieur : null,
         acheteurId: utilisateur.id,
-        produitIds: produits.map((p) => p.id).toList(),
+        lignes: {for (final l in lignes) l.produit.id: l.quantite},
       );
       await orderRepo.save(commande);
-      for (final produit in produits) {
-        await productRepo.updateStatut(produit.id, ProductStatus.reserve);
+      for (final ligne in lignes) {
+        await productRepo.decrementerQuantite(ligne.produit.id, ligne.quantite);
+        // L'article acheté n'a plus de raison de rester dans le
+        // panier — la commande vient d'être créée pour lui.
+        await ref.read(cartProvider.notifier).remove(ligne.produit.id);
       }
 
       state = state.copyWith(step: CheckoutStep.succes, commandeCreee: commande);

@@ -44,6 +44,7 @@ import '../../features/orders/presentation/screens/order_detail_screen.dart';
 import '../../features/favorites/presentation/screens/favorites_screen.dart';
 import '../../features/cart_checkout/presentation/screens/cart_screen.dart';
 import '../../features/cart_checkout/presentation/screens/checkout_screen.dart';
+import '../../features/cart_checkout/providers/checkout_provider.dart';
 import '../../domain/entities/produit.dart';
 
 /// Le routeur complet de l'application TrustNova.
@@ -182,7 +183,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.checkout,
-        builder: (context, state) => CheckoutScreen(produits: state.extra as List<Produit>),
+        builder: (context, state) => CheckoutScreen(lignes: state.extra as List<LignePanier>),
       ),
       GoRoute(
         path: AppRoutes.orders,
