@@ -275,7 +275,7 @@ class ProductDetailScreen extends ConsumerWidget {
                               _demanderConnexion(context);
                               return;
                             }
-                            context.push(AppRoutes.checkout, extra: produit);
+                            context.push(AppRoutes.checkout, extra: [produit]);
                           },
                         ),
                       ),

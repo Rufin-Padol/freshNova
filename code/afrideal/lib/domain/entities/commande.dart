@@ -4,6 +4,10 @@ import '../enums/payment_status.dart';
 
 /// Entité métier Commande, conforme au diagramme UML.
 ///
+/// Une commande regroupe tous les articles achetés en une fois depuis
+/// le panier — pas une commande par article : le paiement (unique,
+/// à la livraison) et la livraison portent sur l'ensemble du panier.
+///
 /// Le paiement se fait à la livraison (espèces ou Mobile Money) : la
 /// commande retient donc la méthode choisie par l'acheteur pour que
 /// la personne qui livre sache quoi collecter, mais aucun [Paiement]
@@ -20,7 +24,7 @@ class Commande extends Equatable {
   final String? numeroPaieur;
 
   final String acheteurId;
-  final String produitId;
+  final List<String> produitIds;
 
   /// Identifiant de la mission de livraison associée, renseigné une
   /// fois qu'un agent a été assigné pour livrer la commande.
@@ -36,7 +40,7 @@ class Commande extends Equatable {
     required this.adresseLivraison,
     required this.methodePaiement,
     required this.acheteurId,
-    required this.produitId,
+    required this.produitIds,
     this.numeroPaieur,
     this.missionLivraisonId,
   });
@@ -52,7 +56,7 @@ class Commande extends Equatable {
     PaymentMethod? methodePaiement,
     String? numeroPaieur,
     String? acheteurId,
-    String? produitId,
+    List<String>? produitIds,
     String? missionLivraisonId,
   }) {
     return Commande(
@@ -66,7 +70,7 @@ class Commande extends Equatable {
       methodePaiement: methodePaiement ?? this.methodePaiement,
       numeroPaieur: numeroPaieur ?? this.numeroPaieur,
       acheteurId: acheteurId ?? this.acheteurId,
-      produitId: produitId ?? this.produitId,
+      produitIds: produitIds ?? this.produitIds,
       missionLivraisonId: missionLivraisonId ?? this.missionLivraisonId,
     );
   }
@@ -90,7 +94,7 @@ class Commande extends Equatable {
         methodePaiement,
         numeroPaieur,
         acheteurId,
-        produitId,
+        produitIds,
         missionLivraisonId,
       ];
 }

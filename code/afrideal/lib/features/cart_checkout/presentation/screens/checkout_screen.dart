@@ -10,29 +10,33 @@ import '../../../../domain/entities/produit.dart';
 import '../../../../domain/enums/order_status.dart';
 import '../../../../domain/enums/payment_status.dart';
 import '../../../../shared/widgets/buttons/app_primary_button.dart';
+import '../../../../shared/widgets/buttons/app_secondary_button.dart';
 import '../../../../shared/widgets/illustrations/onboarding_illustrations.dart';
 import '../../../../shared/widgets/inputs/app_text_field.dart';
 import '../../providers/checkout_provider.dart';
 
-/// Écran de paiement, déclenché depuis la fiche produit.
+/// Écran de paiement, déclenché depuis la fiche produit (un seul
+/// article) ou depuis le panier (plusieurs articles à la fois).
 ///
-/// Reçoit le produit à acheter directement (plutôt que de passer par
-/// un identifiant et un nouveau chargement), car au moment où
-/// l'utilisateur arrive ici, le produit est déjà chargé en mémoire
-/// par l'écran précédent — évite un aller-retour réseau inutile,
-/// important pour la fluidité sur connexion lente.
+/// Reçoit directement les produits à acheter (plutôt que de passer
+/// par des identifiants et un nouveau chargement), car au moment où
+/// l'utilisateur arrive ici, ils sont déjà chargés en mémoire par
+/// l'écran précédent — évite un aller-retour réseau inutile, important
+/// pour la fluidité sur connexion lente.
 class CheckoutScreen extends ConsumerWidget {
-  final Produit produit;
+  final List<Produit> produits;
 
-  const CheckoutScreen({super.key, required this.produit});
+  const CheckoutScreen({super.key, required this.produits});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(checkoutProvider);
 
     if (state.step == CheckoutStep.succes) {
-      return _CheckoutSuccessView(produit: produit);
+      return _CheckoutSuccessView(produits: produits);
     }
+
+    final montantTotal = produits.fold<double>(0, (somme, p) => somme + p.prix);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -49,21 +53,38 @@ class CheckoutScreen extends ConsumerWidget {
                 borderRadius: AppRadius.lgRadius,
                 border: Border.all(color: AppColors.gray200),
               ),
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  for (final produit in produits) ...[
+                    Row(
                       children: [
-                        Text(produit.titre, style: AppTypography.titleMedium),
-                        const SizedBox(height: 4),
+                        Expanded(
+                          child: Text(produit.titre, style: AppTypography.titleMedium),
+                        ),
                         Text(
                           Formatters.currency(produit.prix),
+                          style: AppTypography.bodyLarge.copyWith(color: AppColors.gray700),
+                        ),
+                      ],
+                    ),
+                    if (produit != produits.last) const SizedBox(height: AppSpacing.sm),
+                  ],
+                  if (produits.length > 1) ...[
+                    const SizedBox(height: AppSpacing.md),
+                    const Divider(height: 1),
+                    const SizedBox(height: AppSpacing.md),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Total', style: AppTypography.titleMedium),
+                        Text(
+                          Formatters.currency(montantTotal),
                           style: AppTypography.titleLarge.copyWith(color: AppColors.violet),
                         ),
                       ],
                     ),
-                  ),
+                  ],
                 ],
               ),
             ),
@@ -118,11 +139,11 @@ class CheckoutScreen extends ConsumerWidget {
           child: AppPrimaryButton(
             label: state.step == CheckoutStep.traitement
                 ? 'Confirmation en cours...'
-                : 'Confirmer — ${Formatters.currency(produit.prix)} à la livraison',
+                : 'Confirmer — ${Formatters.currency(montantTotal)} à la livraison',
             isLoading: state.step == CheckoutStep.traitement,
             onPressed: state.step == CheckoutStep.traitement
                 ? null
-                : () => ref.read(checkoutProvider.notifier).confirmerAchat(produit),
+                : () => ref.read(checkoutProvider.notifier).confirmerAchat(produits),
           ),
         ),
       ),
@@ -251,12 +272,16 @@ class _PaymentMethodSelector extends StatelessWidget {
 }
 
 class _CheckoutSuccessView extends ConsumerWidget {
-  final Produit produit;
+  final List<Produit> produits;
 
-  const _CheckoutSuccessView({required this.produit});
+  const _CheckoutSuccessView({required this.produits});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final description = produits.length == 1
+        ? 'Votre achat de "${produits.first.titre}" est enregistré.'
+        : 'Vos ${produits.length} articles sont enregistrés.';
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -274,8 +299,8 @@ class _CheckoutSuccessView extends ConsumerWidget {
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
-                'Votre achat de "${produit.titre}" est enregistré. '
-                'Notre équipe s\'occupe de la livraison — vous payez à la réception.',
+                '$description Notre équipe s\'occupe de la livraison — '
+                'vous payez à la réception.',
                 style: AppTypography.bodyLarge,
                 textAlign: TextAlign.center,
               ),
@@ -285,6 +310,14 @@ class _CheckoutSuccessView extends ConsumerWidget {
                 onPressed: () {
                   ref.read(checkoutProvider.notifier).reset();
                   context.go(AppRoutes.orders);
+                },
+              ),
+              const SizedBox(height: AppSpacing.md),
+              AppSecondaryButton(
+                label: 'Continuer mes achats',
+                onPressed: () {
+                  ref.read(checkoutProvider.notifier).reset();
+                  context.go(AppRoutes.shop);
                 },
               ),
             ],

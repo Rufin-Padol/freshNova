@@ -87,7 +87,12 @@ class CheckoutNotifier extends Notifier<CheckoutState> {
     state = const CheckoutState();
   }
 
-  Future<void> confirmerAchat(Produit produit) async {
+  /// Confirme la commande pour l'ensemble des produits passés — un
+  /// panier de plusieurs articles donne UNE seule commande, avec un
+  /// montant total unique et un paiement unique à la livraison, pas
+  /// une commande par article.
+  Future<void> confirmerAchat(List<Produit> produits) async {
+    if (produits.isEmpty) return;
     final utilisateur = ref.read(currentUserProvider);
     if (utilisateur == null) {
       state = state.copyWith(
@@ -116,11 +121,12 @@ class CheckoutNotifier extends Notifier<CheckoutState> {
       final reference = Commande.genererReference(
         DateTime.now().millisecondsSinceEpoch.remainder(10000),
       );
+      final montantTotal = produits.fold<double>(0, (somme, p) => somme + p.prix);
 
       final commande = Commande(
         id: commandeId,
         reference: reference,
-        montantTotal: produit.prix,
+        montantTotal: montantTotal,
         statut: OrderStatus.pendante,
         dateCommande: DateTime.now(),
         modeLivraison: state.modeLivraison,
@@ -128,10 +134,12 @@ class CheckoutNotifier extends Notifier<CheckoutState> {
         methodePaiement: state.methode,
         numeroPaieur: paiementMobile ? state.numeroPaieur : null,
         acheteurId: utilisateur.id,
-        produitId: produit.id,
+        produitIds: produits.map((p) => p.id).toList(),
       );
       await orderRepo.save(commande);
-      await productRepo.updateStatut(produit.id, ProductStatus.reserve);
+      for (final produit in produits) {
+        await productRepo.updateStatut(produit.id, ProductStatus.reserve);
+      }
 
       state = state.copyWith(step: CheckoutStep.succes, commandeCreee: commande);
     } catch (e) {

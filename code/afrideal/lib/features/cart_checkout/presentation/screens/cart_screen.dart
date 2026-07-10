@@ -20,8 +20,9 @@ import '../../providers/cart_provider.dart';
 /// Chaque article de la marketplace étant un bien de seconde main
 /// unique, le panier ne gère pas de quantité — juste un ensemble de
 /// produits, résolus depuis leurs identifiants comme pour les
-/// favoris. Passer commande sur un article le retire du panier et
-/// enchaîne directement sur l'écran de paiement existant.
+/// favoris. La commande se passe pour tout le panier en une fois
+/// (un seul bouton "Commander" en bas, une seule commande à la fin) —
+/// pas une commande séparée par article.
 class CartScreen extends ConsumerWidget {
   const CartScreen({super.key});
 
@@ -90,18 +91,6 @@ class _CartList extends ConsumerWidget {
                   return _CartTile(
                     produit: produit,
                     onRemove: () => ref.read(cartProvider.notifier).remove(produit.id),
-                    onOrder: () async {
-                      if (ref.read(currentUserProvider) == null) {
-                        context.push(
-                          '${AppRoutes.demoAccounts}?from=${Uri.encodeComponent(AppRoutes.cart)}',
-                        );
-                        return;
-                      }
-                      await ref.read(cartProvider.notifier).remove(produit.id);
-                      if (context.mounted) {
-                        context.push(AppRoutes.checkout, extra: produit);
-                      }
-                    },
                   );
                 },
               ),
@@ -114,17 +103,29 @@ class _CartList extends ConsumerWidget {
                   color: AppColors.surface,
                   border: Border(top: BorderSide(color: AppColors.gray200)),
                 ),
-                child: Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Total (${produits.length} article${produits.length > 1 ? 's' : ''})',
-                              style: AppTypography.bodySmall),
-                          Text(Formatters.currency(total), style: AppTypography.titleLarge),
-                        ],
-                      ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Total (${produits.length} article${produits.length > 1 ? 's' : ''})',
+                                style: AppTypography.bodySmall,
+                              ),
+                              Text(Formatters.currency(total), style: AppTypography.titleLarge),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    AppPrimaryButton(
+                      label: 'Commander',
+                      onPressed: () => _commander(context, ref, produits),
                     ),
                   ],
                 ),
@@ -135,17 +136,30 @@ class _CartList extends ConsumerWidget {
       },
     );
   }
+
+  Future<void> _commander(BuildContext context, WidgetRef ref, List<Produit> produits) async {
+    if (ref.read(currentUserProvider) == null) {
+      context.push(
+        '${AppRoutes.demoAccounts}?from=${Uri.encodeComponent(AppRoutes.cart)}',
+      );
+      return;
+    }
+    for (final produit in produits) {
+      await ref.read(cartProvider.notifier).remove(produit.id);
+    }
+    if (context.mounted) {
+      context.push(AppRoutes.checkout, extra: produits);
+    }
+  }
 }
 
 class _CartTile extends StatelessWidget {
   final Produit produit;
   final VoidCallback onRemove;
-  final VoidCallback onOrder;
 
   const _CartTile({
     required this.produit,
     required this.onRemove,
-    required this.onOrder,
   });
 
   @override
@@ -184,14 +198,6 @@ class _CartTile extends StatelessWidget {
                 Text(
                   Formatters.currency(produit.prix),
                   style: AppTypography.titleMedium.copyWith(color: AppColors.violet),
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                SizedBox(
-                  height: 34,
-                  child: AppPrimaryButton(
-                    label: 'Commander',
-                    onPressed: onOrder,
-                  ),
                 ),
               ],
             ),

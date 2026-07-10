@@ -13,7 +13,7 @@ class CommandeModel {
   final String methodePaiement;
   final String? numeroPaieur;
   final String acheteurId;
-  final String produitId;
+  final List<String> produitIds;
   final String? missionLivraisonId;
 
   const CommandeModel({
@@ -26,7 +26,7 @@ class CommandeModel {
     required this.adresseLivraison,
     required this.methodePaiement,
     required this.acheteurId,
-    required this.produitId,
+    required this.produitIds,
     this.numeroPaieur,
     this.missionLivraisonId,
   });
@@ -43,7 +43,7 @@ class CommandeModel {
       methodePaiement: e.methodePaiement.name,
       numeroPaieur: e.numeroPaieur,
       acheteurId: e.acheteurId,
-      produitId: e.produitId,
+      produitIds: e.produitIds,
       missionLivraisonId: e.missionLivraisonId,
     );
   }
@@ -60,7 +60,7 @@ class CommandeModel {
       methodePaiement: PaymentMethod.values.firstWhere((m) => m.name == methodePaiement),
       numeroPaieur: numeroPaieur,
       acheteurId: acheteurId,
-      produitId: produitId,
+      produitIds: produitIds,
       missionLivraisonId: missionLivraisonId,
     );
   }
@@ -76,7 +76,7 @@ class CommandeModel {
         'methodePaiement': methodePaiement,
         'numeroPaieur': numeroPaieur,
         'acheteurId': acheteurId,
-        'produitId': produitId,
+        'produitIds': produitIds,
         'missionLivraisonId': missionLivraisonId,
       };
 
@@ -94,7 +94,11 @@ class CommandeModel {
       methodePaiement: json['methodePaiement'] as String? ?? PaymentMethod.especes.name,
       numeroPaieur: json['numeroPaieur'] as String?,
       acheteurId: json['acheteurId'] as String,
-      produitId: json['produitId'] as String,
+      // Repli sur l'ancien champ "produitId" (singulier) pour les
+      // commandes créées avant le passage au panier multi-articles.
+      produitIds: json['produitIds'] != null
+          ? List<String>.from(json['produitIds'] as List)
+          : [json['produitId'] as String],
       missionLivraisonId: json['missionLivraisonId'] as String?,
     );
   }

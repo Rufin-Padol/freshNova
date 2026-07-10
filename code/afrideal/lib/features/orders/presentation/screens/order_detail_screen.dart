@@ -6,10 +6,11 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/errors/error_view.dart';
 import '../../../../domain/enums/order_status.dart';
+import '../../../../core/providers/repository_providers.dart';
+import '../../../../domain/entities/produit.dart';
 import '../../../../shared/widgets/cards/info_row.dart';
 import '../../../../shared/widgets/feedback/app_loading_indicator.dart';
 import '../../../../shared/widgets/layout/progress_steps.dart';
-import '../../../shop/providers/product_list_provider.dart';
 import '../../providers/order_list_provider.dart';
 
 /// Suivi détaillé d'une commande, avec barre de progression visuelle
@@ -39,7 +40,7 @@ class OrderDetailScreen extends ConsumerWidget {
           if (commande == null) {
             return const ErrorView(message: 'Commande introuvable.');
           }
-          final produitAsync = ref.watch(productDetailProvider(commande.produitId));
+          final productRepo = ref.watch(productRepositoryProvider);
           final etapeIndex = _etapeIndexPourStatut(commande.statut);
 
           return SingleChildScrollView(
@@ -70,13 +71,37 @@ class OrderDetailScreen extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      produitAsync.when(
-                        loading: () => const SizedBox(height: 24),
-                        error: (_, __) => const SizedBox.shrink(),
-                        data: (produit) => Text(
-                          produit?.titre ?? 'Produit',
-                          style: AppTypography.titleLarge,
-                        ),
+                      FutureBuilder<List<Produit>>(
+                        future: Future.wait(
+                          commande.produitIds.map((id) => productRepo.getById(id)),
+                        ).then((liste) => liste.whereType<Produit>().toList()),
+                        builder: (context, snapshot) {
+                          final produits = snapshot.data;
+                          if (produits == null) return const SizedBox(height: 24);
+                          if (produits.isEmpty) {
+                            return Text('Produit', style: AppTypography.titleLarge);
+                          }
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              for (final produit in produits)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 4),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(produit.titre, style: AppTypography.titleLarge),
+                                      ),
+                                      Text(
+                                        Formatters.currency(produit.prix),
+                                        style: AppTypography.bodyMedium,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                            ],
+                          );
+                        },
                       ),
                       const SizedBox(height: AppSpacing.md),
                       InfoRow(

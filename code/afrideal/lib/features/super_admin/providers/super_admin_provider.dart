@@ -50,9 +50,11 @@ final superAdminStatsProvider = FutureProvider<SuperAdminStats>((ref) async {
   // vendu et son montant net vendeur (voir Produit.montantNetVendeur).
   double revenus = 0;
   for (final c in commandesLivrees) {
-    final produit = produits.where((p) => p.id == c.produitId).firstOrNull;
-    if (produit != null) {
-      revenus += produit.prix - produit.montantNetVendeur;
+    for (final produitId in c.produitIds) {
+      final produit = produits.where((p) => p.id == produitId).firstOrNull;
+      if (produit != null) {
+        revenus += produit.prix - produit.montantNetVendeur;
+      }
     }
   }
 

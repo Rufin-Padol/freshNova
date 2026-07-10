@@ -390,7 +390,7 @@ class DemoDataSeeder {
       methodePaiement: PaymentMethod.orangeMoney,
       numeroPaieur: '670000001',
       acheteurId: DemoIds.acheteurId,
-      produitId: 'demo-prod-reserve',
+      produitIds: const ['demo-prod-reserve'],
     );
 
     final commandeLivree = Commande(
@@ -404,7 +404,7 @@ class DemoDataSeeder {
       methodePaiement: PaymentMethod.mtnMomo,
       numeroPaieur: '670000001',
       acheteurId: DemoIds.acheteurId,
-      produitId: 'demo-prod-livre',
+      produitIds: const ['demo-prod-livre'],
     );
 
     await orderRepo.save(commandeEnLivraison);

@@ -182,7 +182,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.checkout,
-        builder: (context, state) => CheckoutScreen(produit: state.extra as Produit),
+        builder: (context, state) => CheckoutScreen(produits: state.extra as List<Produit>),
       ),
       GoRoute(
         path: AppRoutes.orders,

@@ -5,7 +5,9 @@ import '../../../../core/theme/app_dimens.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/errors/error_view.dart';
+import '../../../../core/providers/repository_providers.dart';
 import '../../../../domain/entities/commande.dart';
+import '../../../../domain/entities/produit.dart';
 import '../../../../domain/enums/order_status.dart';
 import '../../../../shared/widgets/buttons/app_primary_button.dart';
 import '../../../../shared/widgets/buttons/app_secondary_button.dart';
@@ -13,7 +15,6 @@ import '../../../../shared/widgets/cards/info_row.dart';
 import '../../../../shared/widgets/cards/status_badge.dart';
 import '../../../../shared/widgets/feedback/app_loading_indicator.dart';
 import '../../../../shared/widgets/feedback/app_snackbar.dart';
-import '../../../shop/providers/product_list_provider.dart';
 import '../../providers/admin_provider.dart';
 
 class AdminOrdersScreen extends ConsumerWidget {
@@ -86,7 +87,7 @@ class _AdminOrderDetailSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final produitAsync = ref.watch(productDetailProvider(commande.produitId));
+    final productRepo = ref.watch(productRepositoryProvider);
 
     return Padding(
       padding: EdgeInsets.only(
@@ -108,10 +109,23 @@ class _AdminOrderDetailSheet extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.lg),
-          produitAsync.when(
-            loading: () => const SizedBox(height: 24),
-            error: (_, __) => const SizedBox.shrink(),
-            data: (produit) => Text(produit?.titre ?? 'Produit', style: AppTypography.titleMedium),
+          FutureBuilder<List<Produit>>(
+            future: Future.wait(commande.produitIds.map((id) => productRepo.getById(id)))
+                .then((liste) => liste.whereType<Produit>().toList()),
+            builder: (context, snapshot) {
+              final produits = snapshot.data;
+              if (produits == null) return const SizedBox(height: 24);
+              if (produits.isEmpty) {
+                return Text('Produit', style: AppTypography.titleMedium);
+              }
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (final produit in produits)
+                    Text(produit.titre, style: AppTypography.titleMedium),
+                ],
+              );
+            },
           ),
           const SizedBox(height: AppSpacing.md),
           InfoRow(
