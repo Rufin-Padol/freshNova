@@ -10,7 +10,8 @@ import '../illustrations/empty_image_illustration.dart';
 /// une grille serrée forçait une hauteur fixe par carte, ce qui
 /// débordait dès que le contenu dépassait l'espace prévu). En liste
 /// pleine largeur, la carte s'adapte naturellement à son contenu, sans
-/// contrainte de hauteur imposée depuis l'extérieur.
+/// contrainte de hauteur imposée depuis l'extérieur. Photo en haut,
+/// informations en dessous — jamais côte à côte.
 ///
 /// Affiche la localisation générale du produit (ville/quartier) —
 /// utile pour évaluer la faisabilité d'une livraison — mais jamais
@@ -47,58 +48,60 @@ class ProductCard extends StatelessWidget {
       onTap: onTap,
       borderRadius: AppRadius.lgRadius,
       child: Container(
-        padding: const EdgeInsets.all(AppSpacing.sm),
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: AppRadius.lgRadius,
           boxShadow: AppShadows.card,
         ),
-        child: Row(
+        clipBehavior: Clip.antiAlias,
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ClipRRect(
-              borderRadius: AppRadius.mdRadius,
-              child: SizedBox(
-                width: 108,
-                height: 108,
-                child: photoUrl != null && photoUrl!.isNotEmpty
-                    ? Image.network(
-                        photoUrl!,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => const EmptyImageIllustration(),
-                      )
-                    : const EmptyImageIllustration(),
-              ),
+            Stack(
+              children: [
+                AspectRatio(
+                  aspectRatio: 16 / 10,
+                  child: photoUrl != null && photoUrl!.isNotEmpty
+                      ? Image.network(
+                          photoUrl!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => const EmptyImageIllustration(),
+                        )
+                      : const EmptyImageIllustration(),
+                ),
+                if (onFavoriteTap != null)
+                  Positioned(
+                    top: AppSpacing.sm,
+                    right: AppSpacing.sm,
+                    child: GestureDetector(
+                      onTap: onFavoriteTap,
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: AppColors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: AppShadows.card,
+                        ),
+                        child: Icon(
+                          estFavori ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                          size: 16,
+                          color: estFavori ? AppColors.danger : AppColors.gray400,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.md),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          titre,
-                          style: AppTypography.titleMedium,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      if (onFavoriteTap != null)
-                        GestureDetector(
-                          onTap: onFavoriteTap,
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: AppSpacing.xs),
-                            child: Icon(
-                              estFavori ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                              size: 18,
-                              color: estFavori ? AppColors.danger : AppColors.gray400,
-                            ),
-                          ),
-                        ),
-                    ],
+                  Text(
+                    titre,
+                    style: AppTypography.titleMedium,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -123,7 +126,7 @@ class ProductCard extends StatelessWidget {
                     ),
                   ],
                   if (onCartTap != null) ...[
-                    const SizedBox(height: AppSpacing.sm),
+                    const SizedBox(height: AppSpacing.md),
                     _AddToCartButton(dansLePanier: estDansPanier, onTap: onCartTap!),
                   ],
                 ],
@@ -148,7 +151,7 @@ class _AddToCartButton extends StatelessWidget {
       onTap: onTap,
       child: Container(
         width: double.infinity,
-        height: 32,
+        height: 38,
         decoration: BoxDecoration(
           color: dansLePanier ? AppColors.violetSurface : AppColors.violet,
           borderRadius: AppRadius.smRadius,
@@ -158,13 +161,13 @@ class _AddToCartButton extends StatelessWidget {
           children: [
             Icon(
               dansLePanier ? Icons.check_rounded : Icons.add_shopping_cart_rounded,
-              size: 14,
+              size: 16,
               color: dansLePanier ? AppColors.violet : AppColors.white,
             ),
             const SizedBox(width: 6),
             Text(
               dansLePanier ? 'Dans le panier' : 'Ajouter au panier',
-              style: AppTypography.bodySmall.copyWith(
+              style: AppTypography.bodyMedium.copyWith(
                 color: dansLePanier ? AppColors.violet : AppColors.white,
                 fontWeight: FontWeight.w600,
               ),
