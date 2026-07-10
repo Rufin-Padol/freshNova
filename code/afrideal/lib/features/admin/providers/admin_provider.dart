@@ -4,6 +4,7 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/providers/repository_providers.dart';
 import '../../../domain/entities/categorie.dart';
 import '../../../domain/entities/commande.dart';
+import '../../../domain/entities/conversation.dart';
 import '../../../domain/entities/demande_vendeur.dart';
 import '../../../domain/entities/litige.dart';
 import '../../../domain/entities/mission.dart';
@@ -71,6 +72,104 @@ final allSellerRequestsAdminProvider = FutureProvider<List<DemandeVendeur>>((ref
   final all = await repo.getAll();
   all.sort((a, b) => b.dateCreation.compareTo(a.dateCreation));
   return all;
+});
+
+/// Toutes les conversations de la plateforme, tous participants
+/// confondus — contrairement à [myConversationsProvider] (réservé aux
+/// conversations où l'utilisateur connecté est participant), l'admin a
+/// besoin de voir toutes les questions envoyées à propos d'un produit,
+/// même celles où aucun compte admin précis n'a encore été ajouté.
+final allConversationsAdminProvider = FutureProvider<List<Conversation>>((ref) async {
+  final repo = ref.watch(messageRepositoryProvider);
+  return repo.getAllConversations();
+});
+
+/// Un point de la courbe d'activité de la plateforme pour une journée
+/// donnée : nombre de commandes passées et commission perçue (sur les
+/// seules commandes déjà livrées, la commission n'étant réellement
+/// acquise qu'à ce moment-là).
+class DailyActivite {
+  final DateTime jour;
+  final int nombreCommandes;
+  final double revenuCommission;
+
+  const DailyActivite({
+    required this.jour,
+    required this.nombreCommandes,
+    required this.revenuCommission,
+  });
+}
+
+/// Activité quotidienne des 30 derniers jours, dérivée des commandes
+/// et produits déjà chargés — aucun nouvel accès dépôt nécessaire, le
+/// regroupement par jour se fait entièrement en mémoire.
+final adminActiviteProvider = FutureProvider<List<DailyActivite>>((ref) async {
+  final commandes = await ref.watch(allOrdersAdminProvider.future);
+  final produits = await ref.watch(allProductsAdminProvider.future);
+  final produitParId = {for (final p in produits) p.id: p};
+
+  final maintenant = DateTime.now();
+  final aujourdHui = DateTime(maintenant.year, maintenant.month, maintenant.day);
+  final jours = List.generate(30, (i) => aujourdHui.subtract(Duration(days: 29 - i)));
+
+  return jours.map((jour) {
+    final commandesDuJour = commandes.where((c) {
+      final d = c.dateCommande;
+      return d.year == jour.year && d.month == jour.month && d.day == jour.day;
+    });
+
+    double revenu = 0;
+    for (final c in commandesDuJour) {
+      if (c.statut != OrderStatus.livree) continue;
+      for (final entry in c.lignes.entries) {
+        final produit = produitParId[entry.key];
+        if (produit != null) {
+          revenu += (produit.prix - produit.montantNetVendeur) * entry.value;
+        }
+      }
+    }
+
+    return DailyActivite(
+      jour: jour,
+      nombreCommandes: commandesDuJour.length,
+      revenuCommission: revenu,
+    );
+  }).toList();
+});
+
+/// Produit vendu accompagné du nombre total d'unités écoulées, pour
+/// mettre en avant les meilleures ventes de la plateforme.
+class TopProduit {
+  final Produit produit;
+  final int quantiteVendue;
+  const TopProduit({required this.produit, required this.quantiteVendue});
+}
+
+/// Les produits les plus vendus, toutes commandes non annulées
+/// confondues — donne à l'admin un aperçu direct de ce qui se vend le
+/// mieux sur la plateforme.
+final adminTopProduitsProvider = FutureProvider<List<TopProduit>>((ref) async {
+  final commandes = await ref.watch(allOrdersAdminProvider.future);
+  final produits = await ref.watch(allProductsAdminProvider.future);
+  final produitParId = {for (final p in produits) p.id: p};
+
+  final quantitesVendues = <String, int>{};
+  for (final c in commandes) {
+    if (c.statut == OrderStatus.annulee) continue;
+    for (final entry in c.lignes.entries) {
+      quantitesVendues[entry.key] = (quantitesVendues[entry.key] ?? 0) + entry.value;
+    }
+  }
+
+  final resultats = <TopProduit>[];
+  for (final entry in quantitesVendues.entries) {
+    final produit = produitParId[entry.key];
+    if (produit != null) {
+      resultats.add(TopProduit(produit: produit, quantiteVendue: entry.value));
+    }
+  }
+  resultats.sort((a, b) => b.quantiteVendue.compareTo(a.quantiteVendue));
+  return resultats.take(4).toList();
 });
 
 /// Actions admin sur les produits (changement de statut).

@@ -53,6 +53,7 @@ class AppRoutes {
   static const String adminCatalog = '/admin/catalog';
   static const String adminProductEdit = '/admin/catalog/:productId/edit';
   static const String adminSellerRequests = '/admin/seller-requests';
+  static const String adminMessages = '/admin/messages';
   static const String adminOrders = '/admin/orders';
   static const String adminDisputes = '/admin/disputes';
   static const String adminUsers = '/admin/users';

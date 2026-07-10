@@ -5,6 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_dimens.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../auth/providers/session_provider.dart';
+import '../../providers/admin_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Navigation latérale du panel Admin, utilisée à la fois sur le
@@ -17,6 +18,7 @@ class AdminSidebar extends ConsumerWidget {
     _NavItem(Icons.dashboard_rounded, 'Tableau de bord', AppRoutes.adminDashboard),
     _NavItem(Icons.inventory_2_outlined, 'Catalogue', AppRoutes.adminCatalog),
     _NavItem(Icons.assignment_outlined, 'Demandes vendeurs', AppRoutes.adminSellerRequests),
+    _NavItem(Icons.chat_bubble_outline_rounded, 'Messages', AppRoutes.adminMessages),
     _NavItem(Icons.receipt_long_outlined, 'Commandes', AppRoutes.adminOrders),
     _NavItem(Icons.people_outline_rounded, 'Utilisateurs', AppRoutes.adminUsers),
     _NavItem(Icons.gavel_rounded, 'Litiges', AppRoutes.adminDisputes),
@@ -25,6 +27,12 @@ class AdminSidebar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final conversationsAsync = ref.watch(allConversationsAdminProvider);
+    final messagesNonLus = conversationsAsync.valueOrNull
+            ?.where((c) => c.nombreNonLus > 0)
+            .length ??
+        0;
+
     return Container(
       width: 220,
       decoration: const BoxDecoration(
@@ -51,7 +59,8 @@ class AdminSidebar extends ConsumerWidget {
             const SizedBox(height: AppSpacing.sm),
             ...AdminSidebar._items.map((item) {
               final selected = currentRoute.startsWith(item.route);
-              return _SidebarTile(item: item, selected: selected);
+              final badge = item.route == AppRoutes.adminMessages ? messagesNonLus : 0;
+              return _SidebarTile(item: item, selected: selected, badgeCount: badge);
             }),
             const Spacer(),
             const Divider(color: AppColors.gray800, height: 1),
@@ -78,7 +87,8 @@ class _NavItem {
 class _SidebarTile extends StatelessWidget {
   final _NavItem item;
   final bool selected;
-  const _SidebarTile({required this.item, required this.selected});
+  final int badgeCount;
+  const _SidebarTile({required this.item, required this.selected, this.badgeCount = 0});
 
   @override
   Widget build(BuildContext context) {
@@ -98,6 +108,23 @@ class _SidebarTile extends StatelessWidget {
             fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
           ),
         ),
+        trailing: badgeCount > 0
+            ? Container(
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                decoration: BoxDecoration(
+                  color: AppColors.violet,
+                  borderRadius: AppRadius.fullRadius,
+                ),
+                child: Text(
+                  '$badgeCount',
+                  style: const TextStyle(
+                    color: AppColors.white,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              )
+            : null,
         onTap: () => context.go(item.route),
         dense: true,
       ),

@@ -3,6 +3,7 @@ import 'package:uuid/uuid.dart';
 import '../../../core/providers/repository_providers.dart';
 import '../../../domain/entities/conversation.dart';
 import '../../../domain/entities/message.dart';
+import '../../admin/providers/admin_provider.dart';
 import '../../auth/providers/session_provider.dart';
 
 const _uuid = Uuid();
@@ -60,8 +61,24 @@ Future<String> ouvrirConversationProduit(WidgetRef ref, String produitId) async 
 class ConversationNotifier extends FamilyNotifier<AsyncValue<List<Message>>, String> {
   @override
   AsyncValue<List<Message>> build(String conversationId) {
-    _charger();
+    _ouvrir();
     return const AsyncLoading();
+  }
+
+  /// Chargement initial du fil : on le marque comme lu une seule fois,
+  /// à l'ouverture. Ne pas refaire cet appel après un envoi (voir
+  /// [envoyer]) : ce serait remettre à zéro le compteur destiné à
+  /// prévenir l'AUTRE participant, juste après l'avoir soi-même
+  /// incrémenté en envoyant. Conversation.nombreNonLus reste un
+  /// compteur partagé plutôt que par participant — imparfait si les
+  /// deux côtés rouvrent la conversation en alternance, mais très
+  /// largement suffisant ici.
+  Future<void> _ouvrir() async {
+    await _charger();
+    final repo = ref.read(messageRepositoryProvider);
+    await repo.marquerLue(arg);
+    ref.invalidate(myConversationsProvider);
+    ref.invalidate(allConversationsAdminProvider);
   }
 
   Future<void> _charger() async {
@@ -88,6 +105,7 @@ class ConversationNotifier extends FamilyNotifier<AsyncValue<List<Message>>, Str
     await repo.envoyerMessage(msg);
     await _charger();
     ref.invalidate(myConversationsProvider);
+    ref.invalidate(allConversationsAdminProvider);
   }
 }
 

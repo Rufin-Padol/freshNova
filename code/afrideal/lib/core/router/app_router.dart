@@ -31,6 +31,7 @@ import '../../features/admin/presentation/screens/admin_shell_screen.dart';
 import '../../features/admin/presentation/screens/admin_dashboard_screen.dart';
 import '../../features/admin/presentation/screens/admin_catalog_screen.dart';
 import '../../features/admin/presentation/screens/admin_seller_requests_screen.dart';
+import '../../features/admin/presentation/screens/admin_messages_screen.dart';
 import '../../features/admin/presentation/screens/admin_product_edit_screen.dart';
 import '../../features/admin/presentation/screens/admin_disputes_screen.dart';
 import '../../features/admin/presentation/screens/admin_agents_screen.dart';
@@ -327,6 +328,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.adminSellerRequests,
         builder: (context, state) =>
             const AdminShellScreen(child: AdminSellerRequestsScreen()),
+      ),
+      GoRoute(
+        path: AppRoutes.adminMessages,
+        builder: (context, state) =>
+            const AdminShellScreen(child: AdminMessagesScreen()),
       ),
       GoRoute(
         path: AppRoutes.adminProductEdit,

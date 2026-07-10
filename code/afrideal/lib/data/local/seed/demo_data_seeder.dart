@@ -568,5 +568,25 @@ class DemoDataSeeder {
       dateEnvoi: maintenant.subtract(const Duration(days: 6)),
       estLu: true,
     ));
+
+    // Question d'un acheteur à propos d'un produit précis, non encore
+    // répondue par l'admin — sert à démontrer la messagerie admin
+    // (voir AdminMessagesScreen) dès le premier lancement plutôt que
+    // de laisser cette boîte de réception vide.
+    await messageRepo.saveConversation(Conversation(
+      id: 'demo-conv-produit-1',
+      participantIds: const [DemoIds.acheteurId],
+      produitId: 'demo-prod-iphone12',
+      dernierMessage: '',
+      dateDernierMessage: maintenant.subtract(const Duration(hours: 3)),
+    ));
+
+    await messageRepo.envoyerMessage(Message(
+      id: 'demo-msg-3',
+      conversationId: 'demo-conv-produit-1',
+      expediteurId: DemoIds.acheteurId,
+      contenu: 'Bonjour, est-ce que la batterie tient bien toute la journée ?',
+      dateEnvoi: maintenant.subtract(const Duration(hours: 3)),
+    ));
   }
 }

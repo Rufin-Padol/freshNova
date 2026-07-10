@@ -31,6 +31,14 @@ class LocalMessageRepository implements IMessageRepository {
   }
 
   @override
+  Future<List<Conversation>> getAllConversations() async {
+    final all = await _conversationStore.getAll();
+    final sorted = [...all]
+      ..sort((a, b) => b.dateDernierMessage.compareTo(a.dateDernierMessage));
+    return sorted.map((m) => m.toEntity()).toList();
+  }
+
+  @override
   Future<Conversation?> getConversationById(String id) async {
     final model = await _conversationStore.getById(id);
     return model?.toEntity();
@@ -47,10 +55,33 @@ class LocalMessageRepository implements IMessageRepository {
   @override
   Future<void> envoyerMessage(Message message) async {
     await _messageStore.save(MessageModel.fromEntity(message));
+
+    // Tient l'aperçu de la conversation à jour (dernier message, date,
+    // compteur de non-lus) — sans ça, la liste des messages affichait
+    // toujours l'aperçu du tout premier message, même après des
+    // échanges plus récents.
+    final conversationModel = await _conversationStore.getById(message.conversationId);
+    if (conversationModel == null) return;
+    final conversation = conversationModel.toEntity();
+    await _conversationStore.save(ConversationModel.fromEntity(conversation.copyWith(
+      dernierMessage: message.contenu,
+      dateDernierMessage: message.dateEnvoi,
+      nombreNonLus: conversation.nombreNonLus + 1,
+    )));
   }
 
   @override
   Future<void> saveConversation(Conversation conversation) async {
     await _conversationStore.save(ConversationModel.fromEntity(conversation));
+  }
+
+  @override
+  Future<void> marquerLue(String conversationId) async {
+    final model = await _conversationStore.getById(conversationId);
+    if (model == null || model.nombreNonLus == 0) return;
+    final conversation = model.toEntity();
+    await _conversationStore.save(
+      ConversationModel.fromEntity(conversation.copyWith(nombreNonLus: 0)),
+    );
   }
 }
