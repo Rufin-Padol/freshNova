@@ -65,8 +65,12 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
-  # Aucune entrée "assets:" pour l'instant : toutes les illustrations
-  # de l'app sont des widgets Dart (voir shared/widgets/illustrations),
-  # pas des fichiers chargés depuis assets/images|icons|illustrations,
-  # qui restent vides. Idem pour "fonts:" (assets/fonts/ vide). Ajouter
-  # ces sections dès que de vrais fichiers y sont placés.
+  # Logos officiels des moyens de paiement Mobile Money (Orange Money,
+  # MTN MoMo), affichés tels quels sur l'écran de paiement pour que
+  # l'acheteur identifie immédiatement les options disponibles — seuls
+  # fichiers d'assets utilisés dans l'app pour l'instant, tout le
+  # reste des illustrations étant des widgets Dart (voir
+  # shared/widgets/illustrations). Toujours pas de "fonts:"
+  # (assets/fonts/ vide).
+  assets:
+    - assets/icons/payment/

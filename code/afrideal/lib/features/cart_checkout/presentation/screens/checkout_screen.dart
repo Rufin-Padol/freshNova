@@ -264,13 +264,15 @@ class _PaymentMethodSelector extends StatelessWidget {
     if (methode == PaymentMethod.especes) {
       return const Icon(Icons.payments_outlined, size: 28, color: AppColors.gray700);
     }
-    final couleur = methode == PaymentMethod.orangeMoney
-        ? const Color(0xFFFF6600)
-        : const Color(0xFFFFCC00);
-    return Container(
-      width: 28,
+    final asset = methode == PaymentMethod.orangeMoney
+        ? 'assets/icons/payment/orange_money.png'
+        : 'assets/icons/payment/mtn_momo.png';
+    return SizedBox(
       height: 28,
-      decoration: BoxDecoration(color: couleur, shape: BoxShape.circle),
+      child: FittedBox(
+        fit: BoxFit.contain,
+        child: Image.asset(asset),
+      ),
     );
   }
 }
