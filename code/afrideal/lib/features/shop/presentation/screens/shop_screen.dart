@@ -74,26 +74,30 @@ class ShopScreen extends ConsumerWidget {
                               ),
                             ],
                           ),
-                          if (utilisateur == null)
-                            TextButton(
-                              onPressed: () => context.push(AppRoutes.demoAccounts),
-                              child: const Text('Se connecter'),
-                            )
-                          else
-                            Row(
-                              children: [
-                                _TopIconButton(
-                                  icon: Icons.shopping_cart_outlined,
-                                  badgeCount: panier.length,
-                                  onTap: () => context.push(AppRoutes.cart),
-                                ),
-                                const SizedBox(width: AppSpacing.sm),
+                          Row(
+                            children: [
+                              // Visible même sans connexion : on peut
+                              // ajouter au panier en tant qu'invité, il
+                              // faut donc pouvoir voir et ouvrir ce
+                              // panier sans être connecté.
+                              _TopIconButton(
+                                icon: Icons.shopping_cart_outlined,
+                                badgeCount: panier.length,
+                                onTap: () => context.push(AppRoutes.cart),
+                              ),
+                              const SizedBox(width: AppSpacing.sm),
+                              if (utilisateur == null)
+                                TextButton(
+                                  onPressed: () => context.push(AppRoutes.demoAccounts),
+                                  child: const Text('Se connecter'),
+                                )
+                              else
                                 _TopIconButton(
                                   icon: Icons.notifications_outlined,
                                   onTap: () => context.push(AppRoutes.notifications),
                                 ),
-                              ],
-                            ),
+                            ],
+                          ),
                         ],
                       ),
                       const SizedBox(height: AppSpacing.xl),
