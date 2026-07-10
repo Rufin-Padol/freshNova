@@ -19,6 +19,7 @@ class DemandeVendeurModel {
   final String? raisonRefus;
   final double? latitude;
   final double? longitude;
+  final List<String> photos;
 
   const DemandeVendeurModel({
     required this.id,
@@ -38,6 +39,7 @@ class DemandeVendeurModel {
     this.raisonRefus,
     this.latitude,
     this.longitude,
+    this.photos = const [],
   });
 
   factory DemandeVendeurModel.fromEntity(DemandeVendeur e) {
@@ -59,6 +61,7 @@ class DemandeVendeurModel {
       raisonRefus: e.raisonRefus,
       latitude: e.latitude,
       longitude: e.longitude,
+      photos: e.photos,
     );
   }
 
@@ -81,6 +84,7 @@ class DemandeVendeurModel {
       raisonRefus: raisonRefus,
       latitude: latitude,
       longitude: longitude,
+      photos: photos,
     );
   }
 
@@ -102,6 +106,7 @@ class DemandeVendeurModel {
         'raisonRefus': raisonRefus,
         'latitude': latitude,
         'longitude': longitude,
+        'photos': photos,
       };
 
   factory DemandeVendeurModel.fromJson(Map<String, dynamic> json) {
@@ -123,6 +128,7 @@ class DemandeVendeurModel {
       raisonRefus: json['raisonRefus'] as String?,
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
+      photos: (json['photos'] as List?)?.cast<String>() ?? const [],
     );
   }
 }

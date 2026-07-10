@@ -9,9 +9,11 @@ class AppConstants {
   /// Nombre maximal de produits soumis en une seule fois par un vendeur.
   static const int maxQuantityPerSubmission = 10;
 
-  /// Nombre maximal de photos qu'un vendeur peut joindre à sa soumission
-  /// (photos d'aperçu, différentes des photos officielles de l'agent).
-  static const int maxSellerPreviewPhotos = 5;
+  /// Nombre minimal et maximal de photos qu'un vendeur doit joindre à sa
+  /// soumission (photos d'aperçu, différentes des photos officielles
+  /// prises par l'agent lors de la collecte).
+  static const int minSellerPreviewPhotos = 2;
+  static const int maxSellerPreviewPhotos = 4;
 
   /// Délai, en minutes, durant lequel un produit reste réservé pour un
   /// acheteur sans paiement confirmé avant d'être remis en vente.

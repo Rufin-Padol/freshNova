@@ -2,16 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/config/app_config.dart';
+import '../../../../core/providers/repository_providers.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_dimens.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/formatters.dart';
 import '../../../../data/local/datasources/hive_service.dart';
 import '../../../../data/local/seed/datasources_box_check.dart';
-import '../../../../domain/enums/seller_request_status.dart';
+import '../../../../domain/entities/demande_vendeur.dart';
+import '../../../../domain/entities/utilisateur.dart';
 import '../../../../domain/enums/user_role.dart';
+import '../../../../shared/widgets/buttons/app_primary_button.dart';
 import '../../../../shared/widgets/cards/app_avatar.dart';
+import '../../../../shared/widgets/cards/status_badge.dart';
+import '../../../../shared/widgets/feedback/app_loading_indicator.dart';
 import '../../../../shared/widgets/feedback/app_snackbar.dart';
+import '../../../../shared/widgets/inputs/app_text_field.dart';
 import '../../../auth/providers/session_provider.dart';
 import '../../../sell/providers/sell_provider.dart';
 
@@ -52,27 +59,29 @@ class ProfileScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.xxl),
-          if (utilisateur.role == UserRole.acheteur) ...[
-            _SectionTitre('Vendre'),
-            _MesAnnoncesCard(),
-            const SizedBox(height: AppSpacing.xl),
-          ],
-          _SectionTitre('Informations'),
+          _SectionHeader(
+            titre: 'Informations personnelles',
+            actionIcon: Icons.edit_outlined,
+            onAction: () => _ouvrirEditionProfil(context, ref, utilisateur),
+          ),
           _InfoTile(Icons.phone_outlined, 'Téléphone', utilisateur.telephone),
+          _InfoTile(Icons.location_city_outlined, 'Ville', utilisateur.ville ?? 'Non renseignée'),
           _InfoTile(Icons.badge_outlined, 'Rôle', utilisateur.role.label),
           if (utilisateur.noteVendeur != null)
             _InfoTile(Icons.star_outline_rounded, 'Note vendeur',
                 '${utilisateur.noteVendeur!.toStringAsFixed(1)} / 5.0'),
           const SizedBox(height: AppSpacing.xl),
-          _SectionTitre('Application'),
-          _InfoTile(
-            AppConfig.isLocal ? Icons.storage_outlined : Icons.cloud_outlined,
-            'Mode de données',
-            AppConfig.isLocal ? 'Données locales' : 'API connectée',
-          ),
-          const SizedBox(height: AppSpacing.xl),
+          if (utilisateur.role == UserRole.acheteur) ...[
+            _SectionHeader(
+              titre: 'Mes annonces',
+              actionIcon: Icons.add_rounded,
+              onAction: () => context.push(AppRoutes.sellStep1),
+            ),
+            _MesAnnonces(),
+            const SizedBox(height: AppSpacing.xl),
+          ],
           if (AppConfig.isLocal) ...[
-            _SectionTitre('Développement'),
+            const _SectionHeader(titre: 'Développement'),
             ListTile(
               leading: const Icon(Icons.refresh_rounded, color: AppColors.warning),
               title: Text('Réinitialiser les données de démo',
@@ -100,24 +109,200 @@ class ProfileScreen extends ConsumerWidget {
       ),
     );
   }
+
+  void _ouvrirEditionProfil(BuildContext context, WidgetRef ref, Utilisateur utilisateur) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: AppRadius.xlRadius.topLeft),
+      ),
+      builder: (sheetContext) => _EditionProfilSheet(utilisateur: utilisateur),
+    );
+  }
 }
 
-/// Point d'entrée vers la vente, accessible depuis le profil de tout
-/// utilisateur connecté — pas besoin d'un rôle "vendeur" distinct pour
-/// soumettre un bien, à la manière d'un profil Facebook où chacun peut
-/// aussi bien consulter que publier une annonce.
-class _MesAnnoncesCard extends ConsumerWidget {
+/// Formulaire de modification des informations personnelles.
+///
+/// Modifie le compte via IUserRepository.save, puis rafraîchit la
+/// session : sauvegarder dans le dépôt ne met pas automatiquement à
+/// jour currentUserProvider, qui ne reflète que l'état de session.
+class _EditionProfilSheet extends ConsumerStatefulWidget {
+  final Utilisateur utilisateur;
+
+  const _EditionProfilSheet({required this.utilisateur});
+
+  @override
+  ConsumerState<_EditionProfilSheet> createState() => _EditionProfilSheetState();
+}
+
+class _EditionProfilSheetState extends ConsumerState<_EditionProfilSheet> {
+  late final TextEditingController _prenomCtrl;
+  late final TextEditingController _nomCtrl;
+  late final TextEditingController _telephoneCtrl;
+  late final TextEditingController _villeCtrl;
+  bool _enCours = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final u = widget.utilisateur;
+    _prenomCtrl = TextEditingController(text: u.prenom);
+    _nomCtrl = TextEditingController(text: u.nom);
+    _telephoneCtrl = TextEditingController(text: u.telephone);
+    _villeCtrl = TextEditingController(text: u.ville ?? '');
+  }
+
+  @override
+  void dispose() {
+    _prenomCtrl.dispose();
+    _nomCtrl.dispose();
+    _telephoneCtrl.dispose();
+    _villeCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _enregistrer() async {
+    if (_prenomCtrl.text.trim().isEmpty ||
+        _nomCtrl.text.trim().isEmpty ||
+        _telephoneCtrl.text.trim().isEmpty) {
+      AppSnackbar.showError(context, 'Prénom, nom et téléphone sont obligatoires.');
+      return;
+    }
+
+    setState(() => _enCours = true);
+    final utilisateurMisAJour = widget.utilisateur.copyWith(
+      prenom: _prenomCtrl.text.trim(),
+      nom: _nomCtrl.text.trim(),
+      telephone: _telephoneCtrl.text.trim(),
+      ville: _villeCtrl.text.trim().isEmpty ? null : _villeCtrl.text.trim(),
+    );
+    await ref.read(userRepositoryProvider).save(utilisateurMisAJour);
+    await ref.read(sessionProvider.notifier).refresh();
+
+    if (mounted) {
+      Navigator.of(context).pop();
+      AppSnackbar.showSuccess(context, 'Profil mis à jour.');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        left: AppSpacing.lg,
+        right: AppSpacing.lg,
+        top: AppSpacing.lg,
+        bottom: MediaQuery.of(context).viewInsets.bottom + AppSpacing.lg,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Modifier mes informations', style: AppTypography.titleLarge),
+          const SizedBox(height: AppSpacing.lg),
+          Row(
+            children: [
+              Expanded(
+                child: AppTextField(label: 'Prénom', controller: _prenomCtrl),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: AppTextField(label: 'Nom', controller: _nomCtrl),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          AppTextField(
+            label: 'Numéro de téléphone',
+            controller: _telephoneCtrl,
+            keyboardType: TextInputType.phone,
+            prefixIcon: Icons.phone_outlined,
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          AppTextField(
+            label: 'Ville',
+            controller: _villeCtrl,
+            prefixIcon: Icons.location_city_outlined,
+          ),
+          const SizedBox(height: AppSpacing.xl),
+          AppPrimaryButton(
+            label: 'Enregistrer',
+            isLoading: _enCours,
+            onPressed: _enCours ? null : _enregistrer,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Annonces déjà soumises par l'utilisateur, affichées directement sur
+/// son profil (pas seulement un résumé qui renvoie ailleurs) — on y
+/// voit tout de suite ce qui a été soumis, et un bouton "+" permet
+/// d'en ajouter une nouvelle sans quitter son propre profil.
+class _MesAnnonces extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final demandesAsync = ref.watch(mySellerRequestsProvider);
-    final enCours = demandesAsync.valueOrNull
-            ?.where((d) => d.statut != SellerRequestStatus.terminee)
-            .length ??
-        0;
 
+    return demandesAsync.when(
+      loading: () => const Padding(
+        padding: EdgeInsets.symmetric(vertical: AppSpacing.lg),
+        child: AppLoadingIndicator(),
+      ),
+      error: (_, __) => Text(
+        'Impossible de charger vos annonces.',
+        style: AppTypography.bodySmall.copyWith(color: AppColors.danger),
+      ),
+      data: (demandes) {
+        if (demandes.isEmpty) {
+          return Container(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: AppRadius.lgRadius,
+              border: Border.all(color: AppColors.gray200),
+            ),
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Aucune annonce pour l\'instant', style: AppTypography.bodyLarge),
+                SizedBox(height: 4),
+                Text(
+                  'Appuyez sur "+" pour soumettre un bien — un agent viendra le vérifier chez vous.',
+                  style: AppTypography.bodySmall,
+                ),
+              ],
+            ),
+          );
+        }
+        return Column(
+          children: [
+            for (final demande in demandes)
+              Padding(
+                padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                child: _AnnonceTile(demande: demande),
+              ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _AnnonceTile extends StatelessWidget {
+  final DemandeVendeur demande;
+
+  const _AnnonceTile({required this.demande});
+
+  @override
+  Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => context.push(AppRoutes.sellHome),
       borderRadius: AppRadius.lgRadius,
+      onTap: () => context.push(
+        AppRoutes.sellRequestDetail.replaceFirst(':requestId', demande.id),
+      ),
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.lg),
         decoration: BoxDecoration(
@@ -125,33 +310,28 @@ class _MesAnnoncesCard extends ConsumerWidget {
           borderRadius: AppRadius.lgRadius,
           border: Border.all(color: AppColors.gray200),
         ),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: const BoxDecoration(
-                color: AppColors.violetSurface,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.add_box_outlined, color: AppColors.violet),
-            ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Vendre un bien', style: AppTypography.titleMedium),
-                  Text(
-                    enCours > 0
-                        ? '$enCours demande${enCours > 1 ? 's' : ''} en cours'
-                        : 'Soumettez un produit, un agent le vérifiera chez vous',
-                    style: AppTypography.bodySmall,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    demande.typeProduitSouhaite,
+                    style: AppTypography.titleMedium,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ],
-              ),
+                ),
+                StatusBadge(label: demande.statut.label, color: demande.statut.color),
+              ],
             ),
-            const Icon(Icons.chevron_right_rounded, color: AppColors.gray400),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              '${Formatters.currency(demande.prixSouhaite)} souhaité · '
+              '${Formatters.shortDate(demande.dateCreation)}',
+              style: AppTypography.bodySmall,
+            ),
           ],
         ),
       ),
@@ -159,15 +339,38 @@ class _MesAnnoncesCard extends ConsumerWidget {
   }
 }
 
-class _SectionTitre extends StatelessWidget {
+class _SectionHeader extends StatelessWidget {
   final String titre;
-  const _SectionTitre(this.titre);
+  final IconData? actionIcon;
+  final VoidCallback? onAction;
+
+  const _SectionHeader({required this.titre, this.actionIcon, this.onAction});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 4, bottom: AppSpacing.sm),
-      child: Text(titre, style: AppTypography.label.copyWith(letterSpacing: 0.8)),
+      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            titre,
+            style: AppTypography.label.copyWith(letterSpacing: 0.8),
+          ),
+          if (actionIcon != null)
+            GestureDetector(
+              onTap: onAction,
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: const BoxDecoration(
+                  color: AppColors.violetSurface,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(actionIcon, size: 16, color: AppColors.violet),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

@@ -36,6 +36,12 @@ class DemandeVendeur extends Equatable {
   final double? latitude;
   final double? longitude;
 
+  /// Photos d'aperçu jointes par le vendeur à la soumission (data URLs
+  /// base64), distinctes des photos officielles que l'agent prend lors
+  /// de la collecte — elles aident simplement l'admin à juger la
+  /// demande avant d'envoyer un agent sur place.
+  final List<String> photos;
+
   const DemandeVendeur({
     required this.id,
     required this.statut,
@@ -54,6 +60,7 @@ class DemandeVendeur extends Equatable {
     this.raisonRefus,
     this.latitude,
     this.longitude,
+    this.photos = const [],
   });
 
   DemandeVendeur copyWith({
@@ -74,6 +81,7 @@ class DemandeVendeur extends Equatable {
     String? raisonRefus,
     double? latitude,
     double? longitude,
+    List<String>? photos,
   }) {
     return DemandeVendeur(
       id: id ?? this.id,
@@ -93,6 +101,7 @@ class DemandeVendeur extends Equatable {
       raisonRefus: raisonRefus ?? this.raisonRefus,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
+      photos: photos ?? this.photos,
     );
   }
 
@@ -115,5 +124,6 @@ class DemandeVendeur extends Equatable {
         raisonRefus,
         latitude,
         longitude,
+        photos,
       ];
 }

@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/providers/repository_providers.dart';
 import '../../../domain/entities/demande_vendeur.dart';
 import '../../../domain/enums/seller_request_status.dart';
@@ -15,6 +16,10 @@ class SellFormState {
   final double prixSouhaite;
   final String description;
   final int quantite;
+
+  /// Photos d'aperçu (data URLs base64), 2 minimum / 4 maximum —
+  /// distinctes des photos officielles que l'agent prendra sur place.
+  final List<String> photos;
 
   // Étape 2 — logistique
   final String adresse;
@@ -35,6 +40,7 @@ class SellFormState {
     this.prixSouhaite = 0,
     this.description = '',
     this.quantite = 1,
+    this.photos = const [],
     this.adresse = '',
     this.zone = '',
     this.disponibilite = '',
@@ -52,6 +58,7 @@ class SellFormState {
     double? prixSouhaite,
     String? description,
     int? quantite,
+    List<String>? photos,
     String? adresse,
     String? zone,
     String? disponibilite,
@@ -69,6 +76,7 @@ class SellFormState {
       prixSouhaite: prixSouhaite ?? this.prixSouhaite,
       description: description ?? this.description,
       quantite: quantite ?? this.quantite,
+      photos: photos ?? this.photos,
       adresse: adresse ?? this.adresse,
       zone: zone ?? this.zone,
       disponibilite: disponibilite ?? this.disponibilite,
@@ -93,6 +101,17 @@ class SellNotifier extends Notifier<SellFormState> {
     state = state.copyWith(prixSouhaite: parsed, clearErreur: true);
   }
   void setDescription(String v) => state = state.copyWith(description: v, clearErreur: true);
+
+  void ajouterPhoto(String dataUrl) {
+    if (state.photos.length >= AppConstants.maxSellerPreviewPhotos) return;
+    state = state.copyWith(photos: [...state.photos, dataUrl], clearErreur: true);
+  }
+
+  void retirerPhoto(int index) {
+    final photos = [...state.photos]..removeAt(index);
+    state = state.copyWith(photos: photos, clearErreur: true);
+  }
+
   void setAdresse(String v) => state = state.copyWith(adresse: v, clearErreur: true);
   void setZone(String v) => state = state.copyWith(zone: v, clearErreur: true);
   void setDisponibilite(String v) => state = state.copyWith(disponibilite: v, clearErreur: true);
@@ -110,6 +129,12 @@ class SellNotifier extends Notifier<SellFormState> {
     }
     if (state.prixSouhaite <= 0) {
       state = state.copyWith(erreur: 'Veuillez indiquer un prix valide.');
+      return false;
+    }
+    if (state.photos.length < AppConstants.minSellerPreviewPhotos) {
+      state = state.copyWith(
+        erreur: 'Ajoutez au moins ${AppConstants.minSellerPreviewPhotos} photos du produit.',
+      );
       return false;
     }
     return true;
@@ -161,6 +186,7 @@ class SellNotifier extends Notifier<SellFormState> {
         prixSouhaite: state.prixSouhaite,
         latitude: state.latitude,
         longitude: state.longitude,
+        photos: state.photos,
       ));
       state = state.copyWith(estEnvoi: false, estEnvoye: true);
     } catch (e) {

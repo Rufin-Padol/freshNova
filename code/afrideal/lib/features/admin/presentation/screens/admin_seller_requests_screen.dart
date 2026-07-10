@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -8,10 +11,13 @@ import '../../../../core/errors/error_view.dart';
 import '../../../../domain/entities/demande_vendeur.dart';
 import '../../../../domain/entities/utilisateur.dart';
 import '../../../../domain/enums/seller_request_status.dart';
+import '../../../../shared/widgets/cards/info_row.dart';
 import '../../../../shared/widgets/cards/status_badge.dart';
 import '../../../../shared/widgets/feedback/app_loading_indicator.dart';
 import '../../../../shared/widgets/feedback/app_snackbar.dart';
 import '../../providers/admin_provider.dart';
+
+Uint8List _decodeDataUrl(String dataUrl) => base64Decode(dataUrl.split(',').last);
 
 /// Écran admin de traitement des demandes vendeurs — le maillon
 /// central du cycle métier : c'est ici que chaque soumission reçoit un
@@ -57,6 +63,7 @@ class AdminSellerRequestsScreen extends ConsumerWidget {
                         d.statut == SellerRequestStatus.validee;
                     return ListTile(
                       contentPadding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                      onTap: () => _ouvrirDetail(context, ref, d),
                       title: Row(
                         children: [
                           Expanded(
@@ -83,6 +90,98 @@ class AdminSellerRequestsScreen extends ConsumerWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Future<void> _ouvrirDetail(BuildContext context, WidgetRef ref, DemandeVendeur d) async {
+    final peutAssigner =
+        d.statut == SellerRequestStatus.enAttente || d.statut == SellerRequestStatus.validee;
+
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(borderRadius: AppRadius.xlRadius),
+      builder: (sheetContext) => DraggableScrollableSheet(
+        initialChildSize: 0.75,
+        maxChildSize: 0.95,
+        expand: false,
+        builder: (_, scrollController) => SingleChildScrollView(
+          controller: scrollController,
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(d.typeProduitSouhaite, style: AppTypography.titleLarge),
+                  ),
+                  StatusBadge(label: d.statut.label, color: d.statut.color),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                '${Formatters.currency(d.prixSouhaite)} souhaité · '
+                '${Formatters.shortDate(d.dateCreation)}',
+                style: AppTypography.bodyMedium,
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              Text(d.descriptionInitiale, style: AppTypography.bodyLarge),
+              const SizedBox(height: AppSpacing.lg),
+              InfoRow(icon: Icons.location_on_outlined, label: 'Adresse', value: d.adresse),
+              const SizedBox(height: AppSpacing.md),
+              InfoRow(icon: Icons.map_outlined, label: 'Zone', value: d.zone),
+              const SizedBox(height: AppSpacing.md),
+              InfoRow(
+                icon: Icons.schedule_outlined,
+                label: 'Disponibilité',
+                value: d.disponibilite,
+              ),
+              const SizedBox(height: AppSpacing.md),
+              InfoRow(
+                icon: Icons.inventory_2_outlined,
+                label: 'Quantité',
+                value: '${d.quantite}',
+              ),
+              if (d.photos.isNotEmpty) ...[
+                const SizedBox(height: AppSpacing.lg),
+                Text('Photos du vendeur', style: AppTypography.titleMedium),
+                const SizedBox(height: AppSpacing.sm),
+                Wrap(
+                  spacing: AppSpacing.sm,
+                  runSpacing: AppSpacing.sm,
+                  children: [
+                    for (final photo in d.photos)
+                      ClipRRect(
+                        borderRadius: AppRadius.smRadius,
+                        child: Image.memory(
+                          _decodeDataUrl(photo),
+                          height: 96,
+                          width: 96,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+              if (peutAssigner) ...[
+                const SizedBox(height: AppSpacing.xl),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    onPressed: () {
+                      Navigator.of(sheetContext).pop();
+                      _ouvrirAssignation(context, ref, d);
+                    },
+                    child: const Text('Assigner un agent'),
+                  ),
+                ),
+              ],
+              const SizedBox(height: AppSpacing.lg),
+            ],
+          ),
+        ),
       ),
     );
   }
