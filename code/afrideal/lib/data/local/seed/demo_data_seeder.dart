@@ -446,12 +446,29 @@ class DemoDataSeeder {
       zone: 'Douala 5ème',
       dateCreation: maintenant.subtract(const Duration(hours: 8)),
       vendeurId: DemoIds.vendeurId,
-      typeProduitSouhaite: 'Téléviseur Samsung 43"',
+      typeProduitSouhaite: 'Téléviseur Samsung 43" occasion',
       categorieId: DemoIds.catElectronique,
       quantite: 1,
-      descriptionInitiale: 'Téléviseur en bon état, peu utilisé.',
+      descriptionInitiale: 'Téléviseur d\'occasion en bon état, peu utilisé.',
       prixSouhaite: 95000,
       missionId: 'demo-mission-1',
+    ));
+
+    await requestRepo.save(DemandeVendeur(
+      id: 'demo-req-2',
+      statut: SellerRequestStatus.enAttente,
+      adresse: 'Carrefour Nlongkak, Yaoundé',
+      disponibilite: 'Week-end uniquement',
+      contactVendeur: '670000002',
+      zone: 'Yaoundé Centre',
+      dateCreation: maintenant.subtract(const Duration(days: 1)),
+      vendeurId: DemoIds.vendeurId,
+      typeProduitSouhaite: 'Moto Boxer 100 occasion',
+      categorieId: DemoIds.catVehicules,
+      quantite: 1,
+      descriptionInitiale:
+          'Moto d\'occasion, moteur révisé récemment, quelques rayures sur le réservoir.',
+      prixSouhaite: 350000,
     ));
 
     await missionRepo.save(Mission(
