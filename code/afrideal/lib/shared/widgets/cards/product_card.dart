@@ -5,20 +5,23 @@ import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/formatters.dart';
 import '../illustrations/empty_image_illustration.dart';
 
-/// Carte produit affichée dans les grilles de la boutique, des
-/// favoris, et des listes vendeur/agent.
+/// Carte produit affichée dans les listes de la boutique et des
+/// favoris — une carte par ligne (jamais de grille à deux colonnes :
+/// une grille serrée forçait une hauteur fixe par carte, ce qui
+/// débordait dès que le contenu dépassait l'espace prévu). En liste
+/// pleine largeur, la carte s'adapte naturellement à son contenu, sans
+/// contrainte de hauteur imposée depuis l'extérieur.
 ///
-/// Volontairement compacte : seules les informations essentielles à
-/// la décision d'achat sont visibles (photo, titre, prix). Ni la
-/// localisation ni le vendeur ne sont affichés — TrustNova est
-/// l'unique interlocuteur visible de l'acheteur, sur la carte comme
-/// sur la fiche produit. Pas de note ni de "stock restant" : chaque
-/// annonce est un bien de seconde main unique, pas un article en
-/// stock avec avis clients.
+/// Affiche la localisation générale du produit (ville/quartier) —
+/// utile pour évaluer la faisabilité d'une livraison — mais jamais
+/// l'identité du vendeur : TrustNova reste l'unique interlocuteur
+/// visible de l'acheteur. Pas de note ni de "stock restant" non plus,
+/// chaque annonce étant un bien de seconde main unique.
 class ProductCard extends StatelessWidget {
   final String titre;
   final double prix;
   final String? photoUrl;
+  final String? localisation;
   final VoidCallback onTap;
   final VoidCallback? onFavoriteTap;
   final bool estFavori;
@@ -31,6 +34,7 @@ class ProductCard extends StatelessWidget {
     required this.prix,
     required this.onTap,
     this.photoUrl,
+    this.localisation,
     this.onFavoriteTap,
     this.estFavori = false,
     this.onCartTap,
@@ -43,81 +47,88 @@ class ProductCard extends StatelessWidget {
       onTap: onTap,
       borderRadius: AppRadius.lgRadius,
       child: Container(
+        padding: const EdgeInsets.all(AppSpacing.sm),
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: AppRadius.lgRadius,
           boxShadow: AppShadows.card,
         ),
-        clipBehavior: Clip.antiAlias,
-        child: Column(
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Stack(
-              children: [
-                AspectRatio(
-                  aspectRatio: 1.15,
-                  child: photoUrl != null && photoUrl!.isNotEmpty
-                      ? Image.network(
-                          photoUrl!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => const EmptyImageIllustration(),
-                        )
-                      : const EmptyImageIllustration(),
-                ),
-                if (onFavoriteTap != null)
-                  Positioned(
-                    top: AppSpacing.sm,
-                    right: AppSpacing.sm,
-                    child: GestureDetector(
-                      onTap: onFavoriteTap,
-                      child: Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: AppColors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: AppShadows.card,
-                        ),
-                        child: Icon(
-                          estFavori ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                          size: 16,
-                          color: estFavori ? AppColors.danger : AppColors.gray400,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.md, AppSpacing.md, AppSpacing.md, AppSpacing.sm,
+            ClipRRect(
+              borderRadius: AppRadius.mdRadius,
+              child: SizedBox(
+                width: 108,
+                height: 108,
+                child: photoUrl != null && photoUrl!.isNotEmpty
+                    ? Image.network(
+                        photoUrl!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => const EmptyImageIllustration(),
+                      )
+                    : const EmptyImageIllustration(),
               ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    titre,
-                    style: AppTypography.titleMedium,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          titre,
+                          style: AppTypography.titleMedium,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (onFavoriteTap != null)
+                        GestureDetector(
+                          onTap: onFavoriteTap,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: AppSpacing.xs),
+                            child: Icon(
+                              estFavori ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                              size: 18,
+                              color: estFavori ? AppColors.danger : AppColors.gray400,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                   const SizedBox(height: 4),
                   Text(
                     Formatters.currency(prix),
                     style: AppTypography.titleMedium.copyWith(color: AppColors.violet),
                   ),
+                  if (localisation != null && localisation!.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        const Icon(Icons.location_on_outlined, size: 13, color: AppColors.gray400),
+                        const SizedBox(width: 2),
+                        Expanded(
+                          child: Text(
+                            localisation!,
+                            style: AppTypography.caption,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                  if (onCartTap != null) ...[
+                    const SizedBox(height: AppSpacing.sm),
+                    _AddToCartButton(dansLePanier: estDansPanier, onTap: onCartTap!),
+                  ],
                 ],
               ),
             ),
-            if (onCartTap != null)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.md, 0, AppSpacing.md, AppSpacing.md,
-                ),
-                child: _AddToCartButton(
-                  dansLePanier: estDansPanier,
-                  onTap: onCartTap!,
-                ),
-              ),
           ],
         ),
       ),
@@ -137,7 +148,7 @@ class _AddToCartButton extends StatelessWidget {
       onTap: onTap,
       child: Container(
         width: double.infinity,
-        height: 34,
+        height: 32,
         decoration: BoxDecoration(
           color: dansLePanier ? AppColors.violetSurface : AppColors.violet,
           borderRadius: AppRadius.smRadius,
@@ -147,7 +158,7 @@ class _AddToCartButton extends StatelessWidget {
           children: [
             Icon(
               dansLePanier ? Icons.check_rounded : Icons.add_shopping_cart_rounded,
-              size: 15,
+              size: 14,
               color: dansLePanier ? AppColors.violet : AppColors.white,
             ),
             const SizedBox(width: 6),

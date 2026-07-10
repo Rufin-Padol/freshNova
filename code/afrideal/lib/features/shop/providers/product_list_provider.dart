@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/providers/repository_providers.dart';
 import '../../../domain/entities/produit.dart';
+import '../../auth/providers/session_provider.dart';
 
 /// Ordre de tri des annonces dans la boutique.
 enum ShopTri { recent, prixCroissant, prixDecroissant }
@@ -58,17 +59,38 @@ final shopFiltersProvider = NotifierProvider<ShopFiltersNotifier, ShopFilters>(
 /// changement de filtre grâce à ref.watch(shopFiltersProvider). Le tri
 /// se fait côté client : aucune annonce supplémentaire n'est chargée,
 /// on réordonne simplement la liste déjà récupérée.
+///
+/// Par défaut (tri "récents"), les annonces situées dans la même
+/// ville que l'acheteur remontent en premier — un signal simple et
+/// honnête (basé sur la ville renseignée à l'inscription) plutôt
+/// qu'un filtre strict qui masquerait les autres annonces. Un tri prix
+/// explicite reste un tri prix pur : on ne réordonne pas un choix
+/// explicite de l'utilisateur.
 final shopProductsProvider = FutureProvider<List<Produit>>((ref) async {
   final repo = ref.watch(productRepositoryProvider);
   final filtres = ref.watch(shopFiltersProvider);
+  final utilisateur = ref.watch(currentUserProvider);
   final produits = await repo.getEnVente(
     categorieId: filtres.categorieId,
     recherche: filtres.recherche.isEmpty ? null : filtres.recherche,
   );
   final tries = [...produits];
+  final villeUtilisateur = utilisateur?.ville?.trim().toLowerCase();
+  bool memeVille(Produit p) =>
+      villeUtilisateur != null &&
+      villeUtilisateur.isNotEmpty &&
+      p.localisation.toLowerCase().contains(villeUtilisateur);
+
   switch (filtres.tri) {
     case ShopTri.recent:
-      tries.sort((a, b) => b.dateCreation.compareTo(a.dateCreation));
+      tries.sort((a, b) {
+        if (villeUtilisateur != null) {
+          final prioriteA = memeVille(a) ? 0 : 1;
+          final prioriteB = memeVille(b) ? 0 : 1;
+          if (prioriteA != prioriteB) return prioriteA.compareTo(prioriteB);
+        }
+        return b.dateCreation.compareTo(a.dateCreation);
+      });
     case ShopTri.prixCroissant:
       tries.sort((a, b) => a.prix.compareTo(b.prix));
     case ShopTri.prixDecroissant:

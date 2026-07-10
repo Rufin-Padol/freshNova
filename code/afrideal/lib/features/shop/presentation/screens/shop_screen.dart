@@ -164,50 +164,44 @@ class ShopScreen extends ConsumerWidget {
                   }
                   return SliverPadding(
                     padding: const EdgeInsets.all(AppSpacing.lg),
-                    sliver: SliverGrid(
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: AppSpacing.md,
-                        mainAxisSpacing: AppSpacing.md,
-                        childAspectRatio: 0.56,
-                      ),
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final produit = produits[index];
-                          return ProductCard(
-                            titre: produit.titre,
-                            prix: produit.prix,
-                            photoUrl: produit.photoPrincipale?.url,
-                            estFavori: favoris.contains(produit.id),
-                            onFavoriteTap: () {
-                              if (utilisateur == null) {
-                                demanderConnexion();
-                                return;
-                              }
-                              ref.read(favoritesProvider.notifier).toggle(produit.id);
-                            },
-                            estDansPanier: panier.contains(produit.id),
-                            onCartTap: () async {
-                              if (utilisateur == null) {
-                                demanderConnexion();
-                                return;
-                              }
-                              final ajoute = !panier.contains(produit.id);
-                              await ref.read(cartProvider.notifier).toggle(produit.id);
-                              if (context.mounted) {
-                                AppSnackbar.showSuccess(
-                                  context,
-                                  ajoute ? 'Ajouté au panier' : 'Retiré du panier',
-                                );
-                              }
-                            },
-                            onTap: () => context.push(
-                              AppRoutes.productDetail.replaceFirst(':productId', produit.id),
-                            ),
-                          );
-                        },
-                        childCount: produits.length,
-                      ),
+                    sliver: SliverList.separated(
+                      itemCount: produits.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.md),
+                      itemBuilder: (context, index) {
+                        final produit = produits[index];
+                        return ProductCard(
+                          titre: produit.titre,
+                          prix: produit.prix,
+                          photoUrl: produit.photoPrincipale?.url,
+                          localisation: produit.localisation,
+                          estFavori: favoris.contains(produit.id),
+                          onFavoriteTap: () {
+                            if (utilisateur == null) {
+                              demanderConnexion();
+                              return;
+                            }
+                            ref.read(favoritesProvider.notifier).toggle(produit.id);
+                          },
+                          estDansPanier: panier.contains(produit.id),
+                          onCartTap: () async {
+                            if (utilisateur == null) {
+                              demanderConnexion();
+                              return;
+                            }
+                            final ajoute = !panier.contains(produit.id);
+                            await ref.read(cartProvider.notifier).toggle(produit.id);
+                            if (context.mounted) {
+                              AppSnackbar.showSuccess(
+                                context,
+                                ajoute ? 'Ajouté au panier' : 'Retiré du panier',
+                              );
+                            }
+                          },
+                          onTap: () => context.push(
+                            AppRoutes.productDetail.replaceFirst(':productId', produit.id),
+                          ),
+                        );
+                      },
                     ),
                   );
                 },

@@ -73,21 +73,17 @@ class _FavoritesGrid extends ConsumerWidget {
             icon: Icons.favorite_border_rounded,
           );
         }
-        return GridView.builder(
+        return ListView.separated(
           padding: const EdgeInsets.all(AppSpacing.lg),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: AppSpacing.md,
-            mainAxisSpacing: AppSpacing.md,
-            childAspectRatio: 0.56,
-          ),
           itemCount: produits.length,
+          separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.md),
           itemBuilder: (context, index) {
             final produit = produits[index];
             return ProductCard(
               titre: produit.titre,
               prix: produit.prix,
               photoUrl: produit.photoPrincipale?.url,
+              localisation: produit.localisation,
               estFavori: true,
               onFavoriteTap: () => ref.read(favoritesProvider.notifier).toggle(produit.id),
               estDansPanier: panier.contains(produit.id),

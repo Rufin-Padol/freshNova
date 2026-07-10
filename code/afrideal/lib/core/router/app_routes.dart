@@ -16,6 +16,7 @@ class AppRoutes {
 
   // ── Authentification ──
   static const String login = '/login';
+  static const String register = '/register';
   static const String demoAccounts = '/demo-accounts';
 
   // ── Acheteur ──

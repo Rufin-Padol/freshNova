@@ -130,6 +130,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         : () {
                             final from = GoRouterState.of(context).uri.queryParameters['from'];
                             final chemin = from == null
+                                ? AppRoutes.register
+                                : '${AppRoutes.register}?from=${Uri.encodeComponent(from)}';
+                            context.push(chemin);
+                          },
+                    child: const Text('Pas de compte ? Créer un compte'),
+                  ),
+                ),
+                Center(
+                  child: TextButton(
+                    onPressed: enCours
+                        ? null
+                        : () {
+                            final from = GoRouterState.of(context).uri.queryParameters['from'];
+                            final chemin = from == null
                                 ? AppRoutes.demoAccounts
                                 : '${AppRoutes.demoAccounts}?from=${Uri.encodeComponent(from)}';
                             context.push(chemin);

@@ -9,6 +9,7 @@ import '../../shared/widgets/layout/placeholder_screen.dart';
 import 'app_routes.dart';
 import '../../features/auth/presentation/screens/entry_choice_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
+import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/demo_accounts_screen.dart';
 import '../../features/shop/presentation/screens/shop_screen.dart';
 import '../../features/product_detail/presentation/screens/product_detail_screen.dart';
@@ -87,6 +88,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
       final estSurEcranAuth = chemin == AppRoutes.entryChoice ||
           chemin == AppRoutes.login ||
+          chemin == AppRoutes.register ||
           chemin == AppRoutes.demoAccounts;
 
       // Boutique et fiches produit restent consultables sans compte :
@@ -139,6 +141,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.login,
         builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.register,
+        builder: (context, state) => const RegisterScreen(),
       ),
       GoRoute(
         path: AppRoutes.demoAccounts,

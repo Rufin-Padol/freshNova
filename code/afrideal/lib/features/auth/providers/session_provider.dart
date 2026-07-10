@@ -29,6 +29,17 @@ class SessionNotifier extends AsyncNotifier<SessionState> {
     );
   }
 
+  /// Crée un nouveau compte et connecte immédiatement la session sur
+  /// ce compte (contrairement à creerCompteSansConnexion, réservé au
+  /// Super Admin créant un compte Admin pour quelqu'un d'autre).
+  Future<void> register(Utilisateur utilisateur, String motDePasse) async {
+    state = const AsyncLoading();
+    final authRepo = ref.read(authRepositoryProvider);
+    state = await AsyncValue.guard(
+      () => authRepo.register(utilisateur, motDePasse),
+    );
+  }
+
   /// Connecte directement un compte de démonstration, sans mot de
   /// passe, conformément au choix validé pour le mode local.
   Future<void> loginAsDemo(Utilisateur compteDemo) async {

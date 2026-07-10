@@ -21,11 +21,13 @@ import '../../../messages/providers/message_provider.dart';
 import '../../../shop/providers/product_list_provider.dart';
 
 /// Fiche détaillée d'un produit, accessible depuis la boutique.
-/// Affiche la photo officielle, l'état, et la description — y compris
-/// les défauts connus affichés de façon transparente. Ni la
-/// localisation ni l'identité du vendeur ne sont exposées à
+/// Affiche la photo officielle, l'état, la localisation générale
+/// (ville/quartier — utile pour évaluer la livraison) et la
+/// description, y compris les défauts connus affichés de façon
+/// transparente. L'identité du vendeur, elle, n'est jamais exposée à
 /// l'acheteur : TrustNova est le seul interlocuteur visible, c'est
-/// notre boutique qui vend.
+/// notre boutique qui vend — la localisation ne dit pas qui vend,
+/// seulement où se trouve le produit.
 class ProductDetailScreen extends ConsumerWidget {
   final String productId;
 
@@ -213,10 +215,23 @@ class ProductDetailScreen extends ConsumerWidget {
                         ),
                       ],
                       const SizedBox(height: AppSpacing.xl),
-                      InfoRow(
-                        icon: Icons.checkroom_outlined,
-                        label: 'État',
-                        value: produit.etat.label,
+                      Row(
+                        children: [
+                          Expanded(
+                            child: InfoRow(
+                              icon: Icons.checkroom_outlined,
+                              label: 'État',
+                              value: produit.etat.label,
+                            ),
+                          ),
+                          Expanded(
+                            child: InfoRow(
+                              icon: Icons.location_on_outlined,
+                              label: 'Localisation',
+                              value: produit.localisation,
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: AppSpacing.huge),
                     ],
