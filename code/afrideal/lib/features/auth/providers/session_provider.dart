@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/providers/repository_providers.dart';
 import '../../../domain/entities/utilisateur.dart';
+import '../../cart_checkout/providers/cart_provider.dart';
 
 /// État de la session utilisateur. Volontairement simple (un seul
 /// champ nullable) : null signifie "personne n'est connecté".
@@ -27,6 +28,7 @@ class SessionNotifier extends AsyncNotifier<SessionState> {
     state = await AsyncValue.guard(
       () => authRepo.login(telephone: telephone, motDePasse: motDePasse),
     );
+    await _migrerPanierInvite();
   }
 
   /// Crée un nouveau compte et connecte immédiatement la session sur
@@ -38,6 +40,7 @@ class SessionNotifier extends AsyncNotifier<SessionState> {
     state = await AsyncValue.guard(
       () => authRepo.register(utilisateur, motDePasse),
     );
+    await _migrerPanierInvite();
   }
 
   /// Connecte directement un compte de démonstration, sans mot de
@@ -48,6 +51,17 @@ class SessionNotifier extends AsyncNotifier<SessionState> {
     state = await AsyncValue.guard(
       () => authRepo.loginAsDemoAccount(compteDemo.id),
     );
+    await _migrerPanierInvite();
+  }
+
+  /// Un visiteur peut ajouter des produits au panier sans être
+  /// connecté (seule la commande exige un compte) — au moment où il
+  /// se connecte, on transfère ce panier "invité" vers son compte pour
+  /// qu'il ne perde pas sa sélection.
+  Future<void> _migrerPanierInvite() async {
+    final utilisateur = state.valueOrNull;
+    if (utilisateur == null) return;
+    await ref.read(cartProvider.notifier).migrerVersUtilisateur(utilisateur.id);
   }
 
   Future<void> logout() async {

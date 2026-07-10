@@ -91,12 +91,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           chemin == AppRoutes.register ||
           chemin == AppRoutes.demoAccounts;
 
-      // Boutique et fiches produit restent consultables sans compte :
-      // la connexion n'est demandée qu'au moment d'une action précise
-      // (favori, achat, vente, messages...), jamais pour simplement
-      // regarder les produits.
-      final estCheminPublic =
-          estSurEcranAuth || chemin == AppRoutes.shop || chemin.startsWith('/product/');
+      // Boutique, fiches produit et panier restent consultables sans
+      // compte : on peut ajouter des produits au panier sans être
+      // connecté, la connexion n'est exigée qu'au moment de passer
+      // commande (checkout) ou pour une autre action précise (favori,
+      // vente, messages...).
+      final estCheminPublic = estSurEcranAuth ||
+          chemin == AppRoutes.shop ||
+          chemin.startsWith('/product/') ||
+          chemin == AppRoutes.cart;
 
       if (!estConnecte) {
         if (estCheminPublic) return null;

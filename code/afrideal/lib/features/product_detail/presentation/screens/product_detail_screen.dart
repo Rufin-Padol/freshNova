@@ -82,10 +82,6 @@ class ProductDetailScreen extends ConsumerWidget {
                   if (peutGererFavori)
                     IconButton(
                       onPressed: () async {
-                        if (utilisateur == null) {
-                          _demanderConnexion(context);
-                          return;
-                        }
                         final ajoute = !estDansPanier;
                         await ref.read(cartProvider.notifier).toggle(productId);
                         if (context.mounted) {

@@ -12,6 +12,7 @@ import '../../../../domain/entities/produit.dart';
 import '../../../../shared/widgets/buttons/app_primary_button.dart';
 import '../../../../shared/widgets/feedback/app_loading_indicator.dart';
 import '../../../../shared/widgets/illustrations/empty_image_illustration.dart';
+import '../../../auth/providers/session_provider.dart';
 import '../../providers/cart_provider.dart';
 
 /// Panier de l'acheteur : liste des produits mis de côté avant achat.
@@ -90,6 +91,12 @@ class _CartList extends ConsumerWidget {
                     produit: produit,
                     onRemove: () => ref.read(cartProvider.notifier).remove(produit.id),
                     onOrder: () async {
+                      if (ref.read(currentUserProvider) == null) {
+                        context.push(
+                          '${AppRoutes.demoAccounts}?from=${Uri.encodeComponent(AppRoutes.cart)}',
+                        );
+                        return;
+                      }
                       await ref.read(cartProvider.notifier).remove(produit.id);
                       if (context.mounted) {
                         context.push(AppRoutes.checkout, extra: produit);

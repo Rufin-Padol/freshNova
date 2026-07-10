@@ -184,10 +184,6 @@ class ShopScreen extends ConsumerWidget {
                           },
                           estDansPanier: panier.contains(produit.id),
                           onCartTap: () async {
-                            if (utilisateur == null) {
-                              demanderConnexion();
-                              return;
-                            }
                             final ajoute = !panier.contains(produit.id);
                             await ref.read(cartProvider.notifier).toggle(produit.id);
                             if (context.mounted) {
