@@ -12,6 +12,7 @@ import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/demo_accounts_screen.dart';
 import '../../features/shop/presentation/screens/shop_screen.dart';
+import '../../features/shop/presentation/screens/search_screen.dart';
 import '../../features/product_detail/presentation/screens/product_detail_screen.dart';
 import '../../features/orders/presentation/screens/orders_screen.dart';
 import '../../features/sell/presentation/screens/sell_home_screen.dart';
@@ -99,6 +100,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       // vente, messages...).
       final estCheminPublic = estSurEcranAuth ||
           chemin == AppRoutes.shop ||
+          chemin == AppRoutes.search ||
           chemin.startsWith('/product/') ||
           chemin == AppRoutes.cart;
 
@@ -164,6 +166,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           transitionsBuilder: AppTransitions.fade,
           transitionDuration: const Duration(milliseconds: 200),
         ),
+      ),
+      GoRoute(
+        path: AppRoutes.search,
+        builder: (context, state) => const SearchScreen(),
       ),
       GoRoute(
         path: AppRoutes.productDetail,
@@ -409,6 +415,7 @@ bool _cheminAutorisePourRole(String chemin, UserRole role) {
     // pas l'utilisateur lui-même.
     case UserRole.acheteur:
       return correspond(AppRoutes.shop) ||
+          correspond(AppRoutes.search) ||
           correspond('/product') ||
           correspond(AppRoutes.cart) ||
           correspond(AppRoutes.checkout) ||

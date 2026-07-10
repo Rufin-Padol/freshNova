@@ -21,6 +21,7 @@ class AppRoutes {
 
   // ── Acheteur ──
   static const String shop = '/shop';
+  static const String search = '/search';
   static const String productDetail = '/product/:productId';
   static const String cart = '/cart';
   static const String checkout = '/checkout';

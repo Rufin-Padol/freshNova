@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -105,8 +106,8 @@ class ShopScreen extends ConsumerWidget {
                         children: [
                           Expanded(
                             child: AppSearchField(
-                              onChanged: (texte) =>
-                                  ref.read(shopFiltersProvider.notifier).setRecherche(texte),
+                              readOnly: true,
+                              onTap: () => context.push(AppRoutes.search),
                             ),
                           ),
                           const SizedBox(width: AppSpacing.sm),
@@ -374,19 +375,29 @@ class _PromoBanner extends StatefulWidget {
 class _PromoBannerState extends State<_PromoBanner> {
   static const _slides = [
     (
-      icone: Icons.shield_rounded,
+      illustration: 'assets/illustrations/promo_verified.svg',
       titre: 'Achetez en toute confiance',
       sousTitre: 'Chaque produit est vérifié par un agent TrustNova avant la vente.',
+      detail: 'Avant toute mise en vente, un agent TrustNova se déplace chez le '
+          'propriétaire pour examiner le produit, vérifier son état réel et '
+          'prendre des photos officielles. Aucune annonce n\'est publiée sans '
+          'cette vérification.',
     ),
     (
-      icone: Icons.payments_rounded,
+      illustration: 'assets/illustrations/promo_payment.svg',
       titre: 'Payez à la livraison',
       sousTitre: 'Espèces, Orange Money ou MTN Mobile Money — réglez à la réception.',
+      detail: 'Rien n\'est débité au moment de la commande. Vous payez uniquement '
+          'quand le produit est entre vos mains, en espèces ou par Mobile '
+          'Money (Orange Money, MTN MoMo).',
     ),
     (
-      icone: Icons.map_rounded,
+      illustration: 'assets/illustrations/promo_map.svg',
       titre: 'Partout au Cameroun',
       sousTitre: 'Douala, Yaoundé et au-delà : nous livrons où que vous soyez.',
+      detail: 'Notre réseau d\'agents et de livreurs couvre les grandes villes '
+          'du Cameroun et s\'étend progressivement. Les annonces de votre '
+          'propre ville remontent en priorité dans la boutique.',
     ),
   ];
 
@@ -399,12 +410,34 @@ class _PromoBannerState extends State<_PromoBanner> {
     super.dispose();
   }
 
+  void _ouvrirDetail(BuildContext context, ({String detail, String titre}) slide) {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: AppRadius.xlRadius.topLeft),
+      ),
+      builder: (sheetContext) => Padding(
+        padding: const EdgeInsets.all(AppSpacing.xl),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(slide.titre, style: AppTypography.titleLarge),
+            const SizedBox(height: AppSpacing.sm),
+            Text(slide.detail, style: AppTypography.bodyMedium),
+            const SizedBox(height: AppSpacing.lg),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         SizedBox(
-          height: 128,
+          height: 172,
           child: PageView.builder(
             controller: _controller,
             itemCount: _slides.length,
@@ -412,42 +445,64 @@ class _PromoBannerState extends State<_PromoBanner> {
             itemBuilder: (context, index) {
               final slide = _slides[index];
               return Container(
-                padding: const EdgeInsets.all(AppSpacing.lg),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                 decoration: BoxDecoration(
                   gradient: AppColors.primaryGradient,
                   borderRadius: AppRadius.lgRadius,
                 ),
                 child: Row(
                   children: [
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: AppColors.white.withValues(alpha: 0.18),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(slide.icone, color: AppColors.white, size: 24),
-                    ),
-                    const SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
                             slide.titre,
                             style: AppTypography.titleLarge.copyWith(color: AppColors.white),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 4),
                           Text(
                             slide.sousTitre,
-                            style: AppTypography.bodyMedium.copyWith(
+                            style: AppTypography.bodySmall.copyWith(
                               color: AppColors.white.withValues(alpha: 0.85),
                             ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
+                          const SizedBox(height: AppSpacing.md),
+                          GestureDetector(
+                            onTap: () => _ouvrirDetail(
+                              context,
+                              (titre: slide.titre, detail: slide.detail),
+                            ),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppSpacing.md,
+                                vertical: AppSpacing.sm,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.black,
+                                borderRadius: AppRadius.fullRadius,
+                              ),
+                              child: Text(
+                                'En savoir plus',
+                                style: AppTypography.bodySmall.copyWith(
+                                  color: AppColors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
+                    ),
+                    SizedBox(
+                      height: 130,
+                      width: 104,
+                      child: SvgPicture.asset(slide.illustration, fit: BoxFit.contain),
                     ),
                   ],
                 ),

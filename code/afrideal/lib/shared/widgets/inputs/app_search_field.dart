@@ -10,12 +10,22 @@ class AppSearchField extends StatelessWidget {
   final void Function(String)? onChanged;
   final VoidCallback? onFilterTap;
 
+  /// Quand vrai, le champ n'accepte pas la saisie directement — utile
+  /// pour un champ "déclencheur" qui ouvre un écran de recherche dédié
+  /// au lieu de filtrer sur place (voir [onTap]).
+  final bool readOnly;
+  final VoidCallback? onTap;
+  final bool autofocus;
+
   const AppSearchField({
     super.key,
     this.controller,
     this.hint = 'Rechercher un produit...',
     this.onChanged,
     this.onFilterTap,
+    this.readOnly = false,
+    this.onTap,
+    this.autofocus = false,
   });
 
   @override
@@ -35,6 +45,9 @@ class AppSearchField extends StatelessWidget {
             child: TextField(
               controller: controller,
               onChanged: onChanged,
+              readOnly: readOnly,
+              autofocus: autofocus,
+              onTap: onTap,
               decoration: InputDecoration(
                 hintText: hint,
                 border: InputBorder.none,

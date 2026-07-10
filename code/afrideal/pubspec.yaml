@@ -77,6 +77,12 @@ flutter:
   # DemoDataSeeder au moment du seed, jamais chargées telles quelles
   # par l'UI) — sans elles, le profil de démo affichait des annonces
   # sans aucune photo.
+  #
+  # assets/illustrations/ : illustrations SVG du bandeau promo de la
+  # boutique (licence unDraw, libre de droits), recolorées à la marque
+  # TrustNova et avec des teintes de peau adaptées au contexte
+  # camerounais — remplace les icônes seules utilisées avant.
   assets:
     - assets/icons/payment/
     - assets/seed/
+    - assets/illustrations/
