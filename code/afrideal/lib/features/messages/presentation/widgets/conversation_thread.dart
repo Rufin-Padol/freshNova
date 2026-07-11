@@ -89,14 +89,18 @@ class _ConversationThreadState extends ConsumerState<ConversationThread> {
                       maxWidth: MediaQuery.of(context).size.width * 0.72,
                     ),
                     decoration: BoxDecoration(
-                      color: estMoi ? AppColors.violet : AppColors.surface,
+                      // Fond gris plein (pas juste blanc avec un fin
+                      // contour) pour que les messages de l'AUTRE
+                      // participant restent nettement visibles même
+                      // sur le fond très clair de l'écran — un simple
+                      // contour se distinguait mal à l'œil.
+                      color: estMoi ? AppColors.violet : AppColors.gray100,
                       borderRadius: BorderRadius.only(
                         topLeft: const Radius.circular(AppRadius.md),
                         topRight: const Radius.circular(AppRadius.md),
                         bottomLeft: Radius.circular(estMoi ? AppRadius.md : AppRadius.sm),
                         bottomRight: Radius.circular(estMoi ? AppRadius.sm : AppRadius.md),
                       ),
-                      border: estMoi ? null : Border.all(color: AppColors.gray200),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
@@ -113,7 +117,7 @@ class _ConversationThreadState extends ConsumerState<ConversationThread> {
                           style: AppTypography.caption.copyWith(
                             color: estMoi
                                 ? AppColors.white.withValues(alpha: 0.7)
-                                : AppColors.gray400,
+                                : AppColors.gray500,
                           ),
                         ),
                       ],

@@ -169,7 +169,7 @@ class _Header extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(width: AppSpacing.md),
+            const SizedBox(width: AppSpacing.lg),
             Stack(
               clipBehavior: Clip.none,
               children: [
@@ -204,7 +204,7 @@ class _Header extends StatelessWidget {
                   ),
               ],
             ),
-            const SizedBox(width: AppSpacing.md),
+            const SizedBox(width: AppSpacing.lg),
             AppAvatar(initiales: admin?.initiales ?? '?', size: 44),
           ],
         ),
@@ -288,7 +288,7 @@ class _KpiRow extends StatelessWidget {
             crossAxisCount: colonnes,
             crossAxisSpacing: AppSpacing.lg,
             mainAxisSpacing: AppSpacing.lg,
-            mainAxisExtent: 128,
+            mainAxisExtent: 152,
           ),
           itemBuilder: (context, i) => cartes[i],
         );

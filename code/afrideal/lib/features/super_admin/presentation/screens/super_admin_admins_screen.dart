@@ -4,86 +4,108 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_dimens.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/errors/error_view.dart';
+import '../../../../domain/entities/utilisateur.dart';
 import '../../../../shared/widgets/buttons/app_primary_button.dart';
 import '../../../../shared/widgets/cards/app_avatar.dart';
 import '../../../../shared/widgets/cards/status_badge.dart';
 import '../../../../shared/widgets/feedback/app_loading_indicator.dart';
 import '../../../../shared/widgets/feedback/app_snackbar.dart';
+import '../../../../shared/widgets/inputs/app_search_field.dart';
 import '../../../../shared/widgets/inputs/app_text_field.dart';
 import '../../../admin/providers/admin_provider.dart';
 import '../../providers/super_admin_provider.dart';
 
-class SuperAdminAdminsScreen extends ConsumerWidget {
+class SuperAdminAdminsScreen extends ConsumerStatefulWidget {
   const SuperAdminAdminsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SuperAdminAdminsScreen> createState() => _SuperAdminAdminsScreenState();
+}
+
+class _SuperAdminAdminsScreenState extends ConsumerState<SuperAdminAdminsScreen> {
+  String _requete = '';
+
+  @override
+  Widget build(BuildContext context) {
     final adminsAsync = ref.watch(adminAccountsProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(AppSpacing.xl),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Administrateurs', style: AppTypography.displayMedium),
-                TextButton.icon(
-                  onPressed: () => _ouvrirCreation(context, ref),
-                  icon: const Icon(Icons.add_rounded),
-                  label: const Text('Nouvel admin'),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: adminsAsync.when(
-              loading: () => const AppLoadingIndicator(),
-              error: (_, __) => ErrorView(
-                message: 'Impossible de charger les administrateurs.',
-                onRetry: () => ref.invalidate(adminAccountsProvider),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppSpacing.xl),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Administrateurs', style: AppTypography.displayMedium),
+                  FilledButton.icon(
+                    onPressed: () => _ouvrirCreation(context, ref),
+                    icon: const Icon(Icons.add_rounded, size: 18),
+                    label: const Text('Nouvel admin'),
+                  ),
+                ],
               ),
-              data: (admins) {
-                if (admins.isEmpty) {
-                  return const EmptyView(
-                    message: 'Aucun administrateur',
-                    icon: Icons.admin_panel_settings_outlined,
-                  );
-                }
-                return ListView.separated(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                  itemCount: admins.length,
-                  separatorBuilder: (_, __) => const Divider(height: 1),
-                  itemBuilder: (context, i) {
-                    final a = admins[i];
-                    return ListTile(
-                      contentPadding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-                      leading: AppAvatar(initiales: a.initiales, size: 44),
-                      title: Row(
-                        children: [
-                          Expanded(child: Text(a.nomComplet, style: AppTypography.titleMedium)),
-                          StatusBadge(
-                            label: a.estActif ? 'Actif' : 'Suspendu',
-                            color: a.estActif ? AppColors.success : AppColors.danger,
-                          ),
-                        ],
+              const SizedBox(height: AppSpacing.xl),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(AppSpacing.xl),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: AppRadius.lgRadius,
+                  border: Border.all(color: AppColors.gray200),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AppSearchField(
+                      hint: 'Rechercher un administrateur...',
+                      onChanged: (v) => setState(() => _requete = v),
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    adminsAsync.when(
+                      loading: () => const Padding(
+                        padding: EdgeInsets.all(AppSpacing.xl),
+                        child: Center(child: AppLoadingIndicator()),
                       ),
-                      subtitle: Text(a.telephone, style: AppTypography.bodySmall),
-                      trailing: Switch(
-                        value: a.estActif,
-                        onChanged: (v) =>
-                            ref.read(adminUserNotifierProvider.notifier).toggleActif(a.id, v),
+                      error: (_, __) => ErrorView(
+                        message: 'Impossible de charger les administrateurs.',
+                        onRetry: () => ref.invalidate(adminAccountsProvider),
                       ),
-                    );
-                  },
-                );
-              },
-            ),
+                      data: (admins) {
+                        final req = _requete.trim().toLowerCase();
+                        final filtres = admins
+                            .where((a) => req.isEmpty || a.nomComplet.toLowerCase().contains(req))
+                            .toList();
+
+                        if (filtres.isEmpty) {
+                          return const Padding(
+                            padding: EdgeInsets.symmetric(vertical: AppSpacing.xl),
+                            child: EmptyView(
+                              message: 'Aucun administrateur',
+                              icon: Icons.admin_panel_settings_outlined,
+                            ),
+                          );
+                        }
+
+                        return Column(
+                          children: [
+                            for (final a in filtres) ...[
+                              _AdminTile(admin: a),
+                              if (a != filtres.last) const Divider(height: 1),
+                            ],
+                          ],
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -151,5 +173,43 @@ class SuperAdminAdminsScreen extends ConsumerWidget {
     } catch (e) {
       if (context.mounted) AppSnackbar.showError(context, 'Création impossible : $e');
     }
+  }
+}
+
+class _AdminTile extends ConsumerWidget {
+  final Utilisateur admin;
+  const _AdminTile({required this.admin});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+      child: Row(
+        children: [
+          AppAvatar(initiales: admin.initiales, size: 44),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(admin.nomComplet, style: AppTypography.titleMedium),
+                const SizedBox(height: 2),
+                Text(admin.telephone, style: AppTypography.bodySmall),
+              ],
+            ),
+          ),
+          StatusBadge(
+            label: admin.estActif ? 'Actif' : 'Suspendu',
+            color: admin.estActif ? AppColors.success : AppColors.danger,
+          ),
+          const SizedBox(width: AppSpacing.md),
+          Switch(
+            value: admin.estActif,
+            activeThumbColor: AppColors.violet,
+            onChanged: (v) => ref.read(adminUserNotifierProvider.notifier).toggleActif(admin.id, v),
+          ),
+        ],
+      ),
+    );
   }
 }

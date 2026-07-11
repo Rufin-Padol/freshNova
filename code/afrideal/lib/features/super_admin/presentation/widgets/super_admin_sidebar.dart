@@ -13,10 +13,24 @@ class SuperAdminSidebar extends ConsumerWidget {
   final String currentRoute;
   const SuperAdminSidebar({super.key, required this.currentRoute});
 
-  static const _items = [
+  static const _itemsSuperAdmin = [
     _NavItem(Icons.dashboard_rounded, 'Vue globale', AppRoutes.superAdminDashboard),
     _NavItem(Icons.admin_panel_settings_outlined, 'Administrateurs', AppRoutes.superAdminAdmins),
     _NavItem(Icons.percent_rounded, 'Commissions', AppRoutes.superAdminCommissions),
+  ];
+
+  // Le Super Admin doit pouvoir faire tout ce que fait un Admin — ces
+  // routes sont déjà autorisées pour son rôle par le routeur (voir
+  // _cheminAutorisePourRole), il ne manquait qu'un point d'entrée
+  // dans la navigation pour y accéder.
+  static const _itemsAdmin = [
+    _NavItem(Icons.inventory_2_outlined, 'Catalogue', AppRoutes.adminCatalog),
+    _NavItem(Icons.assignment_outlined, 'Demandes vendeurs', AppRoutes.adminSellerRequests),
+    _NavItem(Icons.chat_bubble_outline_rounded, 'Messages', AppRoutes.adminMessages),
+    _NavItem(Icons.receipt_long_outlined, 'Commandes', AppRoutes.adminOrders),
+    _NavItem(Icons.people_outline_rounded, 'Utilisateurs', AppRoutes.adminUsers),
+    _NavItem(Icons.gavel_rounded, 'Litiges', AppRoutes.adminDisputes),
+    _NavItem(Icons.route_outlined, 'Agents', AppRoutes.adminAgents),
   ];
 
   @override
@@ -45,11 +59,36 @@ class SuperAdminSidebar extends ConsumerWidget {
             ),
             const Divider(color: AppColors.gray800, height: 1),
             const SizedBox(height: AppSpacing.sm),
-            ..._items.map((item) {
-              final selected = currentRoute.startsWith(item.route);
-              return _SidebarTile(item: item, selected: selected);
-            }),
-            const Spacer(),
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: [
+                  ..._itemsSuperAdmin.map((item) {
+                    final selected = currentRoute.startsWith(item.route);
+                    return _SidebarTile(item: item, selected: selected);
+                  }),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.lg,
+                      AppSpacing.lg,
+                      AppSpacing.lg,
+                      AppSpacing.sm,
+                    ),
+                    child: Text(
+                      'ADMINISTRATION',
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.gray500,
+                        letterSpacing: 0.6,
+                      ),
+                    ),
+                  ),
+                  ..._itemsAdmin.map((item) {
+                    final selected = currentRoute.startsWith(item.route);
+                    return _SidebarTile(item: item, selected: selected);
+                  }),
+                ],
+              ),
+            ),
             const Divider(color: AppColors.gray800, height: 1),
             ListTile(
               leading: const Icon(Icons.logout_rounded, color: AppColors.gray400, size: 20),
