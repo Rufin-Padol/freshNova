@@ -15,6 +15,7 @@ import '../../../../shared/widgets/cards/info_row.dart';
 import '../../../../shared/widgets/cards/status_badge.dart';
 import '../../../../shared/widgets/feedback/app_loading_indicator.dart';
 import '../../../../shared/widgets/feedback/app_snackbar.dart';
+import '../../../../shared/widgets/inputs/app_search_field.dart';
 import '../../providers/admin_provider.dart';
 
 Uint8List _decodeDataUrl(String dataUrl) => base64Decode(dataUrl.split(',').last);
@@ -23,79 +24,96 @@ Uint8List _decodeDataUrl(String dataUrl) => base64Decode(dataUrl.split(',').last
 /// central du cycle métier : c'est ici que chaque soumission reçoit un
 /// agent, ce qui crée la mission de collecte et le produit brouillon
 /// correspondant (voir AdminSellerRequestNotifier.assignerAgent).
-class AdminSellerRequestsScreen extends ConsumerWidget {
+class AdminSellerRequestsScreen extends ConsumerStatefulWidget {
   const AdminSellerRequestsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AdminSellerRequestsScreen> createState() => _AdminSellerRequestsScreenState();
+}
+
+class _AdminSellerRequestsScreenState extends ConsumerState<AdminSellerRequestsScreen> {
+  String _requete = '';
+
+  @override
+  Widget build(BuildContext context) {
     final demandesAsync = ref.watch(allSellerRequestsAdminProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(AppSpacing.xl),
-            child: Text('Demandes vendeurs', style: AppTypography.displayMedium),
-          ),
-          Expanded(
-            child: demandesAsync.when(
-              loading: () => const AppLoadingIndicator(),
-              error: (_, __) => ErrorView(
-                message: 'Impossible de charger les demandes.',
-                onRetry: () => ref.invalidate(allSellerRequestsAdminProvider),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppSpacing.xl),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Demandes vendeurs', style: AppTypography.displayMedium),
+              const SizedBox(height: AppSpacing.xl),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(AppSpacing.xl),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: AppRadius.lgRadius,
+                  border: Border.all(color: AppColors.gray200),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AppSearchField(
+                      hint: 'Rechercher une demande...',
+                      onChanged: (v) => setState(() => _requete = v),
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    demandesAsync.when(
+                      loading: () => const Padding(
+                        padding: EdgeInsets.all(AppSpacing.xl),
+                        child: Center(child: AppLoadingIndicator()),
+                      ),
+                      error: (_, __) => ErrorView(
+                        message: 'Impossible de charger les demandes.',
+                        onRetry: () => ref.invalidate(allSellerRequestsAdminProvider),
+                      ),
+                      data: (demandes) {
+                        final req = _requete.trim().toLowerCase();
+                        final filtres = demandes
+                            .where((d) =>
+                                req.isEmpty || d.typeProduitSouhaite.toLowerCase().contains(req))
+                            .toList();
+
+                        if (filtres.isEmpty) {
+                          return const Padding(
+                            padding: EdgeInsets.symmetric(vertical: AppSpacing.xl),
+                            child: EmptyView(
+                              message: 'Aucune demande vendeur',
+                              icon: Icons.inventory_outlined,
+                            ),
+                          );
+                        }
+
+                        return Column(
+                          children: [
+                            for (final d in filtres) ...[
+                              _DemandeTile(demande: d, onTap: () => _ouvrirDetail(context, ref, d)),
+                              if (d != filtres.last) const Divider(height: 1),
+                            ],
+                          ],
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
-              data: (demandes) {
-                if (demandes.isEmpty) {
-                  return const EmptyView(
-                    message: 'Aucune demande vendeur',
-                    icon: Icons.inventory_outlined,
-                  );
-                }
-                return ListView.separated(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                  itemCount: demandes.length,
-                  separatorBuilder: (_, __) => const Divider(height: 1),
-                  itemBuilder: (context, i) {
-                    final d = demandes[i];
-                    final peutAssigner = d.statut == SellerRequestStatus.enAttente ||
-                        d.statut == SellerRequestStatus.validee;
-                    return ListTile(
-                      contentPadding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-                      onTap: () => _ouvrirDetail(context, ref, d),
-                      title: Row(
-                        children: [
-                          Expanded(
-                            child: Text(d.typeProduitSouhaite, style: AppTypography.titleMedium),
-                          ),
-                          StatusBadge(label: d.statut.label, color: d.statut.color),
-                        ],
-                      ),
-                      subtitle: Text(
-                        '${Formatters.currency(d.prixSouhaite)} · ${d.zone} · '
-                        '${Formatters.shortDate(d.dateCreation)}',
-                        style: AppTypography.bodySmall,
-                      ),
-                      trailing: peutAssigner
-                          ? TextButton(
-                              onPressed: () => _ouvrirAssignation(context, ref, d),
-                              child: const Text('Assigner un agent'),
-                            )
-                          : null,
-                    );
-                  },
-                );
-              },
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 
-  Future<void> _ouvrirDetail(BuildContext context, WidgetRef ref, DemandeVendeur d) async {
-    final peutAssigner =
+}
+
+Future<void> _ouvrirDetail(BuildContext context, WidgetRef ref, DemandeVendeur d) async {
+  final peutAssigner =
         d.statut == SellerRequestStatus.enAttente || d.statut == SellerRequestStatus.validee;
 
     await showModalBottomSheet(
@@ -220,8 +238,59 @@ class AdminSellerRequestsScreen extends ConsumerWidget {
         .read(adminSellerRequestNotifierProvider.notifier)
         .assignerAgent(demande, agentChoisi.id);
 
-    if (context.mounted) {
-      AppSnackbar.showSuccess(context, 'Agent assigné. Mission de collecte créée.');
-    }
+  if (context.mounted) {
+    AppSnackbar.showSuccess(context, 'Agent assigné. Mission de collecte créée.');
+  }
+}
+
+class _DemandeTile extends ConsumerWidget {
+  final DemandeVendeur demande;
+  final VoidCallback onTap;
+  const _DemandeTile({required this.demande, required this.onTap});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final peutAssigner = demande.statut == SellerRequestStatus.enAttente ||
+        demande.statut == SellerRequestStatus.validee;
+
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(demande.typeProduitSouhaite, style: AppTypography.titleMedium),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      StatusBadge(label: demande.statut.label, color: demande.statut.color),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '${Formatters.currency(demande.prixSouhaite)} · ${demande.zone} · '
+                    '${Formatters.shortDate(demande.dateCreation)}',
+                    style: AppTypography.bodySmall,
+                  ),
+                ],
+              ),
+            ),
+            if (peutAssigner)
+              TextButton(
+                onPressed: () => _ouvrirAssignation(context, ref, demande),
+                child: const Text('Assigner un agent'),
+              )
+            else
+              const Icon(Icons.chevron_right_rounded, color: AppColors.gray400),
+          ],
+        ),
+      ),
+    );
   }
 }

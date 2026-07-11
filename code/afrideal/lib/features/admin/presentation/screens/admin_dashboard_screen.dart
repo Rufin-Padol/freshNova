@@ -243,35 +243,56 @@ class _KpiRow extends StatelessWidget {
         ?.where((l) => l.statut == DisputeStatus.ouvert || l.statut == DisputeStatus.enExamen)
         .length;
 
-    return Wrap(
-      spacing: AppSpacing.lg,
-      runSpacing: AppSpacing.lg,
-      children: [
-        _KpiCard(
-          titre: 'Produits en vente',
-          valeur: enVente,
-          icon: Icons.storefront_rounded,
-          couleur: AppColors.success,
-        ),
-        _KpiCard(
-          titre: 'Commandes en cours',
-          valeur: commandesEnCours,
-          icon: Icons.local_shipping_outlined,
-          couleur: AppColors.blue,
-        ),
-        _KpiCard(
-          titre: 'Demandes en attente',
-          valeur: demandesEnAttente,
-          icon: Icons.assignment_outlined,
-          couleur: AppColors.gold,
-        ),
-        _KpiCard(
-          titre: 'Litiges ouverts',
-          valeur: litigesOuverts,
-          icon: Icons.gavel_rounded,
-          couleur: AppColors.danger,
-        ),
-      ],
+    final cartes = [
+      _KpiCard(
+        titre: 'Produits en vente',
+        valeur: enVente,
+        icon: Icons.storefront_rounded,
+        couleur: AppColors.success,
+      ),
+      _KpiCard(
+        titre: 'Commandes en cours',
+        valeur: commandesEnCours,
+        icon: Icons.local_shipping_outlined,
+        couleur: AppColors.blue,
+      ),
+      _KpiCard(
+        titre: 'Demandes en attente',
+        valeur: demandesEnAttente,
+        icon: Icons.assignment_outlined,
+        couleur: AppColors.gold,
+      ),
+      _KpiCard(
+        titre: 'Litiges ouverts',
+        valeur: litigesOuverts,
+        icon: Icons.gavel_rounded,
+        couleur: AppColors.danger,
+      ),
+    ];
+
+    // Grille qui occupe toute la largeur disponible plutôt que des
+    // cartes à taille fixe collées à gauche : 4 colonnes sur grand
+    // écran, 2 sur tablette/téléphone, 1 sur les très petits écrans.
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final colonnes = constraints.maxWidth >= 1000
+            ? 4
+            : constraints.maxWidth >= 620
+                ? 2
+                : 1;
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: cartes.length,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: colonnes,
+            crossAxisSpacing: AppSpacing.lg,
+            mainAxisSpacing: AppSpacing.lg,
+            mainAxisExtent: 128,
+          ),
+          itemBuilder: (context, i) => cartes[i],
+        );
+      },
     );
   }
 }
@@ -292,7 +313,7 @@ class _KpiCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 200,
+      width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -301,6 +322,7 @@ class _KpiCard extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
             padding: const EdgeInsets.all(AppSpacing.sm),
@@ -630,32 +652,38 @@ class _DernieresCommandesCard extends StatelessWidget {
                 );
               }
 
-              return SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: DataTable(
-                  headingRowHeight: 40,
-                  dataRowMinHeight: 48,
-                  dataRowMaxHeight: 56,
-                  columns: const [
-                    DataColumn(label: Text('Référence')),
-                    DataColumn(label: Text('Client')),
-                    DataColumn(label: Text('Date')),
-                    DataColumn(label: Text('Montant')),
-                    DataColumn(label: Text('Statut')),
-                  ],
-                  rows: [
-                    for (final c in filtrees)
-                      DataRow(cells: [
-                        DataCell(Text(
-                          c.reference,
-                          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
-                        )),
-                        DataCell(Text(utilisateurParId[c.acheteurId]?.nomComplet ?? '—')),
-                        DataCell(Text(Formatters.shortDate(c.dateCommande))),
-                        DataCell(Text(Formatters.currency(c.montantTotal))),
-                        DataCell(StatusBadge(label: c.statut.label, color: c.statut.color)),
-                      ]),
-                  ],
+              return LayoutBuilder(
+                builder: (context, constraints) => SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                    child: DataTable(
+                      headingRowHeight: 40,
+                      dataRowMinHeight: 48,
+                      dataRowMaxHeight: 56,
+                      columns: const [
+                        DataColumn(label: Text('Référence')),
+                        DataColumn(label: Text('Client')),
+                        DataColumn(label: Text('Date')),
+                        DataColumn(label: Text('Montant')),
+                        DataColumn(label: Text('Statut')),
+                      ],
+                      rows: [
+                        for (final c in filtrees)
+                          DataRow(cells: [
+                            DataCell(Text(
+                              c.reference,
+                              style:
+                                  AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+                            )),
+                            DataCell(Text(utilisateurParId[c.acheteurId]?.nomComplet ?? '—')),
+                            DataCell(Text(Formatters.shortDate(c.dateCommande))),
+                            DataCell(Text(Formatters.currency(c.montantTotal))),
+                            DataCell(StatusBadge(label: c.statut.label, color: c.statut.color)),
+                          ]),
+                      ],
+                    ),
+                  ),
                 ),
               );
             },

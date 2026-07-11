@@ -14,97 +14,135 @@ import '../../../../domain/enums/product_status.dart';
 import '../../../../shared/widgets/cards/status_badge.dart';
 import '../../../../shared/widgets/feedback/app_loading_indicator.dart';
 import '../../../../shared/widgets/feedback/app_snackbar.dart';
+import '../../../../shared/widgets/inputs/app_search_field.dart';
 import '../../../shop/providers/category_provider.dart';
 import '../../providers/admin_provider.dart';
 
 const _uuid = Uuid();
 
-class AdminCatalogScreen extends ConsumerWidget {
+class AdminCatalogScreen extends ConsumerStatefulWidget {
   const AdminCatalogScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AdminCatalogScreen> createState() => _AdminCatalogScreenState();
+}
+
+class _AdminCatalogScreenState extends ConsumerState<AdminCatalogScreen> {
+  String _requete = '';
+
+  @override
+  Widget build(BuildContext context) {
     final produitsAsync = ref.watch(allProductsAdminProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(AppSpacing.xl),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Catalogue produits', style: AppTypography.displayMedium),
-                TextButton.icon(
-                  onPressed: () => _creerProduit(context, ref),
-                  icon: const Icon(Icons.add_rounded),
-                  label: const Text('Créer un produit'),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: produitsAsync.when(
-              loading: () => const AppLoadingIndicator(),
-              error: (_, __) => ErrorView(
-                message: 'Impossible de charger le catalogue.',
-                onRetry: () => ref.invalidate(allProductsAdminProvider),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppSpacing.xl),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Catalogue produits', style: AppTypography.displayMedium),
+                  FilledButton.icon(
+                    onPressed: () => _creerProduit(context, ref),
+                    icon: const Icon(Icons.add_rounded, size: 18),
+                    label: const Text('Créer un produit'),
+                  ),
+                ],
               ),
-              data: (produits) {
-                if (produits.isEmpty) {
-                  return const EmptyView(message: 'Aucun produit', icon: Icons.inventory_2_outlined);
-                }
-                return ListView.separated(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                  itemCount: produits.length,
-                  separatorBuilder: (_, __) => const Divider(height: 1),
-                  itemBuilder: (context, i) {
-                    final p = produits[i];
-                    return ListTile(
-                      contentPadding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-                      title: Row(
-                        children: [
-                          Expanded(child: Text(p.titre, style: AppTypography.titleMedium)),
-                          StatusBadge(label: p.statut.label, color: p.statut.color),
-                        ],
+              const SizedBox(height: AppSpacing.xl),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(AppSpacing.xl),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: AppRadius.lgRadius,
+                  border: Border.all(color: AppColors.gray200),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AppSearchField(
+                      hint: 'Rechercher un produit...',
+                      onChanged: (v) => setState(() => _requete = v),
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    produitsAsync.when(
+                      loading: () => const Padding(
+                        padding: EdgeInsets.all(AppSpacing.xl),
+                        child: Center(child: AppLoadingIndicator()),
                       ),
-                      subtitle: Text(
-                        '${Formatters.currency(p.prix)} · ${p.localisation} · ${Formatters.shortDate(p.dateCreation)}',
-                        style: AppTypography.bodySmall,
+                      error: (_, __) => ErrorView(
+                        message: 'Impossible de charger le catalogue.',
+                        onRetry: () => ref.invalidate(allProductsAdminProvider),
                       ),
-                      trailing: p.statut == ProductStatus.enTraitement
-                          ? TextButton(
-                              onPressed: () => context.push(
-                                AppRoutes.adminProductEdit.replaceFirst(':productId', p.id),
-                                extra: p,
+                      data: (produits) {
+                        final req = _requete.trim().toLowerCase();
+                        final filtres = produits.where((p) {
+                          if (req.isEmpty) return true;
+                          return p.titre.toLowerCase().contains(req) ||
+                              p.localisation.toLowerCase().contains(req);
+                        }).toList();
+
+                        if (filtres.isEmpty) {
+                          return const Padding(
+                            padding: EdgeInsets.symmetric(vertical: AppSpacing.xl),
+                            child: EmptyView(message: 'Aucun produit', icon: Icons.inventory_2_outlined),
+                          );
+                        }
+
+                        return LayoutBuilder(
+                          builder: (context, constraints) => SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                              child: DataTable(
+                                headingRowHeight: 40,
+                                dataRowMinHeight: 52,
+                                dataRowMaxHeight: 60,
+                                columns: const [
+                                  DataColumn(label: Text('Produit')),
+                                  DataColumn(label: Text('Prix')),
+                                  DataColumn(label: Text('Localisation')),
+                                  DataColumn(label: Text('Date')),
+                                  DataColumn(label: Text('Statut')),
+                                  DataColumn(label: Text('Action')),
+                                ],
+                                rows: [
+                                  for (final p in filtres)
+                                    DataRow(cells: [
+                                      DataCell(SizedBox(
+                                        width: 220,
+                                        child: Text(
+                                          p.titre,
+                                          style: AppTypography.bodyMedium
+                                              .copyWith(fontWeight: FontWeight.w600),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      )),
+                                      DataCell(Text(Formatters.currency(p.prix))),
+                                      DataCell(Text(p.localisation)),
+                                      DataCell(Text(Formatters.shortDate(p.dateCreation))),
+                                      DataCell(StatusBadge(label: p.statut.label, color: p.statut.color)),
+                                      DataCell(_ActionCell(produit: p)),
+                                    ]),
+                                ],
                               ),
-                              child: const Text('Rédiger la fiche'),
-                            )
-                          : p.statut == ProductStatus.soumis
-                              ? PopupMenuButton<String>(
-                                  onSelected: (action) async {
-                                    final notifier = ref.read(adminProductNotifierProvider.notifier);
-                                    if (action == 'refuser') {
-                                      await notifier.changerStatut(p.id, ProductStatus.refuse);
-                                      if (context.mounted) {
-                                        AppSnackbar.showInfo(context, 'Produit refusé.');
-                                      }
-                                    }
-                                  },
-                                  itemBuilder: (_) => [
-                                    const PopupMenuItem(value: 'refuser', child: Text('Refuser')),
-                                  ],
-                                )
-                              : null,
-                    );
-                  },
-                );
-              },
-            ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -152,5 +190,40 @@ class AdminCatalogScreen extends ConsumerWidget {
       AppRoutes.adminProductEdit.replaceFirst(':productId', produit.id),
       extra: produit,
     );
+  }
+}
+
+class _ActionCell extends ConsumerWidget {
+  final Produit produit;
+  const _ActionCell({required this.produit});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (produit.statut == ProductStatus.enTraitement) {
+      return TextButton(
+        onPressed: () => context.push(
+          AppRoutes.adminProductEdit.replaceFirst(':productId', produit.id),
+          extra: produit,
+        ),
+        child: const Text('Rédiger la fiche'),
+      );
+    }
+    if (produit.statut == ProductStatus.soumis) {
+      return PopupMenuButton<String>(
+        onSelected: (action) async {
+          final notifier = ref.read(adminProductNotifierProvider.notifier);
+          if (action == 'refuser') {
+            await notifier.changerStatut(produit.id, ProductStatus.refuse);
+            if (context.mounted) {
+              AppSnackbar.showInfo(context, 'Produit refusé.');
+            }
+          }
+        },
+        itemBuilder: (_) => [
+          const PopupMenuItem(value: 'refuser', child: Text('Refuser')),
+        ],
+      );
+    }
+    return const SizedBox.shrink();
   }
 }

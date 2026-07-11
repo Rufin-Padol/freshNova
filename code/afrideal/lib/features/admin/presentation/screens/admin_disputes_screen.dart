@@ -11,69 +11,131 @@ import '../../../../shared/widgets/buttons/app_primary_button.dart';
 import '../../../../shared/widgets/cards/status_badge.dart';
 import '../../../../shared/widgets/feedback/app_loading_indicator.dart';
 import '../../../../shared/widgets/feedback/app_snackbar.dart';
+import '../../../../shared/widgets/inputs/app_search_field.dart';
 import '../../../../shared/widgets/inputs/app_text_field.dart';
 import '../../providers/admin_provider.dart';
 
-class AdminDisputesScreen extends ConsumerWidget {
+class AdminDisputesScreen extends ConsumerStatefulWidget {
   const AdminDisputesScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AdminDisputesScreen> createState() => _AdminDisputesScreenState();
+}
+
+class _AdminDisputesScreenState extends ConsumerState<AdminDisputesScreen> {
+  String _requete = '';
+
+  @override
+  Widget build(BuildContext context) {
     final litigesAsync = ref.watch(allDisputesAdminProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(AppSpacing.xl),
-            child: Text('Litiges', style: AppTypography.displayMedium),
-          ),
-          Expanded(
-            child: litigesAsync.when(
-              loading: () => const AppLoadingIndicator(),
-              error: (_, __) => ErrorView(
-                message: 'Impossible de charger les litiges.',
-                onRetry: () => ref.invalidate(allDisputesAdminProvider),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppSpacing.xl),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Litiges', style: AppTypography.displayMedium),
+              const SizedBox(height: AppSpacing.xl),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(AppSpacing.xl),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: AppRadius.lgRadius,
+                  border: Border.all(color: AppColors.gray200),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AppSearchField(
+                      hint: 'Rechercher un litige...',
+                      onChanged: (v) => setState(() => _requete = v),
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    litigesAsync.when(
+                      loading: () => const Padding(
+                        padding: EdgeInsets.all(AppSpacing.xl),
+                        child: Center(child: AppLoadingIndicator()),
+                      ),
+                      error: (_, __) => ErrorView(
+                        message: 'Impossible de charger les litiges.',
+                        onRetry: () => ref.invalidate(allDisputesAdminProvider),
+                      ),
+                      data: (litiges) {
+                        final req = _requete.trim().toLowerCase();
+                        final filtres = litiges
+                            .where((l) => req.isEmpty || l.motif.toLowerCase().contains(req))
+                            .toList();
+
+                        if (filtres.isEmpty) {
+                          return const Padding(
+                            padding: EdgeInsets.symmetric(vertical: AppSpacing.xl),
+                            child: EmptyView(message: 'Aucun litige', icon: Icons.gavel_outlined),
+                          );
+                        }
+
+                        return Column(
+                          children: [
+                            for (final l in filtres) ...[
+                              _DisputeTile(litige: l),
+                              if (l != filtres.last) const Divider(height: 1),
+                            ],
+                          ],
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
-              data: (litiges) {
-                if (litiges.isEmpty) {
-                  return const EmptyView(message: 'Aucun litige', icon: Icons.gavel_outlined);
-                }
-                return ListView.separated(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                  itemCount: litiges.length,
-                  separatorBuilder: (_, __) => const Divider(height: 1),
-                  itemBuilder: (context, i) {
-                    final l = litiges[i];
-                    final peutTraiter =
-                        l.statut == DisputeStatus.ouvert || l.statut == DisputeStatus.enExamen;
-                    return ListTile(
-                      contentPadding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-                      title: Row(
-                        children: [
-                          Expanded(child: Text(l.motif, style: AppTypography.titleMedium)),
-                          StatusBadge(label: l.statut.label, color: l.statut.color),
-                        ],
-                      ),
-                      subtitle: Text(
-                        'Commande #${l.commandeId} · ${Formatters.shortDate(l.dateOuverture)}'
-                        '${l.decision != null ? ' · ${l.decision}' : ''}',
-                        style: AppTypography.bodySmall,
-                      ),
-                      trailing: peutTraiter
-                          ? TextButton(
-                              onPressed: () => _ouvrirDecision(context, ref, l),
-                              child: const Text('Traiter'),
-                            )
-                          : null,
-                    );
-                  },
-                );
-              },
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DisputeTile extends ConsumerWidget {
+  final Litige litige;
+  const _DisputeTile({required this.litige});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final peutTraiter =
+        litige.statut == DisputeStatus.ouvert || litige.statut == DisputeStatus.enExamen;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Flexible(child: Text(litige.motif, style: AppTypography.titleMedium)),
+                    const SizedBox(width: AppSpacing.sm),
+                    StatusBadge(label: litige.statut.label, color: litige.statut.color),
+                  ],
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Commande #${litige.commandeId} · ${Formatters.shortDate(litige.dateOuverture)}'
+                  '${litige.decision != null ? ' · ${litige.decision}' : ''}',
+                  style: AppTypography.bodySmall,
+                ),
+              ],
             ),
           ),
+          if (peutTraiter)
+            TextButton(
+              onPressed: () => _ouvrirDecision(context, ref, litige),
+              child: const Text('Traiter'),
+            ),
         ],
       ),
     );
